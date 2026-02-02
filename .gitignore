@@ -1,0 +1,43 @@
+# Pete Dye Story - .gitignore
+
+# System files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Python (for video-processing)
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+ENV/
+
+# Video processing artifacts
+video-processing/segments/
+video-processing/output/
+video-processing/*_frames/
+video-processing/frames/
+video-processing/media/*.mp4
+video-processing/media/*.mov
+video-processing/media/**/*.mp4
+video-processing/media/**/*.mov
+
+# Audio files
+*.mp3
+*.wav
+
+# Temporary files
+*.tmp
+*.temp

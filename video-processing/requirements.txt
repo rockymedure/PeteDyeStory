@@ -1,0 +1,14 @@
+# Pete Dye Story - Video Processing Dependencies
+# Install with: pip install -r requirements.txt
+
+# Core video processing
+opencv-python>=4.8.0
+
+# OpenAI API for audio transcription
+openai>=1.0.0
+
+# HTTP requests for Grok API
+requests>=2.31.0
+
+# System requirement (install separately):
+# brew install ffmpeg

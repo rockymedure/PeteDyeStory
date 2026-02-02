@@ -1,0 +1,64 @@
+# Video Processing - .gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# Generated content
+segments/
+output/
+*_frames/
+frames/
+temp_audio.*
+*.mp3
+*.wav
+
+# Media files - large video files
+media/*.mp4
+media/*.mov
+media/*.avi
+media/*.mkv
+media/*.wmv
+media/**/*.mp4
+media/**/*.mov
+
+# Output files
+*_transcript.txt
+*_analysis.txt
+*_analysis.json
+*_analysis.md
+director_analysis.*
+multimodal_transcript.txt
+fast_multimodal_transcript.txt
+
+# System files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.temp
+test_*segment*.mp4
+random_test_segment.mp4
+
+# Keep the media folder structure
+!media/.gitkeep
+!test/.gitkeep
