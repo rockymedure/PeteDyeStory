@@ -1,0 +1,63 @@
+# Pete Dye Video Processing Queue
+# Ordered by documentary priority
+# Lines starting with # are comments
+
+# ============================================
+# TIER 1: INTERVIEWS & KEY FOOTAGE (Process First)
+# ============================================
+
+Interview With Pete Dye 7-10-94.mp4
+The Pete Dye Golf Course Narrated by Harris Holt.mp4
+Papa Jim Interview Eastpointe Shopping Cneter Blast.mp4
+Pete Dye Golf Course Highlights And Interviews (2)-002.mp4
+
+# ============================================
+# TIER 2: CONSTRUCTION FOOTAGE (Chronological)
+# ============================================
+
+Some Highlites of the Pete Dye - LaRosa Golf Course Aug. 1982-1988 (2)-009.mp4
+Pete Dye Golf Course Construction July 17-1985.mp4
+Aug 1985 PDGC Construction Cleaning out Simpson Creek.mp4
+Pete Dye Golf Course Construction 6-18-1987 thru 10-6-1987.mp4
+Pete Dye Golf Club Spring 1989.mp4
+Highlites of the Pete Dye - LaRosa Flof Course 10-89 thru 10-90 James D_s cats and Dogs.mp4
+Pete Dye Golf Course 10-9-90 thru 11-3-90.mp4
+Pete Dye Golf Course 10-16-90 thru 6-14-91.mp4
+Pete Dye Golf Club 4-27-91 thru 10-10-91 Holes 1 thru 9.mp4
+Pete Dye Golf Club 9-9-1992.mp4
+Pete Dye Golf Club 9-5-92 thru 7-1-93-008.mp4
+PDGC Construction 8-31-93 thru 7-7-94-012.mp4
+
+# ============================================
+# TIER 3: OPENING EVENTS
+# ============================================
+
+PDGC Opening 7-3-1993.mp4
+PDGC Grand Opening.mp4
+PDGC 1994 Opening of the back nine Bember-Guest.mp4
+
+# ============================================
+# TIER 4: EVENTS & RECOGNITION
+# ============================================
+
+12-15-89 - LaRosa Annual Christmas Party.mp4
+9-1-90 Friends of James D._s Dinner at Nona Maria_s Pool at Jimmy Joe_s House.mp4
+PDGC Member-Guest Dinner & Dnace at Green Acres 8-21-1993.mp4
+Harrison Co. Chamber of Commerce Citizen of the Year Award 1995 Presented to James D. LaRosa-006.mp4
+Joe Dimaggio Special Guest At the PDBC.mp4
+
+# ============================================
+# TIER 5: LATER ERA & TOURNAMENTS
+# ============================================
+
+PDGC CBS Promo 10-19-98.mp4
+Disc I  Pete Dye WV Classic July 15&16 2004-020.mp4
+Disc III Pete Dye WV Classic July 15&16 2004.mp4
+Pete Dye WV Classic Nationwide Tour July 15-16 2004-019.mp4
+
+# ============================================
+# TIER 6: SUPPLEMENTARY
+# ============================================
+
+Joung JJL Coal Mining Footage No Sound.mp4
+Pete Dye Golf Club.mp4

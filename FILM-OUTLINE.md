@@ -46,6 +46,12 @@ But this isn't just a golf story. It's a story about **West Virginia**—its coa
 
 **Tone:** Aspirational, nostalgic, underdog setup
 
+**Source Videos:**
+- `Joung JJL Coal Mining Footage No Sound` - Historic mining footage for heritage section
+- `The Pete Dye Golf Course Narrated by Harris Holt` - Professional narration, course overview
+- `Interview With Pete Dye 7-10-94` - Pete discussing design philosophy
+- `Some Highlites Aug 1982-1988` - Early site footage
+
 ---
 
 ### ACT II: THE STRUGGLE (10-15 min)
@@ -59,6 +65,17 @@ But this isn't just a golf story. It's a story about **West Virginia**—its coa
 
 **Tone:** Gritty, determined, moments of humor and camaraderie
 
+**Source Videos:**
+- `Aug 1985 PDGC Construction Cleaning out Simpson Creek` - Early heavy construction
+- `Pete Dye Golf Course Construction 6-18-1987 thru 10-6-1987` - Mid-period work
+- `Pete Dye Golf Club Spring 1989` - Progress footage
+- `Highlites 10-89 thru 10-90` - Year of construction highlights
+- `Pete Dye Golf Course 10-16-90 thru 6-14-91` - Continued construction
+- `PDGC Construction 8-31-93 thru 7-7-94` - Final push
+- `Papa Jim Interview` - James D. stories, personal perspective
+- `12-15-89 LaRosa Annual Christmas Party` - Team/family bonding
+- `Joe Dimaggio Special Guest At the PDBC` - Celebrity connection
+
 ---
 
 ### ACT III: THE ARRIVAL (10-15 min)
@@ -71,6 +88,15 @@ But this isn't just a golf story. It's a story about **West Virginia**—its coa
 - What it means to West Virginia and to the next generation
 
 **Tone:** Triumphant, emotional, reflective
+
+**Source Videos:**
+- `PDGC Opening 7-3-1993` - Front nine opening, July 4, 1993
+- `PDGC Grand Opening` - Full grand opening ceremony (KEY FOOTAGE)
+- `PDGC 1994 Opening of the back nine Bember-Guest` - Back nine completion
+- `Harrison Co. Citizen of the Year Award 1995` - James D. recognition
+- `PDGC CBS Promo 10-19-98` - National media coverage
+- `Disc I & III Pete Dye WV Classic 2004` - PGA Nationwide Tour event
+- `Pete Dye WV Classic Nationwide Tour` - Tournament legacy
 
 ---
 
@@ -122,9 +148,26 @@ These should weave throughout the film:
 ## AVAILABLE ASSETS
 
 ### From the LaRosa Family Archives
-- **Photos:** Coal era, construction phases (1978-1995), Pete Dye snd crew on site, Grand Opening celebrations, family history
+- **Photos:** Coal era, construction phases (1978-1995), Pete Dye and crew on site, Grand Opening celebrations, family history
 - **Video:** Louie and Nancy Ellis filmed the project for 20 years; construction, interviews (including with Pete), Grand Opening footage; Pete and James D. storytelling together.
 - **Artifacts:** Pete's original routing sketch on an air-sickness bag; the bell on #12.
+
+### Processed Video Library (31 videos, 180+ clips)
+
+See **VIDEO-ASSETS.md** for complete inventory. Key videos by story section:
+
+| Story Section | Primary Videos | Clips Ready |
+|--------------|----------------|-------------|
+| **Heritage/Coal** | Coal Mining Footage (no sound), Aug 1982-1988 Highlights | 15 |
+| **Pete Dye Intro** | Harris Holt Narration, Pete Dye Interview 7-10-94 | 20 |
+| **Construction** | 10+ videos spanning 1985-1994 | 50+ |
+| **Relationships** | Papa Jim Interview, Christmas Party 1989, Joe DiMaggio visit | 25 |
+| **Grand Opening** | PDGC Grand Opening, Opening 7-3-1993, Back Nine Opening | 20 |
+| **Legacy** | WV Classic 2004, CBS Promo 1998, Citizen of Year 1995 | 25 |
+
+**Location:** `video-processing/output/[Video_Name]/`
+- `analysis/` - AI-generated summaries, full transcripts
+- `clips/` - Pre-extracted highlight clips (10 per video)
 
 ### From the Director's Shoot
 - Drone footage of the course
