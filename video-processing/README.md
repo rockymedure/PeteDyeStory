@@ -6,12 +6,14 @@ Multimodal video analysis system for processing Pete Dye Golf Club construction 
 
 This system transforms raw video footage into structured, searchable content:
 - **Complete audio transcription** (word-level accuracy with OpenAI)
-- **Visual scene analysis** (frame-by-frame with Grok-4 Vision)
+- **Visual scene analysis** (frame-by-frame with GPT-4o Vision)
 - **Character identification** (who appears and when)
 - **Chapter breakdown** (natural story progression with timestamps)
 - **Highlights extraction** (memorable moments)
 
-**Performance**: Processes an 85-minute video in ~5-6 minutes (15x faster than realtime)
+**Performance**: Processes video ~10-15x faster than realtime
+
+**Simplified Setup**: Only requires an OpenAI API key (no Grok/xAI needed)
 
 ## Quick Start
 
@@ -32,11 +34,12 @@ pip install -r requirements.txt
 brew install ffmpeg
 ```
 
-### 2. Set API Keys
+### 2. Set API Key
+
+Your OpenAI API key is already in the `.env` file. Or set as environment variable:
 
 ```bash
 export OPENAI_API_KEY="your-openai-key"
-export GROK_API_KEY="your-xai-key"  # From x.ai
 ```
 
 ### 3. Run Analysis
@@ -104,7 +107,7 @@ Phase 4: SYNTHESIS
 
 - **OpenAI GPT-4o-transcribe**: High-quality audio transcription
 - **OpenAI Whisper-1**: Word-level timestamps
-- **Grok-4 Vision**: Visual scene understanding
+- **OpenAI GPT-4o Vision**: Visual scene understanding
 - **AsyncIO**: Parallel segment processing
 - **FFmpeg**: Video/audio extraction
 
@@ -134,8 +137,8 @@ video-processing/
 
 ### API Costs
 
-- **OpenAI**: ~$0.10-0.20 per hour of audio
-- **Grok (xAI)**: ~$0.50-1.00 per hour of video (varies by frame count)
+- **OpenAI Audio**: ~$0.10-0.20 per hour of audio
+- **OpenAI Vision**: ~$0.50-1.00 per hour of video (varies by frame count)
 
 ### Troubleshooting
 
@@ -146,9 +149,10 @@ brew install ffmpeg
 
 **API key errors:**
 ```bash
-# Check keys are set
+# Check key is set
 echo $OPENAI_API_KEY
-echo $GROK_API_KEY
+# Or check .env file exists
+cat .env
 ```
 
 **Video format issues:**

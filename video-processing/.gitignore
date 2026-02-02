@@ -1,5 +1,10 @@
 # Video Processing - .gitignore
 
+# Environment files with secrets
+.env
+.env.local
+.env.*
+
 # Python
 __pycache__/
 *.py[cod]

@@ -1,15 +1,14 @@
 """
 Fast Multimodal Video Transcriber
 Optimized processing engine for video analysis with parallel execution.
+Uses OpenAI for both audio transcription AND visual analysis.
 
 Part of the Pete Dye Story video processing system.
-Original: Louie project (September 2024)
 """
 
 import cv2
 import base64
 import json
-import requests
 from datetime import timedelta
 import os
 import subprocess
@@ -20,15 +19,14 @@ import time
 
 class FastMultimodalVideoTranscriber:
     """
-    Optimized video transcriber that combines:
-    - OpenAI GPT-4o for audio transcription
-    - Grok-4 Vision for visual analysis
+    Optimized video transcriber that uses OpenAI for everything:
+    - GPT-4o-transcribe for audio transcription
+    - GPT-4o (vision) for visual analysis
     - Parallel processing for speed
     """
 
-    def __init__(self, openai_api_key, grok_api_key):
+    def __init__(self, openai_api_key):
         self.openai_client = OpenAI(api_key=openai_api_key)
-        self.grok_api_key = grok_api_key
 
     def extract_audio_from_video(self, video_path, output_audio="temp_audio.mp3", save_persistent=False):
         """Extract audio from video file using ffmpeg"""
@@ -178,16 +176,17 @@ class FastMultimodalVideoTranscriber:
 
         return synchronized_data
 
-    def send_batch_to_grok(self, batch_data, batch_num, high_quality_transcript):
-        """Send a batch of frames to Grok 4 for analysis"""
-        print(f"Processing batch {batch_num} ({len(batch_data)} frames)...")
+    def send_batch_to_openai_vision(self, batch_data, batch_num, high_quality_transcript):
+        """Send a batch of frames to OpenAI GPT-4o Vision for analysis"""
+        print(f"Processing batch {batch_num} ({len(batch_data)} frames) with GPT-4o Vision...")
 
+        # Build the message content with text and images
         content = [{
             "type": "text",
             "text": f"""Analyze this video segment with synchronized audio transcription.
 
 FULL AUDIO TRANSCRIPT (High Quality):
-{high_quality_transcript}
+{high_quality_transcript[:3000]}
 
 FRAME-BY-FRAME ANALYSIS FOR BATCH {batch_num}:
 Below are video frames from this segment, each paired with actual spoken words during that time.
@@ -207,68 +206,49 @@ Format: [HH:MM:SS] **VISUAL**: [scene] | **AUDIO**: "[words]" | **CONTEXT**: [an
 
             content.append({
                 "type": "text",
-                "text": f"""\n=== FRAME AT {data['timestamp']} ===
-{speech_indicator}
-AUDIO TEXT: "{data['audio_text']}"
-SAVED AS: {data['filename']}"""
+                "text": f"\n=== FRAME AT {data['timestamp']} ===\n{speech_indicator}\nAUDIO TEXT: \"{data['audio_text']}\""
             })
 
             content.append({
                 "type": "image_url",
                 "image_url": {
-                    "url": f"data:image/jpeg;base64,{data['frame_data']}"
+                    "url": f"data:image/jpeg;base64,{data['frame_data']}",
+                    "detail": "low"  # Use low detail for faster processing
                 }
             })
 
-        payload = {
-            "messages": [{"role": "user", "content": content}],
-            "model": "grok-4-latest",
-            "stream": False,
-            "temperature": 0.1
-        }
+        try:
+            response = self.openai_client.chat.completions.create(
+                model="gpt-4o",
+                messages=[{"role": "user", "content": content}],
+                max_tokens=4000,
+                temperature=0.1
+            )
 
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {self.grok_api_key}"
-        }
-
-        response = requests.post("https://api.x.ai/v1/chat/completions",
-                               headers=headers,
-                               json=payload)
-
-        if response.status_code == 200:
-            result = response.json()
             return {
                 'batch_num': batch_num,
-                'content': result['choices'][0]['message']['content']
+                'content': response.choices[0].message.content
             }
-        else:
-            print(f"Error in batch {batch_num}: {response.status_code} - {response.text}")
+        except Exception as e:
+            print(f"Error in batch {batch_num}: {e}")
             return None
 
-    def send_multimodal_analysis_to_grok_batched(self, synchronized_data, high_quality_transcript):
-        """OPTIMIZATION: Send frames in batches for parallel processing"""
-        print("Preparing batched multimodal analysis...")
+    def send_multimodal_analysis_batched(self, synchronized_data, high_quality_transcript):
+        """Send frames in batches for parallel processing using OpenAI Vision"""
+        print("Preparing batched multimodal analysis with GPT-4o Vision...")
 
-        # Split into batches of 30 frames each
-        batch_size = 30
+        # Split into batches of 20 frames each (smaller batches for OpenAI)
+        batch_size = 20
         batches = [synchronized_data[i:i+batch_size] for i in range(0, len(synchronized_data), batch_size)]
 
-        print(f"Processing {len(batches)} batches in parallel...")
+        print(f"Processing {len(batches)} batches...")
 
-        # Process batches in parallel
+        # Process batches (can be parallelized but being careful with rate limits)
         batch_results = []
-        with ThreadPoolExecutor(max_workers=3) as executor:
-            futures = []
-            for i, batch in enumerate(batches):
-                future = executor.submit(self.send_batch_to_grok, batch, i+1, high_quality_transcript)
-                futures.append(future)
-
-            # Collect results as they complete
-            for future in futures:
-                result = future.result()
-                if result:
-                    batch_results.append(result)
+        for i, batch in enumerate(batches):
+            result = self.send_batch_to_openai_vision(batch, i+1, high_quality_transcript)
+            if result:
+                batch_results.append(result)
 
         # Combine batch results
         combined_analysis = "\n\n".join([
@@ -283,7 +263,7 @@ SAVED AS: {data['filename']}"""
         print(f"Fast processing video: {video_path}")
         start_time = time.time()
 
-        # OPTIMIZATION 1: Parallel audio and video extraction
+        # Parallel audio and video extraction
         print("Starting parallel audio and video extraction...")
 
         with ThreadPoolExecutor(max_workers=2) as executor:
@@ -309,9 +289,9 @@ SAVED AS: {data['filename']}"""
         # Synchronization
         synchronized_data = self.sync_audio_video_data(frames_data, audio_transcript)
 
-        # OPTIMIZATION: Batched analysis
+        # Batched visual analysis with OpenAI
         analysis_start = time.time()
-        multimodal_analysis = self.send_multimodal_analysis_to_grok_batched(
+        multimodal_analysis = self.send_multimodal_analysis_batched(
             synchronized_data,
             audio_transcript['high_quality_transcript']
         )
@@ -374,7 +354,7 @@ SAVED AS: {data['filename']}"""
         high_quality_text = full_transcript.get('high_quality_transcript', '') if full_transcript else ''
 
         # Process frames in batches
-        batch_size = 30
+        batch_size = 20
         all_analyses = []
 
         for i in range(0, len(frames_data), batch_size):
@@ -388,15 +368,13 @@ SAVED AS: {data['filename']}"""
         return '\n\n'.join(all_analyses) if all_analyses else "No visual analysis available"
 
     def process_frames_batch_with_transcript(self, batch_data, batch_num, full_transcript_text):
-        """Process a batch of frames with full transcript context"""
-        messages = [{
-            "role": "user",
-            "content": [{
-                "type": "text",
-                "text": f"""Analyze this video segment with complete audio transcript context.
+        """Process a batch of frames with full transcript context using OpenAI Vision"""
+        content = [{
+            "type": "text",
+            "text": f"""Analyze this video segment with complete audio transcript context.
 
 COMPLETE AUDIO TRANSCRIPT:
-{full_transcript_text[:1500]}...
+{full_transcript_text[:2000]}...
 
 VISUAL ANALYSIS FOR BATCH {batch_num}:
 Analyze the frames below in context of the complete audio transcript.
@@ -409,43 +387,31 @@ For each frame, create entries with:
 5. **Narrative Flow**: How this fits the overall story
 
 Format: [HH:MM:SS] **VISUAL**: [scene] | **AUDIO**: "[words]" | **CONTEXT**: [analysis]"""
-            }]
         }]
 
         # Add frame data
         for data in batch_data:
-            messages[0]["content"].append({
+            content.append({
                 "type": "image_url",
-                "image_url": {"url": f"data:image/jpeg;base64,{data['frame_data']}"}
+                "image_url": {
+                    "url": f"data:image/jpeg;base64,{data['frame_data']}",
+                    "detail": "low"
+                }
             })
-            messages[0]["content"].append({
+            content.append({
                 "type": "text",
                 "text": f"Frame at {data['timestamp']} ({data['seconds']:.1f}s)"
             })
 
-        # Call Grok API
         try:
-            response = requests.post(
-                "https://api.x.ai/v1/chat/completions",
-                headers={
-                    "Authorization": f"Bearer {self.grok_api_key}",
-                    "Content-Type": "application/json"
-                },
-                json={
-                    "messages": messages,
-                    "model": "grok-4-latest",
-                    "temperature": 0.1,
-                    "max_tokens": 4000
-                },
-                timeout=120
+            response = self.openai_client.chat.completions.create(
+                model="gpt-4o",
+                messages=[{"role": "user", "content": content}],
+                max_tokens=4000,
+                temperature=0.1
             )
 
-            if response.status_code == 200:
-                return response.json()['choices'][0]['message']['content']
-            else:
-                print(f"Error in batch {batch_num}: {response.status_code} - {response.text}")
-                return None
-
+            return response.choices[0].message.content
         except Exception as e:
             print(f"Exception in batch {batch_num}: {e}")
             return None
@@ -454,13 +420,12 @@ Format: [HH:MM:SS] **VISUAL**: [scene] | **AUDIO**: "[words]" | **CONTEXT**: [an
 def main():
     """Test the fast multimodal transcriber"""
     openai_api_key = os.environ.get('OPENAI_API_KEY')
-    grok_api_key = os.environ.get('GROK_API_KEY')
 
-    if not openai_api_key or not grok_api_key:
-        print("Error: Please set OPENAI_API_KEY and GROK_API_KEY environment variables")
+    if not openai_api_key:
+        print("Error: Please set OPENAI_API_KEY environment variable")
         return
 
-    transcriber = FastMultimodalVideoTranscriber(openai_api_key, grok_api_key)
+    transcriber = FastMultimodalVideoTranscriber(openai_api_key)
 
     # Test with a video file
     video_path = "../test/test_video.mp4"

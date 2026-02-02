@@ -1,9 +1,9 @@
 """
 Simple Director - Video Analysis Orchestrator
 Main orchestrator system using Agent-as-Tool pattern for parallel video processing.
+Uses OpenAI for all AI operations (audio + vision + synthesis).
 
 Part of the Pete Dye Story video processing system.
-Original: Louie project (September 2024)
 """
 
 import asyncio
@@ -11,12 +11,11 @@ import subprocess
 import os
 import json
 import time
-import requests
 import re
 from datetime import timedelta
 from dataclasses import dataclass
 from typing import List
-import sys
+from openai import OpenAI
 
 # Import sub-agent from same directory
 from fast_multimodal_transcript import FastMultimodalVideoTranscriber
@@ -39,12 +38,14 @@ class SimpleDirector:
     1. Extract and transcribe FULL audio first
     2. Create video segments for visual analysis
     3. Process segments with visual analysis + sync to full transcript
-    4. Send everything to Grok for synthesis
+    4. Send everything to GPT-4o for synthesis
+    
+    Uses OpenAI for everything - only one API key needed.
     """
 
-    def __init__(self, openai_api_key: str, grok_api_key: str, base_dir: str = None):
+    def __init__(self, openai_api_key: str, base_dir: str = None):
         self.openai_api_key = openai_api_key
-        self.grok_api_key = grok_api_key
+        self.openai_client = OpenAI(api_key=openai_api_key)
         
         # Set base directory (defaults to video-processing folder)
         if base_dir:
@@ -60,8 +61,8 @@ class SimpleDirector:
             if not os.path.exists(directory):
                 os.makedirs(directory)
 
-        # Initialize sub-agent
-        self.sub_agent = FastMultimodalVideoTranscriber(openai_api_key, grok_api_key)
+        # Initialize sub-agent (now only needs OpenAI key)
+        self.sub_agent = FastMultimodalVideoTranscriber(openai_api_key)
 
     def setup_video_folders(self, video_path: str) -> tuple:
         """Create organized folder structure for a specific video"""
@@ -138,7 +139,7 @@ class SimpleDirector:
         return result.returncode == 0
 
     async def process_segment_async(self, segment: VideoSegment):
-        """Process one segment with our proven sub-agent (LEGACY - keeping for compatibility)"""
+        """Process one segment with our proven sub-agent"""
         print(f"🔄 Processing segment {segment.segment_id}: {segment.timestamp_range}")
 
         # Use asyncio executor for true parallel processing
@@ -209,16 +210,16 @@ class SimpleDirector:
             end_char = int(end_time * chars_per_second)
             return high_quality[start_char:end_char]
 
-    def grok_synthesis(self, segment_results: List[dict], full_transcript: dict = None) -> dict:
-        """Send all segment results to Grok for final synthesis"""
-        print("🎯 GROK SYNTHESIS - Combining all segments...")
+    def openai_synthesis(self, segment_results: List[dict], full_transcript: dict = None) -> dict:
+        """Send all segment results to GPT-4o for final synthesis"""
+        print("🎯 GPT-4o SYNTHESIS - Combining all segments...")
 
-        # Prepare combined content for Grok
+        # Prepare combined content
         combined_content = "COMPLETE VIDEO ANALYSIS:\n\n"
 
         # Include full transcript at the top for context
         if full_transcript:
-            combined_content += f"COMPLETE AUDIO TRANSCRIPT:\n{full_transcript.get('high_quality_transcript', '')[:2000]}...\n\n"
+            combined_content += f"COMPLETE AUDIO TRANSCRIPT:\n{full_transcript.get('high_quality_transcript', '')[:3000]}...\n\n"
 
         combined_content += "SEGMENT-BY-SEGMENT ANALYSIS:\n\n"
 
@@ -227,7 +228,7 @@ class SimpleDirector:
             combined_content += f"AUDIO EXCERPT:\n{result.get('audio_transcript_excerpt', result.get('audio_transcript', ''))[:800]}...\n\n"
             combined_content += f"VISUAL ANALYSIS:\n{result['multimodal_analysis'][:2000]}...\n\n"
 
-        # Ask Grok to synthesize everything
+        # Ask GPT-4o to synthesize everything
         prompt = f"""
 {combined_content}
 
@@ -245,23 +246,15 @@ Be completely accurate to the content. Extract the real story, don't invent anyt
 This is Pete Dye Golf Club construction footage - look for Pete Dye, construction workers, equipment, and the golf course building process.
 """
 
-        payload = {
-            "messages": [{"role": "user", "content": prompt}],
-            "model": "grok-4-latest",
-            "stream": False,
-            "temperature": 0.1
-        }
+        try:
+            response = self.openai_client.chat.completions.create(
+                model="gpt-4o",
+                messages=[{"role": "user", "content": prompt}],
+                max_tokens=4000,
+                temperature=0.1
+            )
 
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {self.grok_api_key}"
-        }
-
-        response = requests.post("https://api.x.ai/v1/chat/completions", headers=headers, json=payload)
-
-        if response.status_code == 200:
-            result = response.json()
-            synthesis_text = result['choices'][0]['message']['content']
+            synthesis_text = response.choices[0].message.content
 
             return {
                 'video_analysis': {
@@ -271,8 +264,8 @@ This is Pete Dye Golf Club construction footage - look for Pete Dye, constructio
                 },
                 'raw_segments': segment_results
             }
-        else:
-            print(f"❌ Grok synthesis failed: {response.status_code}")
+        except Exception as e:
+            print(f"❌ GPT-4o synthesis failed: {e}")
             return None
 
     async def analyze_video(self, video_path: str, segment_duration: int = 150) -> dict:
@@ -281,9 +274,11 @@ This is Pete Dye Golf Club construction footage - look for Pete Dye, constructio
         1. Extract and transcribe FULL audio first
         2. Create video segments for visual analysis
         3. Process segments with visual analysis + sync to full transcript
-        4. Send everything to Grok for synthesis
+        4. Send everything to GPT-4o for synthesis
         """
         print("🎬 SIMPLE DIRECTOR SYSTEM - Pete Dye Story")
+        print("=" * 50)
+        print("Using OpenAI for all AI operations")
         print("=" * 50)
         start_time = time.time()
 
@@ -338,9 +333,9 @@ This is Pete Dye Golf Club construction footage - look for Pete Dye, constructio
         valid_results = [r for r in segment_results if not isinstance(r, Exception)]
         print(f"✅ Processed {len(valid_results)}/{len(segments)} segments")
 
-        # PHASE 4: Grok synthesis
-        print("🎯 Phase 4: Grok synthesis...")
-        final_synthesis = self.grok_synthesis(valid_results, full_transcript)
+        # PHASE 4: GPT-4o synthesis
+        print("🎯 Phase 4: GPT-4o synthesis...")
+        final_synthesis = self.openai_synthesis(valid_results, full_transcript)
 
         # Save results
         processing_time = time.time() - start_time
@@ -351,7 +346,8 @@ This is Pete Dye Golf Club construction footage - look for Pete Dye, constructio
             'total_processing_time_minutes': processing_time / 60,
             'speed_improvement': f"{(len(segments) * segment_duration) / processing_time:.1f}x faster than realtime",
             'video_path': video_path,
-            'processed_at': time.strftime('%Y-%m-%d %H:%M:%S')
+            'processed_at': time.strftime('%Y-%m-%d %H:%M:%S'),
+            'ai_provider': 'OpenAI (GPT-4o)'
         }
 
         # Save full transcript separately
@@ -372,6 +368,7 @@ This is Pete Dye Golf Club construction footage - look for Pete Dye, constructio
             f.write(f"\n\n---\n\n**Processing Time**: {processing_time/60:.1f} minutes\n")
             f.write(f"**Speed**: {(len(segments) * segment_duration) / processing_time:.1f}x faster than realtime\n")
             f.write(f"**Segments Processed**: {len(valid_results)}\n")
+            f.write(f"**AI Provider**: OpenAI (GPT-4o)\n")
 
         # Cleanup segments
         print("🧹 Cleaning up...")
@@ -400,13 +397,12 @@ This is Pete Dye Golf Club construction footage - look for Pete Dye, constructio
 async def main():
     """Test the Simple Director"""
     openai_api_key = os.environ.get('OPENAI_API_KEY')
-    grok_api_key = os.environ.get('GROK_API_KEY')
 
-    if not openai_api_key or not grok_api_key:
-        print("Error: Please set OPENAI_API_KEY and GROK_API_KEY environment variables")
+    if not openai_api_key:
+        print("Error: Please set OPENAI_API_KEY environment variable")
         return
 
-    director = SimpleDirector(openai_api_key, grok_api_key)
+    director = SimpleDirector(openai_api_key)
 
     # Test with a video file
     video_path = "../test/test_video.mp4"

@@ -6,7 +6,7 @@ Usage:
     python run_video.py path/to/your/video.mp4
 
 Requirements:
-    - Set OPENAI_API_KEY and GROK_API_KEY environment variables
+    - OPENAI_API_KEY in .env file or environment
     - Install dependencies: pip install -r requirements.txt
     - Install FFmpeg: brew install ffmpeg
 """
@@ -14,6 +14,20 @@ Requirements:
 import asyncio
 import sys
 import os
+
+# Load .env file if it exists
+def load_env():
+    env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env')
+    if os.path.exists(env_path):
+        with open(env_path) as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#') and '=' in line:
+                    key, value = line.split('=', 1)
+                    if key and value and key not in os.environ:
+                        os.environ[key] = value
+
+load_env()
 
 # Add scripts folder to path
 scripts_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'scripts')
@@ -38,14 +52,16 @@ EXAMPLES:
     python run_video.py media/pete_interview.mp4 300
 
 SETUP:
-    1. Set API keys:
-       export OPENAI_API_KEY="your-openai-key"
-       export GROK_API_KEY="your-xai-key"
+    1. Add your OpenAI API key to .env file:
+       OPENAI_API_KEY=sk-your-key-here
 
-    2. Install dependencies:
+    2. Or set as environment variable:
+       export OPENAI_API_KEY="your-openai-key"
+
+    3. Install dependencies:
        pip install -r requirements.txt
 
-    3. Install FFmpeg:
+    4. Install FFmpeg:
        brew install ffmpeg
 
 OUTPUT:
@@ -59,18 +75,13 @@ OUTPUT:
 async def run_analysis(video_path: str, segment_duration: int = 150):
     """Run video analysis on the specified file"""
     
-    # Check for API keys
+    # Check for API key
     openai_api_key = os.environ.get('OPENAI_API_KEY')
-    grok_api_key = os.environ.get('GROK_API_KEY')
 
     if not openai_api_key:
-        print("❌ Error: OPENAI_API_KEY environment variable not set")
-        print("   Set it with: export OPENAI_API_KEY='your-key'")
-        return None
-
-    if not grok_api_key:
-        print("❌ Error: GROK_API_KEY environment variable not set")
-        print("   Set it with: export GROK_API_KEY='your-key'")
+        print("❌ Error: OPENAI_API_KEY not found")
+        print("   Add it to .env file or set as environment variable:")
+        print("   export OPENAI_API_KEY='your-key'")
         return None
 
     # Check video file exists
@@ -83,11 +94,12 @@ async def run_analysis(video_path: str, segment_duration: int = 150):
     print(f"📹 Video: {video_path}")
     print(f"📦 Size: {file_size_mb:.1f} MB")
     print(f"⏱️  Segment duration: {segment_duration} seconds ({segment_duration/60:.1f} minutes)")
+    print(f"🤖 AI Provider: OpenAI (GPT-4o)")
     print()
 
-    # Initialize director
+    # Initialize director (now only needs OpenAI key)
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    director = SimpleDirector(openai_api_key, grok_api_key, base_dir=base_dir)
+    director = SimpleDirector(openai_api_key, base_dir=base_dir)
 
     # Run analysis
     result = await director.analyze_video(video_path, segment_duration=segment_duration)
