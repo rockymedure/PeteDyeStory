@@ -48,9 +48,17 @@ class FastMultimodalVideoTranscriber:
         return output_audio
 
     def transcribe_audio_openai(self, audio_path):
-        """Transcribe audio using OpenAI's APIs"""
+        """Transcribe audio using OpenAI's APIs, with chunking for large files"""
         print("Transcribing audio with OpenAI...")
-
+        
+        # Check file size - OpenAI has 25MB limit
+        file_size_mb = os.path.getsize(audio_path) / (1024 * 1024)
+        print(f"Audio file size: {file_size_mb:.1f} MB")
+        
+        if file_size_mb > 24:
+            print(f"Audio file too large ({file_size_mb:.1f} MB), splitting into chunks...")
+            return self.transcribe_large_audio(audio_path)
+        
         with open(audio_path, "rb") as audio_file:
             print("Getting high-quality transcript with gpt-4o-transcribe...")
             high_quality_response = self.openai_client.audio.transcriptions.create(
@@ -75,6 +83,106 @@ class FastMultimodalVideoTranscriber:
             'high_quality_transcript': high_quality_response.text if hasattr(high_quality_response, 'text') else str(high_quality_response),
             'timestamped_transcript': timestamped_response.words if hasattr(timestamped_response, 'words') else []
         }
+
+    def transcribe_large_audio(self, audio_path):
+        """Transcribe large audio files by splitting into chunks"""
+        import subprocess
+        import tempfile
+        import shutil
+        
+        # Get audio duration
+        result = subprocess.run(
+            ['ffprobe', '-v', 'quiet', '-show_entries', 'format=duration', '-of', 'csv=p=0', audio_path],
+            capture_output=True, text=True
+        )
+        total_duration = float(result.stdout.strip())
+        print(f"Total audio duration: {total_duration/60:.1f} minutes")
+        
+        # Split into 10-minute chunks (should be under 25MB each)
+        chunk_duration = 600  # 10 minutes
+        chunk_dir = tempfile.mkdtemp(prefix="audio_chunks_")
+        
+        try:
+            chunks = []
+            start_time = 0
+            chunk_num = 0
+            
+            while start_time < total_duration:
+                chunk_path = os.path.join(chunk_dir, f"chunk_{chunk_num:03d}.mp3")
+                duration = min(chunk_duration, total_duration - start_time)
+                
+                # Extract chunk with ffmpeg
+                subprocess.run([
+                    'ffmpeg', '-i', audio_path,
+                    '-ss', str(start_time),
+                    '-t', str(duration),
+                    '-acodec', 'mp3', '-ab', '64k',  # Lower bitrate to reduce size
+                    '-y', chunk_path
+                ], capture_output=True, text=True)
+                
+                chunks.append({
+                    'path': chunk_path,
+                    'start_time': start_time,
+                    'duration': duration
+                })
+                
+                print(f"  Created chunk {chunk_num}: {start_time/60:.1f} - {(start_time + duration)/60:.1f} min")
+                start_time += chunk_duration
+                chunk_num += 1
+            
+            print(f"Split into {len(chunks)} chunks, now transcribing...")
+            
+            # Transcribe each chunk
+            all_transcripts = []
+            all_words = []
+            
+            for i, chunk in enumerate(chunks):
+                print(f"  Transcribing chunk {i+1}/{len(chunks)}...")
+                
+                with open(chunk['path'], 'rb') as audio_file:
+                    # High-quality transcript
+                    response = self.openai_client.audio.transcriptions.create(
+                        model="gpt-4o-transcribe",
+                        file=audio_file,
+                        response_format="text",
+                        prompt="This is golf course construction documentation featuring Pete Dye and the construction team."
+                    )
+                    
+                    transcript_text = response.text if hasattr(response, 'text') else str(response)
+                    all_transcripts.append(transcript_text)
+                    
+                    # Get timestamped version too
+                    audio_file.seek(0)
+                    timestamped = self.openai_client.audio.transcriptions.create(
+                        model="whisper-1",
+                        file=audio_file,
+                        response_format="verbose_json",
+                        timestamp_granularities=["word"],
+                        prompt="Golf course construction with Pete Dye."
+                    )
+                    
+                    # Adjust timestamps for chunk offset
+                    if hasattr(timestamped, 'words'):
+                        for word in timestamped.words:
+                            adjusted_word = {
+                                'word': getattr(word, 'word', ''),
+                                'start': getattr(word, 'start', 0) + chunk['start_time'],
+                                'end': getattr(word, 'end', 0) + chunk['start_time']
+                            }
+                            all_words.append(adjusted_word)
+            
+            # Combine all transcripts
+            full_transcript = '\n\n'.join(all_transcripts)
+            print(f"✅ Transcription complete: {len(full_transcript)} characters")
+            
+            return {
+                'high_quality_transcript': full_transcript,
+                'timestamped_transcript': all_words
+            }
+            
+        finally:
+            # Cleanup chunk files
+            shutil.rmtree(chunk_dir, ignore_errors=True)
 
     def extract_frames_with_timestamps(self, video_path, frame_interval=4, output_dir="frames"):
         """Extract frames every N seconds from video and save to disk - OPTIMIZED"""
