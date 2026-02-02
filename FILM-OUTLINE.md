@@ -1,7 +1,7 @@
 # Pete Dye Golf Club Documentary
 ## Story Outline for Producer
 
-**Working Title:** *18 Years, 18 Holes*  
+**Working Title:** *TBD*  
 **Runtime:** 30-40 minutes  
 **Format:** Documentary
 
@@ -122,9 +122,9 @@ These should weave throughout the film:
 ## AVAILABLE ASSETS
 
 ### From the LaRosa Family Archives
-- **Photos:** Coal era, construction phases (1978-1995), Pete Dye on site, Grand Opening celebrations, family history
-- **Video:** Louie and Nancy Ellis filmed the project for 20 years; Grand Opening footage; Pete and James D. storytelling together
-- **Artifacts:** Pete's original routing sketch on an air-sickness bag; the bell on #12; Senator Randolph's stones at #1 tee
+- **Photos:** Coal era, construction phases (1978-1995), Pete Dye snd crew on site, Grand Opening celebrations, family history
+- **Video:** Louie and Nancy Ellis filmed the project for 20 years; construction, interviews (including with Pete), Grand Opening footage; Pete and James D. storytelling together.
+- **Artifacts:** Pete's original routing sketch on an air-sickness bag; the bell on #12.
 
 ### From the Director's Shoot
 - Drone footage of the course
@@ -224,9 +224,7 @@ These stories emerged from the Substack series. They may be useful if footage or
 - **The oaks on #2** — Pete burns down the oak trees James D. wanted to save; years later, #2 is ranked among the top 500 holes in the world
 - **The 18th hole debacle** — James D. moves the green while Pete is away; Pete returns and makes him move it back
 - **Pete's design fee** — Asked about payment, Pete says he "just needs a couple hundred dollars to get back to Florida"
-- **The million-dollar letter** — Jack Lupton approves a loan, reverses it, then reinstates it after Jimmy writes a heartfelt letter
 - **The Storm of the Century** — 1993 brings 30 inches of snow, delaying the back nine
-- **Louie and Nancy Ellis** — Family friends who filmed for 20 years with no charge
 
 ---
 
