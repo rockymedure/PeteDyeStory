@@ -83,8 +83,10 @@ function getThumbnailPath(clip: ClipWithVideo): string {
 
 function getClipPath(clip: ClipWithVideo): string {
   if (clip.storage_path) return clip.storage_path;
+  // Clips are stored flat: {video_name}__{clip_name}.mp4
   const videoFilename = (clip.video?.filename || '').replace(/-/g, '_');
-  return `/clips/${videoFilename}/${clip.filename}`;
+  const clipName = clip.filename?.replace('.mp4', '') || '';
+  return `/clips/${videoFilename}__${clipName}.mp4`;
 }
 
 function formatDuration(seconds: number | null | undefined): string {
