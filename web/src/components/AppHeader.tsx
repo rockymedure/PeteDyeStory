@@ -40,14 +40,22 @@ export default function AppHeader({
   status?: string;
   maxWidthClass?: string;
 }) {
+  const pathname = usePathname();
+  const isOutline = pathname.startsWith('/outline');
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-[var(--bg-deep)]/80 border-b border-[var(--border-subtle)]">
       <div className={`${maxWidthClass} mx-auto px-6 h-14 flex items-center justify-between`}>
         <div className="flex items-center gap-4 min-w-0">
           {left ?? (
             <>
-              <span className="font-mono text-xs tracking-widest text-[var(--text-muted)] uppercase">
-                Pete Dye
+              <span
+                className={[
+                  'font-mono text-xs tracking-widest uppercase',
+                  isOutline ? 'text-[var(--amber)]' : 'text-[var(--text-muted)]',
+                ].join(' ')}
+              >
+                {isOutline ? 'Outline' : 'Pete Dye'}
               </span>
               <span className="w-px h-4 bg-[var(--border-visible)]" />
               <span className="font-mono text-[10px] tracking-wider text-[var(--text-muted)]">
@@ -58,13 +66,13 @@ export default function AppHeader({
         </div>
 
         <div className="flex items-center gap-2 sm:gap-3">
+          <div className="rec-indicator">
+            <span>{status}</span>
+          </div>
           <nav className="flex items-center gap-1 sm:gap-2">
             <NavLink href="/">Clips</NavLink>
             <NavLink href="/outline">Outline</NavLink>
           </nav>
-          <div className="rec-indicator">
-            <span>{status}</span>
-          </div>
         </div>
       </div>
     </header>
