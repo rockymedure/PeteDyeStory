@@ -178,7 +178,6 @@ export default async function ActPage({ params }: PageProps) {
     <main className="min-h-screen relative">
       <AppHeader
         maxWidthClass="max-w-5xl"
-        status="Playing"
         left={
           <>
             <Link

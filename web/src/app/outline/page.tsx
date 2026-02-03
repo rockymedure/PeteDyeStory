@@ -43,7 +43,7 @@ export default async function OutlinePage() {
 
   return (
     <main className="min-h-screen relative">
-      <AppHeader status="Outline" />
+      <AppHeader />
 
       <section className="pt-32 pb-10 px-6">
         <div className="max-w-6xl mx-auto">

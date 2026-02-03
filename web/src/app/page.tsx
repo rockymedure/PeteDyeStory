@@ -103,7 +103,7 @@ export default async function Home() {
 
   return (
     <main className="min-h-screen relative">
-      <AppHeader status="Archive" />
+      <AppHeader />
 
       {/* Hero */}
       <section className="pt-32 pb-16 px-6">

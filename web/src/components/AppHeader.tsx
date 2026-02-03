@@ -33,24 +33,18 @@ function NavLink({ href, children }: { href: string; children: ReactNode }) {
 
 export default function AppHeader({
   left,
-  status = 'Archive',
   maxWidthClass = 'max-w-6xl',
 }: {
   left?: ReactNode;
-  status?: string;
   maxWidthClass?: string;
 }) {
   const pathname = usePathname();
   const isOutline = pathname.startsWith('/outline');
-  const indicatorColor = 'var(--rec-red)';
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-[var(--bg-deep)]/80 border-b border-[var(--border-subtle)]">
       <div className={`${maxWidthClass} mx-auto px-6 h-14 flex items-center justify-between`}>
         <div className="flex items-center gap-3 min-w-0">
-          <div className="rec-indicator" style={{ ['--indicator-color' as never]: indicatorColor }}>
-            <span>{status}</span>
-          </div>
           {left ?? (
             <>
               <span
