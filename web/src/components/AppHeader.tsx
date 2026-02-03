@@ -4,14 +4,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
 
-function formatDate() {
-  const now = new Date();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
-  const year = String(now.getFullYear()).slice(-2);
-  return `${month}.${day}.${year}`;
-}
-
 function NavLink({ href, children }: { href: string; children: ReactNode }) {
   const pathname = usePathname();
   const isActive = href === '/' ? pathname === '/' : pathname.startsWith(href);
@@ -38,28 +30,14 @@ export default function AppHeader({
   left?: ReactNode;
   maxWidthClass?: string;
 }) {
-  const pathname = usePathname();
-  const isOutline = pathname.startsWith('/outline');
-
   return (
     <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-[var(--bg-deep)]/80 border-b border-[var(--border-subtle)]">
       <div className={`${maxWidthClass} mx-auto px-6 h-14 flex items-center justify-between`}>
         <div className="flex items-center gap-3 min-w-0">
           {left ?? (
-            <>
-              <span
-                className={[
-                  'font-mono text-xs tracking-widest uppercase',
-                  isOutline ? 'text-[var(--amber)]' : 'text-[var(--text-muted)]',
-                ].join(' ')}
-              >
-                {isOutline ? 'Outline' : 'Pete Dye'}
-              </span>
-              <span className="w-px h-4 bg-[var(--border-visible)]" />
-              <span className="font-mono text-[10px] tracking-wider text-[var(--text-muted)]">
-                {formatDate()}
-              </span>
-            </>
+            <span className="font-mono text-xs tracking-widest uppercase text-[var(--text-muted)]">
+              Pete Dye Golf Club Project
+            </span>
           )}
         </div>
 
