@@ -4,6 +4,7 @@ import { useState } from 'react';
 import type { Clip } from '@/lib/types';
 import VideoPlayer from './VideoPlayer';
 import { playSelect, playStop, playNavigate, playHover, initAudio } from '@/lib/sounds';
+import { resolveThumbnailUrl } from '@/lib/publicAssets';
 
 interface ClipWithVideo extends Clip {
   video?: { filename: string };
@@ -11,13 +12,6 @@ interface ClipWithVideo extends Clip {
 
 interface ClipCarouselProps {
   clips: ClipWithVideo[];
-}
-
-function getThumbnailPath(clip: ClipWithVideo): string {
-  if (clip.thumbnail_path) return clip.thumbnail_path;
-  const videoFilename = (clip.video?.filename || '').replace(/-/g, '_');
-  const clipName = clip.filename?.replace('.mp4', '') || '';
-  return `/thumbnails/${videoFilename}__${clipName}.jpg`;
 }
 
 function formatDuration(seconds: number | null | undefined): string {
@@ -59,7 +53,7 @@ export default function ClipCarousel({ clips }: ClipCarouselProps) {
     <>
       <div className="flex gap-3 overflow-x-auto hide-scrollbar pb-1">
         {displayClips.map((clip, index) => {
-          const thumbPath = getThumbnailPath(clip);
+          const thumbPath = resolveThumbnailUrl(clip);
           
           return (
             <div

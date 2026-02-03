@@ -4,6 +4,7 @@ import { useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import type { Clip } from '@/lib/types';
 import { playNavigate, playStop, playStart } from '@/lib/sounds';
+import { resolveClipUrl } from '@/lib/publicAssets';
 
 interface ClipWithVideo extends Clip {
   video?: { filename: string };
@@ -17,13 +18,6 @@ interface VideoPlayerProps {
   onNavigate: (index: number) => void;
 }
 
-function getClipPath(clip: ClipWithVideo): string {
-  if (clip.storage_path) return clip.storage_path;
-  const videoFilename = (clip.video?.filename || '').replace(/-/g, '_');
-  const clipName = clip.filename?.replace('.mp4', '') || '';
-  return `/clips/${videoFilename}__${clipName}.mp4`;
-}
-
 function formatDuration(seconds: number | null | undefined): string {
   if (!seconds) return '0:00';
   const mins = Math.floor(seconds / 60);
@@ -33,7 +27,7 @@ function formatDuration(seconds: number | null | undefined): string {
 
 export default function VideoPlayer({ clip, clips, currentIndex, onClose, onNavigate }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const clipPath = getClipPath(clip);
+  const clipPath = resolveClipUrl(clip);
   
   const hasPrev = currentIndex > 0;
   const hasNext = currentIndex < clips.length - 1;
