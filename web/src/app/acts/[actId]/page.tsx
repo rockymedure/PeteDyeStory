@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { unstable_cache } from 'next/cache';
 import type { Act, StoryElement, Clip } from '@/lib/types';
+import ClipCarousel from '@/components/ClipCarousel';
 
 interface ClipWithVideo extends Clip {
   video?: { filename: string };
@@ -73,110 +74,94 @@ const getClipsForStoryElement = unstable_cache(
   { revalidate: 60 }
 );
 
-// Helper to get thumbnail path
 function getThumbnailPath(clip: ClipWithVideo): string {
-  // Use database path if available (Supabase URL)
   if (clip.thumbnail_path) return clip.thumbnail_path;
-  
-  // Otherwise construct local path from video + clip filename
-  // Normalize: DB uses hyphens but thumbnails use underscores
   const videoFilename = (clip.video?.filename || '').replace(/-/g, '_');
   const clipName = clip.filename?.replace('.mp4', '') || '';
   return `/thumbnails/${videoFilename}__${clipName}.jpg`;
 }
 
-function StoryElementCard({ element, clips }: { element: StoryElement; clips: ClipWithVideo[] }) {
+function getClipPath(clip: ClipWithVideo): string {
+  if (clip.storage_path) return clip.storage_path;
+  const videoFilename = (clip.video?.filename || '').replace(/-/g, '_');
+  return `/clips/${videoFilename}/${clip.filename}`;
+}
+
+function formatDuration(seconds: number | null | undefined): string {
+  if (!seconds) return '';
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.round(seconds % 60);
+  return `${mins}:${String(secs).padStart(2, '0')}`;
+}
+
+function StoryElementCard({ element, clips, index }: { element: StoryElement; clips: ClipWithVideo[]; index: number }) {
   const isKeyMoment = element.element_type === 'key_moment';
   
   return (
-    <div className={`p-6 rounded-xl border ${
-      isKeyMoment 
-        ? 'bg-amber-950/20 border-amber-800/50' 
-        : 'bg-zinc-900 border-zinc-800'
-    }`}>
-      <div className="flex items-start gap-3 mb-3">
-        {isKeyMoment && (
-          <span className="text-amber-500 text-lg">★</span>
+    <article className={`card overflow-hidden ${isKeyMoment ? 'ring-1 ring-[var(--amber)]/20' : ''}`}>
+      {/* Header */}
+      <div className={`p-6 md:p-8 ${isKeyMoment ? 'bg-[var(--amber)]/[0.03]' : ''}`}>
+        <div className="flex items-start gap-4 mb-4">
+          <span className="font-mono text-[10px] text-[var(--text-muted)] mt-1">
+            {String(index + 1).padStart(2, '0')}
+          </span>
+          
+          <div className="flex-1">
+            <div className="flex items-center gap-3 mb-2">
+              {isKeyMoment && (
+                <span className="font-mono text-[9px] tracking-wider text-[var(--amber)] uppercase px-2 py-0.5 border border-[var(--amber)]/30 rounded">
+                  Key Moment
+                </span>
+              )}
+            </div>
+            
+            <h3 className={`text-xl font-semibold mb-2 ${
+              isKeyMoment ? 'text-[var(--amber)]' : 'text-[var(--text-primary)]'
+            }`}>
+              {element.title}
+            </h3>
+            
+            {element.description && (
+              <p className="text-[var(--text-secondary)] text-sm leading-relaxed">
+                {element.description}
+              </p>
+            )}
+          </div>
+          
+          <span className="font-mono text-[10px] text-[var(--text-muted)]">
+            {clips.length} {clips.length === 1 ? 'clip' : 'clips'}
+          </span>
+        </div>
+        
+        {element.quote && (
+          <blockquote className="border-l-2 border-[var(--amber)]/40 pl-4 my-6 text-[var(--text-secondary)] italic">
+            &ldquo;{element.quote}&rdquo;
+          </blockquote>
         )}
-        <div className="flex-1">
-          <h3 className={`text-lg font-semibold ${
-            isKeyMoment ? 'text-amber-200' : 'text-white'
-          }`}>
-            {element.title}
-          </h3>
-          {element.description && (
-            <p className="text-zinc-400 text-sm mt-1">
-              {element.description}
+        
+        {element.why_it_matters && (
+          <div className="bg-[var(--bg-elevated)] rounded-lg p-4 mt-4 border border-[var(--border-subtle)]">
+            <span className="font-mono text-[9px] font-medium text-[var(--amber)] uppercase tracking-wider">
+              Why it matters
+            </span>
+            <p className="text-sm text-[var(--text-secondary)] mt-2 leading-relaxed">
+              {element.why_it_matters}
             </p>
-          )}
-        </div>
-      </div>
-      
-      {element.quote && (
-        <blockquote className="border-l-2 border-zinc-700 pl-4 my-4 text-zinc-300 italic">
-          &ldquo;{element.quote}&rdquo;
-        </blockquote>
-      )}
-      
-      {element.why_it_matters && (
-        <div className="bg-zinc-800/50 rounded-lg p-3 mt-4">
-          <span className="text-xs font-medium text-zinc-500 uppercase">Why it matters</span>
-          <p className="text-sm text-zinc-300 mt-1">{element.why_it_matters}</p>
-        </div>
-      )}
-      
-      {/* Clips section */}
-      <div className="mt-4 pt-4 border-t border-zinc-800">
-        {clips.length > 0 ? (
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-xs text-emerald-500">✓</span>
-              <span className="text-xs text-zinc-500">{clips.length} clip{clips.length > 1 ? 's' : ''} available</span>
-            </div>
-            <div className="flex gap-3 overflow-x-auto pb-2">
-              {clips.map((clip) => {
-                const thumbPath = getThumbnailPath(clip);
-                return (
-                  <button
-                    key={clip.id}
-                    className="flex-shrink-0 w-56 bg-zinc-800 hover:bg-zinc-700 rounded-lg p-3 transition-colors group text-left"
-                  >
-                    <div className="w-full h-28 bg-zinc-700 rounded overflow-hidden relative">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={thumbPath}
-                        alt={clip.title || clip.filename}
-                        className="w-full h-full object-cover"
-                      />
-                      {/* Play overlay */}
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <svg className="w-10 h-10 text-white drop-shadow-lg" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                      {/* Duration badge */}
-                      {clip.duration_seconds && (
-                        <span className="absolute bottom-1 right-1 bg-black/70 text-white text-xs px-1 rounded">
-                          {Math.floor(clip.duration_seconds / 60)}:{String(Math.round(clip.duration_seconds % 60)).padStart(2, '0')}
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-xs text-zinc-300 mt-2 line-clamp-3">
-                      {clip.description || clip.title || clip.filename?.replace('.mp4', '')}
-                    </p>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        ) : (
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-amber-500">⚠️</span>
-            <span className="text-xs text-zinc-500">No clips linked yet</span>
           </div>
         )}
       </div>
-    </div>
+      
+      {/* Clips */}
+      <div className="px-6 md:px-8 py-6 border-t border-[var(--border-subtle)] bg-[var(--bg-elevated)]/50">
+        {clips.length > 0 ? (
+          <ClipCarousel clips={clips} />
+        ) : (
+          <div className="h-20 flex items-center justify-center border border-dashed border-[var(--border-subtle)] rounded-lg">
+            <span className="font-mono text-xs text-[var(--text-muted)]">No clips assigned</span>
+          </div>
+        )}
+      </div>
+    </article>
   );
 }
 
@@ -190,11 +175,6 @@ export default async function ActPage({ params }: PageProps) {
   
   const elements = await getStoryElements(actId);
   
-  // Separate journey points and key moments
-  const journeyPoints = elements.filter(e => e.element_type === 'journey_point');
-  const keyMoments = elements.filter(e => e.element_type === 'key_moment');
-  
-  // Get clips for each element (in a real app, we'd batch this)
   const elementsWithClips = await Promise.all(
     elements.map(async (element) => {
       const clipLinks = await getClipsForStoryElement(element.id);
@@ -202,7 +182,6 @@ export default async function ActPage({ params }: PageProps) {
         .map((link: { clips: ClipWithVideo | ClipWithVideo[] | null }) => {
           const clip = link.clips;
           if (!clip || Array.isArray(clip)) return null;
-          // Extract video from nested structure
           const videos = (clip as { videos?: { filename: string } | { filename: string }[] }).videos;
           const video = Array.isArray(videos) ? videos[0] : videos;
           return { ...clip, video } as ClipWithVideo;
@@ -212,75 +191,109 @@ export default async function ActPage({ params }: PageProps) {
     })
   );
   
-  const journeyPointsWithClips = elementsWithClips.filter(
-    ({ element }) => element.element_type === 'journey_point'
-  );
-  const keyMomentsWithClips = elementsWithClips.filter(
-    ({ element }) => element.element_type === 'key_moment'
-  );
+  const totalClips = elementsWithClips.reduce((sum, { clips }) => sum + clips.length, 0);
 
   return (
-    <main className="min-h-screen bg-zinc-950 text-white">
+    <main className="min-h-screen relative">
       {/* Header */}
-      <header className="border-b border-zinc-800 bg-zinc-900/50 backdrop-blur-sm sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center gap-4">
-          <Link href="/" className="text-zinc-500 hover:text-white transition-colors">
-            ← Back
-          </Link>
-          <span className="text-zinc-700">|</span>
-          <h1 className="text-lg font-semibold text-zinc-100">
-            Act {act.act_number}: {act.title}
-          </h1>
+      <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-[var(--bg-deep)]/80 border-b border-[var(--border-subtle)]">
+        <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Link 
+              href="/" 
+              className="flex items-center gap-2 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              <span className="font-mono text-xs tracking-wider">Back</span>
+            </Link>
+            <span className="w-px h-4 bg-[var(--border-visible)]" />
+            <span className="font-mono text-xs tracking-wider text-[var(--text-muted)]">
+              Act {String(act.act_number).padStart(2, '0')}
+            </span>
+          </div>
+          <div className="rec-indicator">
+            <span>Playing</span>
+          </div>
         </div>
       </header>
 
-      {/* Act Overview */}
-      <section className="max-w-4xl mx-auto px-6 py-12">
-        <div className="flex items-center gap-3 mb-2">
-          <span className="text-sm font-medium text-zinc-500">
-            ACT {act.act_number}
-          </span>
-          <span className="text-xs text-zinc-600 bg-zinc-800 px-2 py-0.5 rounded">
-            {act.duration_target}
-          </span>
-        </div>
-        
-        <h2 className="text-4xl font-bold text-white mb-4">{act.title}</h2>
-        
-        <p className="text-xl text-zinc-400 mb-4">{act.description}</p>
-        
-        <p className="text-sm text-zinc-600 italic">
-          Tone: {act.tone}
-        </p>
-      </section>
-
-      {/* Journey Points */}
-      <section className="max-w-4xl mx-auto px-6 pb-12">
-        <h3 className="text-sm font-medium text-zinc-500 uppercase tracking-wider mb-6">
-          Story Elements ({journeyPoints.length})
-        </h3>
-        
-        <div className="space-y-4">
-          {journeyPointsWithClips.map(({ element, clips }) => (
-            <StoryElementCard key={element.id} element={element} clips={clips} />
-          ))}
-        </div>
-      </section>
-
-      {/* Key Moments */}
-      {keyMoments.length > 0 && (
-        <section className="max-w-4xl mx-auto px-6 pb-16">
-          <h3 className="text-sm font-medium text-amber-500 uppercase tracking-wider mb-6">
-            Key Emotional Moments ({keyMoments.length})
-          </h3>
+      {/* Hero */}
+      <section className="pt-32 pb-16 px-6">
+        <div className="max-w-5xl mx-auto animate-slide-up">
+          <div className="flex items-center gap-4 mb-6">
+            <span className="font-mono text-[10px] tracking-[0.2em] text-[var(--amber)] uppercase">
+              Act {String(act.act_number).padStart(2, '0')}
+            </span>
+            <span className="font-mono text-[10px] text-[var(--text-muted)]">
+              {act.duration_target}
+            </span>
+            <span className="w-px h-4 bg-[var(--border-visible)]" />
+            <span className="font-mono text-[10px] text-[var(--text-muted)]">
+              {totalClips} clips
+            </span>
+          </div>
           
-          <div className="space-y-4">
-            {keyMomentsWithClips.map(({ element, clips }) => (
-              <StoryElementCard key={element.id} element={element} clips={clips} />
+          <h1 className="text-4xl md:text-5xl font-semibold text-[var(--text-primary)] mb-4 tracking-tight">
+            {act.title}
+          </h1>
+          
+          <p className="text-xl text-[var(--text-secondary)] max-w-2xl leading-relaxed">
+            {act.description}
+          </p>
+          
+          {act.tone && (
+            <p className="font-mono text-xs text-[var(--text-muted)] mt-6">
+              Tone: <span className="text-[var(--text-secondary)]">{act.tone}</span>
+            </p>
+          )}
+        </div>
+      </section>
+
+      {/* Story Elements */}
+      <section className="px-6 pb-24">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex items-center gap-4 mb-8">
+            <h2 className="font-mono text-[10px] tracking-[0.2em] text-[var(--text-muted)] uppercase">
+              Story Elements
+            </h2>
+            <span className="flex-1 h-px bg-[var(--border-subtle)]" />
+            <span className="font-mono text-[10px] text-[var(--text-muted)]">
+              {elements.length} elements
+            </span>
+          </div>
+          
+          <div className="space-y-6 stagger-children">
+            {elementsWithClips.map(({ element, clips }, index) => (
+              <StoryElementCard 
+                key={element.id} 
+                element={element} 
+                clips={clips}
+                index={index}
+              />
             ))}
           </div>
-        </section>
-      )}
+        </div>
+      </section>
+
+      {/* Footer navigation */}
+      <footer className="border-t border-[var(--border-subtle)] px-6 py-8">
+        <div className="max-w-5xl mx-auto flex items-center justify-between">
+          <Link 
+            href="/"
+            className="flex items-center gap-2 font-mono text-xs text-[var(--text-muted)] hover:text-[var(--amber)] transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            All Acts
+          </Link>
+          <span className="font-mono text-[10px] text-[var(--text-muted)]">
+            ◉ PETE DYE GOLF CLUB
+          </span>
+        </div>
+      </footer>
     </main>
   );
 }
