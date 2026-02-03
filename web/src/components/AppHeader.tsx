@@ -42,11 +42,15 @@ export default function AppHeader({
 }) {
   const pathname = usePathname();
   const isOutline = pathname.startsWith('/outline');
+  const indicatorColor = isOutline ? 'var(--amber)' : status === 'Playing' ? 'var(--rec-red)' : 'var(--tape-blue)';
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-[var(--bg-deep)]/80 border-b border-[var(--border-subtle)]">
       <div className={`${maxWidthClass} mx-auto px-6 h-14 flex items-center justify-between`}>
-        <div className="flex items-center gap-4 min-w-0">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="rec-indicator" style={{ ['--indicator-color' as never]: indicatorColor }}>
+            <span>{status}</span>
+          </div>
           {left ?? (
             <>
               <span
@@ -66,9 +70,6 @@ export default function AppHeader({
         </div>
 
         <div className="flex items-center gap-2 sm:gap-3">
-          <div className="rec-indicator">
-            <span>{status}</span>
-          </div>
           <nav className="flex items-center gap-1 sm:gap-2">
             <NavLink href="/">Clips</NavLink>
             <NavLink href="/outline">Outline</NavLink>
