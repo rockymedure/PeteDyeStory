@@ -30,7 +30,7 @@ function playTone(frequency: number, duration: number, type: OscillatorType = 's
     
     oscillator.start(ctx.currentTime);
     oscillator.stop(ctx.currentTime + duration);
-  } catch (e) {
+  } catch {
     // Audio not supported or blocked, fail silently
   }
 }
@@ -62,7 +62,7 @@ function playNoise(duration: number, volume: number = 0.05) {
     gainNode.gain.setValueAtTime(volume, ctx.currentTime);
     
     source.start();
-  } catch (e) {
+  } catch {
     // Audio not supported, fail silently
   }
 }
@@ -114,7 +114,7 @@ export function initAudio() {
     if (ctx.state === 'suspended') {
       ctx.resume();
     }
-  } catch (e) {
+  } catch {
     // Audio not supported
   }
 }

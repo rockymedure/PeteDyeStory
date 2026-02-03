@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { unstable_cache } from 'next/cache';
 import type { Act, StoryElement, Clip } from '@/lib/types';
 import ClipCarousel from '@/components/ClipCarousel';
+import AppHeader from '@/components/AppHeader';
 
 interface ClipWithVideo extends Clip {
   video?: { filename: string };
@@ -73,28 +74,6 @@ const getClipsForStoryElement = unstable_cache(
   ['clips-for-story'],
   { revalidate: 60 }
 );
-
-function getThumbnailPath(clip: ClipWithVideo): string {
-  if (clip.thumbnail_path) return clip.thumbnail_path;
-  const videoFilename = (clip.video?.filename || '').replace(/-/g, '_');
-  const clipName = clip.filename?.replace('.mp4', '') || '';
-  return `/thumbnails/${videoFilename}__${clipName}.jpg`;
-}
-
-function getClipPath(clip: ClipWithVideo): string {
-  if (clip.storage_path) return clip.storage_path;
-  // Clips are stored flat: {video_name}__{clip_name}.mp4
-  const videoFilename = (clip.video?.filename || '').replace(/-/g, '_');
-  const clipName = clip.filename?.replace('.mp4', '') || '';
-  return `/clips/${videoFilename}__${clipName}.mp4`;
-}
-
-function formatDuration(seconds: number | null | undefined): string {
-  if (!seconds) return '';
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.round(seconds % 60);
-  return `${mins}:${String(secs).padStart(2, '0')}`;
-}
 
 function StoryElementCard({ element, clips, index }: { element: StoryElement; clips: ClipWithVideo[]; index: number }) {
   const isKeyMoment = element.element_type === 'key_moment';
@@ -197,12 +176,13 @@ export default async function ActPage({ params }: PageProps) {
 
   return (
     <main className="min-h-screen relative">
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-[var(--bg-deep)]/80 border-b border-[var(--border-subtle)]">
-        <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link 
-              href="/" 
+      <AppHeader
+        maxWidthClass="max-w-5xl"
+        status="Playing"
+        left={
+          <>
+            <Link
+              href="/"
               className="flex items-center gap-2 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -214,12 +194,9 @@ export default async function ActPage({ params }: PageProps) {
             <span className="font-mono text-xs tracking-wider text-[var(--text-muted)]">
               Act {String(act.act_number).padStart(2, '0')}
             </span>
-          </div>
-          <div className="rec-indicator">
-            <span>Playing</span>
-          </div>
-        </div>
-      </header>
+          </>
+        }
+      />
 
       {/* Hero */}
       <section className="pt-32 pb-16 px-6">

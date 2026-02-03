@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useCallback, useState } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import type { Clip } from '@/lib/types';
 import { playNavigate, playStop, playStart } from '@/lib/sounds';
@@ -33,16 +33,10 @@ function formatDuration(seconds: number | null | undefined): string {
 
 export default function VideoPlayer({ clip, clips, currentIndex, onClose, onNavigate }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [mounted, setMounted] = useState(false);
   const clipPath = getClipPath(clip);
   
   const hasPrev = currentIndex > 0;
   const hasNext = currentIndex < clips.length - 1;
-
-  // Track client-side mount for portal
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const handlePrev = useCallback(() => {
     if (hasPrev) {
@@ -113,8 +107,8 @@ export default function VideoPlayer({ clip, clips, currentIndex, onClose, onNavi
     };
   }, []);
 
-  // Don't render until mounted (client-side only for portal)
-  if (!mounted) return null;
+  // Client-only guard for portal target
+  if (typeof document === 'undefined') return null;
 
   const playerContent = (
     <div className="fixed inset-0 z-[9999] bg-black">

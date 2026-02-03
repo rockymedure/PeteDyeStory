@@ -65,7 +65,7 @@ class FastMultimodalVideoTranscriber:
                 model="gpt-4o-transcribe",
                 file=audio_file,
                 response_format="text",
-                prompt="This is golf course construction documentation. The speakers include Pete Dye, construction workers, project managers, and equipment operators discussing golf course design, lake construction, and the building process at Pete Dye Golf Club."
+                prompt="This is archival footage from the Pete Dye Golf Club story (1978-2004). Content may include: construction footage, family gatherings, interviews, celebrations, award ceremonies, tournaments, or social events. Speakers may include Pete Dye, the LaRosa family, friends, dignitaries, or professional golfers. Transcribe accurately based on what you hear."
             )
 
             audio_file.seek(0)
@@ -76,7 +76,7 @@ class FastMultimodalVideoTranscriber:
                 file=audio_file,
                 response_format="verbose_json",
                 timestamp_granularities=["word"],
-                prompt="This is golf course construction documentation featuring Pete Dye and the construction team."
+                prompt="Archival footage from Pete Dye Golf Club including construction, interviews, celebrations, family events, and tournaments."
             )
 
         return {
@@ -145,7 +145,7 @@ class FastMultimodalVideoTranscriber:
                         model="gpt-4o-transcribe",
                         file=audio_file,
                         response_format="text",
-                        prompt="This is golf course construction documentation featuring Pete Dye and the construction team."
+                        prompt="Archival footage from Pete Dye Golf Club story (1978-2004). May include construction, interviews, celebrations, family events, or tournaments."
                     )
                     
                     transcript_text = response.text if hasattr(response, 'text') else str(response)
@@ -158,7 +158,7 @@ class FastMultimodalVideoTranscriber:
                         file=audio_file,
                         response_format="verbose_json",
                         timestamp_granularities=["word"],
-                        prompt="Golf course construction with Pete Dye."
+                        prompt="Pete Dye Golf Club archival footage including construction, celebrations, interviews, and events."
                     )
                     
                     # Adjust timestamps for chunk offset

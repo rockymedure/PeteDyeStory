@@ -243,7 +243,18 @@ Based on the COMPLETE analysis above, provide the REAL video content synthesis:
 **4. HIGHLIGHTS & MEMORABLE MOMENTS** (actual memorable moments with context):
 
 Be completely accurate to the content. Extract the real story, don't invent anything.
-This is Pete Dye Golf Club construction footage - look for Pete Dye, construction workers, equipment, and the golf course building process.
+
+IMPORTANT: This archive contains diverse footage from the Pete Dye Golf Club story (1978-2004). Videos may include:
+- Golf course construction and site work
+- Family gatherings, holidays, and celebrations
+- Grand opening ceremonies and special events
+- Interviews with Pete Dye, the LaRosa family, and others
+- Award ceremonies and recognition events
+- Professional golf tournaments (WV Classic)
+- Visits from celebrities like Joe DiMaggio
+- Christmas parties and social events
+
+Accurately identify what type of content this actually is. Don't assume construction - analyze what you actually see and hear.
 """
 
         try:

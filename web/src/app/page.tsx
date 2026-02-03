@@ -1,8 +1,8 @@
 import { supabase } from '@/lib/supabase';
-import Link from 'next/link';
 import { unstable_cache } from 'next/cache';
 import type { Clip } from '@/lib/types';
 import ClipCarousel from '@/components/ClipCarousel';
+import AppHeader from '@/components/AppHeader';
 
 interface Video {
   id: string;
@@ -85,14 +85,6 @@ const getVideosWithClips = unstable_cache(
   { revalidate: 60 }
 );
 
-function formatDate() {
-  const now = new Date();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
-  const year = String(now.getFullYear()).slice(-2);
-  return `${month}.${day}.${year}`;
-}
-
 export default async function Home() {
   const videosWithClips = await getVideosWithClips();
   const totalClips = videosWithClips.reduce((sum, v) => sum + v.clips.length, 0);
@@ -111,23 +103,7 @@ export default async function Home() {
 
   return (
     <main className="min-h-screen relative">
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-[var(--bg-deep)]/80 border-b border-[var(--border-subtle)]">
-        <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <span className="font-mono text-xs tracking-widest text-[var(--text-muted)] uppercase">
-              Pete Dye
-            </span>
-            <span className="w-px h-4 bg-[var(--border-visible)]" />
-            <span className="font-mono text-[10px] tracking-wider text-[var(--text-muted)]">
-              {formatDate()}
-            </span>
-          </div>
-          <div className="rec-indicator">
-            <span>Archive</span>
-          </div>
-        </div>
-      </header>
+      <AppHeader status="Archive" />
 
       {/* Hero */}
       <section className="pt-32 pb-16 px-6">

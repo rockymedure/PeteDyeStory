@@ -27,20 +27,42 @@ interface ChapterInfo {
 function parseChapterBreakdown(synthesisText: string): ChapterInfo[] {
   const chapters: ChapterInfo[] = [];
   
-  // Find CHAPTER BREAKDOWN section
-  const chapterMatch = synthesisText.match(/\*\*3\. CHAPTER BREAKDOWN\*\*:\s*([\s\S]*?)(?=\*\*4\.|$)/);
+  // Find CHAPTER BREAKDOWN section - handle multiple formats
+  // Format 1: "**3. CHAPTER BREAKDOWN**:"
+  // Format 2: "CHAPTER BREAKDOWN**:"
+  const chapterMatch = synthesisText.match(/CHAPTER BREAKDOWN\*?\*?:\s*([\s\S]*?)(?=\*\*\d+\.|HIGHLIGHTS|MEMORABLE|$)/i);
   if (!chapterMatch) return chapters;
   
-  // Parse individual chapters
+  // Parse individual chapters - handle multiple formats
   const chapterLines = chapterMatch[1].split('\n').filter(line => line.trim().startsWith('-'));
   
   for (const line of chapterLines) {
-    // Match pattern: "- **0:00:00 - 0:05:00**: Description"
-    const match = line.match(/\*\*(\d+:\d+:\d+)\s*-\s*(\d+:\d+:\d+)\*\*:\s*(.+)/);
+    // Format 1: "- **0:00:00 - 0:05:00**: Description"
+    let match = line.match(/\*\*(\d+:\d+:\d+)\s*-\s*(\d+:\d+:\d+)\*\*:\s*(.+)/);
     if (match) {
       chapters.push({
         timeRange: `${match[1]} - ${match[2]}`,
         description: match[3].trim()
+      });
+      continue;
+    }
+    
+    // Format 2: "- **0:00 - Title**: Description" or "- **0:00 - 2:30**: Description"
+    match = line.match(/\*\*([^*]+)\*\*:\s*(.+)/);
+    if (match) {
+      chapters.push({
+        timeRange: match[1].trim(),
+        description: match[2].trim()
+      });
+      continue;
+    }
+    
+    // Format 3: Simple "- Description" without bold markers
+    const simpleMatch = line.match(/^-\s+(.+)/);
+    if (simpleMatch && simpleMatch[1].length > 10) {
+      chapters.push({
+        timeRange: '',
+        description: simpleMatch[1].trim()
       });
     }
   }
