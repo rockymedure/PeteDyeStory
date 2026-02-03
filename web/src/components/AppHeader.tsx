@@ -20,7 +20,7 @@ function NavLink({ href, children }: { href: string; children: ReactNode }) {
     <Link
       href={href}
       className={[
-        'px-3 py-1.5 rounded-full font-mono text-[10px] tracking-widest uppercase transition-colors',
+        'px-2.5 py-1 rounded-full font-mono text-[10px] tracking-widest uppercase transition-colors sm:px-3 sm:py-1.5',
         isActive
           ? 'bg-[var(--amber)]/15 text-[var(--amber)] border border-[var(--amber)]/25'
           : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)] hover:border-[var(--border-visible)]',
@@ -57,8 +57,8 @@ export default function AppHeader({
           )}
         </div>
 
-        <div className="flex items-center gap-3">
-          <nav className="hidden sm:flex items-center gap-2">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <nav className="flex items-center gap-1 sm:gap-2">
             <NavLink href="/">Clips</NavLink>
             <NavLink href="/outline">Outline</NavLink>
           </nav>
