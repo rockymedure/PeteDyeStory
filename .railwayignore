@@ -1,0 +1,28 @@
+## Railway ignore (monorepo)
+## Keep deploy payload small: we only deploy the Next.js app in `web/`.
+
+# Huge media directories
+videos/
+web-clips/
+video-processing/
+
+# Project content/docs (not needed at runtime)
+exports/
+posts/
+*.pdf
+*.docx
+*.odt
+*.rtf
+
+# Tooling/scripts not required for the web deploy
+scripts/
+
+# Editor/agent metadata
+.cursor/
+
+# Node build artifacts
+web/node_modules/
+web/.next/
+web/out/
+web/build/
+
