@@ -15,43 +15,32 @@ const OUTPUT_DIR = '/Users/rockymedure/Desktop/PeteDyeStory/video-processing/out
 const WEB_CLIPS_DIR = '/Users/rockymedure/Desktop/PeteDyeStory/web-clips';
 const THUMBS_DIR = '/Users/rockymedure/Desktop/PeteDyeStory/web-clips/thumbnails';
 
-// Video to Act mapping based on VIDEO-ASSETS.md
-const videoActMapping: Record<string, number[]> = {
-  // ACT I - The Dream
-  'Joung_JJL_Coal_Mining_Footage_No_Sound': [1],
-  'The_Pete_Dye_Golf_Course_Narrated_by_Harris_Holt': [1],
-  'Interview_With_Pete_Dye_7-10-94': [1, 2],
-  'Some_Highlites_of_the_Pete_Dye_-_LaRosa_Golf_Course_Aug__1982-1988__2_-009': [1],
+// Video to Act mapping - maps video directory names to act numbers
+// Uses fuzzy matching to handle naming variations
+function getActsForVideo(videoDir: string): number[] {
+  const name = videoDir.toLowerCase();
   
-  // ACT II - The Struggle
-  'Aug_1985_PDGC_Construction_Cleaning_out_Simpson_Creek': [2],
-  'Pete_Dye_Golf_Course_Construction_6-18-1987_thru_10-6-1987': [2],
-  'Pete_Dye_Golf_Club_Spring_1989': [2],
-  'Highlites_of_the_Pete_Dye_-_LaRosa_Flof_Course_10-89_thru_10-90_James_D_s_cats_and_Dogs': [2],
-  'Pete_Dye_Golf_Course_10-16-90_thru_6-14-91': [2],
-  'Pete_Dye_Golf_Club_4-27-91_thru_10-10-91_Holes_1_thru_9': [2],
-  'Pete_Dye_Golf_Club_9-9-1992': [2],
-  'Pete_Dye_Golf_Club_9-5-92_thru_7-1-93-008': [2],
-  'Oct__1992_thru_Dec__1992': [2],
-  'PDGC_Construction_8-31-93_thru_7-7-94-012': [2],
-  'Papa_Jim_Interview_Eastpointe_Shopping_Cneter_Blast': [2],
-  '12-15-89_-_LaRosa_Annual_Christmas_Party': [2],
-  'Joe_Dimaggio_Special_Guest_At_the_PDBC': [2],
-  'PDGC_Member-Guest_Dinner___Dnace_at_Green_Acres_8-21-1993': [2],
-  '9-1-90_Friends_of_James_D__s_Dinner_at_Nona_Maria_s_Pool_at_Jimmy_Joe_s_House': [2],
+  // ACT I - The Dream (coal mining origins, early vision)
+  if (name.includes('coal') || name.includes('mining') || name.includes('joung')) return [1];
+  if (name.includes('narrated_by_harris')) return [1];
   
-  // ACT III - The Arrival
-  'PDGC_Opening_7-3-1993': [3],
-  'PDGC_Grand_Opening': [3],
-  'PDGC_1994_Opening_of_the_back_nine_Bember-Guest': [3],
-  'Harrison_Co__Chamber_of_Commerce_Citizen_of_the_Year_Award_1995_Presented_to_James_D__LaRosa-006': [3],
-  'PDGC_CBS_Promo_10-19-98': [3],
-  'Disc_I__Pete_Dye_WV_Classic_July_15_16_2004-020': [3],
-  'Disc_III_Pete_Dye_WV_Classic_July_15_16_2004': [3],
-  'Pete_Dye_WV_Classic_Nationwide_Tour_July_15-16_2004-019': [3],
-  'Pete_Dye_Golf_Course_Highlights_And_Interviews__2_-002': [1, 2, 3],
-  'Pete_Dye_Golf_Club': [1, 2, 3],
-};
+  // ACT III - The Arrival (opening, tournaments, awards)
+  if (name.includes('opening') || name.includes('grand_open')) return [3];
+  if (name.includes('classic') || name.includes('nationwide')) return [3];
+  if (name.includes('citizen_of_the_year') || name.includes('award')) return [3];
+  if (name.includes('cbs_promo')) return [3];
+  if (name.includes('disc_i') || name.includes('disc_iii')) return [3];
+  
+  // Interview with Pete Dye spans acts
+  if (name.includes('interview') && name.includes('pete_dye')) return [1, 2];
+  
+  // Highlights compilation spans all acts
+  if (name.includes('highlights') && name.includes('interviews')) return [1, 2, 3];
+  
+  // ACT II - The Struggle (construction, parties, events during building)
+  // Default to Act 2 for most footage
+  return [2];
+}
 
 interface VideoAnalysis {
   video_analysis: {
@@ -164,25 +153,30 @@ async function main() {
     const analysisPath = path.join(videoPath, 'analysis', 'simple_director_analysis.json');
     const clipsPath = path.join(videoPath, 'clips');
     
-    // Skip if no analysis
-    if (!fs.existsSync(analysisPath)) {
-      console.log(`⏭️  Skipping ${videoDir} (no analysis)`);
+    // Check if we have clips
+    const hasClips = fs.existsSync(clipsPath) && fs.readdirSync(clipsPath).filter(f => f.endsWith('.mp4')).length > 0;
+    
+    // Skip if no analysis AND no clips
+    if (!fs.existsSync(analysisPath) && !hasClips) {
+      console.log(`⏭️  Skipping ${videoDir} (no analysis or clips)`);
       continue;
     }
     
     console.log(`📹 ${videoDir}`);
     
-    // Parse analysis
-    const analysis = parseAnalysis(analysisPath);
-    if (!analysis) {
-      console.log(`   ⚠️ Could not parse analysis`);
-      continue;
-    }
+    // Parse analysis (may not exist)
+    const analysis = fs.existsSync(analysisPath) ? parseAnalysis(analysisPath) : null;
     
     // Extract video metadata
-    const summary = extractSummary(analysis.video_analysis.synthesis_text);
-    const characters = extractCharacters(analysis.video_analysis.synthesis_text);
-    const durationSeconds = Math.round(analysis.video_analysis.total_duration_minutes * 60);
+    let summary = '';
+    let characters: string[] = [];
+    let durationSeconds = 0;
+    
+    if (analysis) {
+      summary = extractSummary(analysis.video_analysis.synthesis_text);
+      characters = extractCharacters(analysis.video_analysis.synthesis_text);
+      durationSeconds = Math.round(analysis.video_analysis.total_duration_minutes * 60);
+    }
     
     // Determine processing status based on word count
     const transcriptPath = path.join(videoPath, 'analysis', 'full_transcript.txt');
@@ -219,7 +213,7 @@ async function main() {
     console.log(`   ✓ Video inserted (${status}, ${wordCount} words)`);
     
     // Link video to acts
-    const actNumbers = videoActMapping[videoDir] || [2]; // Default to Act II
+    const actNumbers = getActsForVideo(videoDir);
     for (const actNum of actNumbers) {
       const actId = actIds[actNum];
       if (actId) {
