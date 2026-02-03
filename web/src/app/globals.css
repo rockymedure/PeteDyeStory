@@ -131,10 +131,6 @@ body {
   letter-spacing: 0.1em;
   color: var(--indicator-color);
   text-transform: uppercase;
-  padding: 0.25rem 0.5rem;
-  border-radius: 9999px;
-  border: 1px solid var(--border-subtle);
-  background: rgba(255, 255, 255, 0.03);
 }
 
 .rec-indicator::before {
