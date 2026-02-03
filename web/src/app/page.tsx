@@ -1,91 +1,87 @@
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
 import { unstable_cache } from 'next/cache';
-import type { Act, StoryElement, Clip } from '@/lib/types';
+import type { Clip } from '@/lib/types';
 import ClipCarousel from '@/components/ClipCarousel';
+
+interface Video {
+  id: string;
+  filename: string;
+  title: string | null;
+  summary: string | null;
+}
 
 interface ClipWithVideo extends Clip {
   video?: { filename: string };
 }
 
-interface StoryElementWithClips extends StoryElement {
+interface VideoWithClips extends Video {
   clips: ClipWithVideo[];
 }
 
-interface ActWithElements extends Act {
-  story_elements: StoryElementWithClips[];
-  total_clips: number;
+// Categorize videos into broader themes
+function getCategory(video: Video): string {
+  const title = (video.title || video.filename).toLowerCase();
+  
+  if (title.includes('construction') || title.includes('cleaning') || title.includes('thru')) {
+    return 'Construction';
+  }
+  if (title.includes('interview') || title.includes('pete dye') && !title.includes('classic')) {
+    return 'Pete Dye';
+  }
+  if (title.includes('classic') || title.includes('tour') || title.includes('nationwide')) {
+    return 'Tournaments';
+  }
+  if (title.includes('opening') || title.includes('grand') || title.includes('award') || title.includes('ceremony')) {
+    return 'Milestones';
+  }
+  if (title.includes('christmas') || title.includes('party') || title.includes('dinner') || title.includes('guest')) {
+    return 'Gatherings';
+  }
+  if (title.includes('narrated') || title.includes('highlights') || title.includes('promo')) {
+    return 'Documentary';
+  }
+  return 'Archive';
 }
 
-const getActsWithElements = unstable_cache(
+const getVideosWithClips = unstable_cache(
   async () => {
-    const { data: acts, error: actsError } = await supabase
-      .from('acts')
+    // Get all videos
+    const { data: videos, error: videosError } = await supabase
+      .from('videos')
       .select('*')
-      .order('act_number');
+      .order('title');
     
-    if (actsError) throw actsError;
+    if (videosError) throw videosError;
 
-    const { data: elements, error: elementsError } = await supabase
-      .from('story_elements')
-      .select('*')
-      .order('sort_order');
-    
-    if (elementsError) throw elementsError;
-
-    const { data: clipLinks, error: clipsError } = await supabase
-      .from('clip_story_links')
-      .select(`
-        story_element_id,
-        is_primary,
-        clips (
-          id,
-          filename,
-          storage_path,
-          thumbnail_path,
-          duration_seconds,
-          description,
-          videos (filename)
-        )
-      `)
-      .order('is_primary', { ascending: false });
+    // Get all clips with video info
+    const { data: clips, error: clipsError } = await supabase
+      .from('clips')
+      .select('*, videos(filename)')
+      .order('filename');
     
     if (clipsError) throw clipsError;
 
-    const clipsByElement: Record<string, ClipWithVideo[]> = {};
-    for (const link of clipLinks || []) {
-      const elementId = link.story_element_id;
-      if (!elementId) continue;
-      if (!clipsByElement[elementId]) clipsByElement[elementId] = [];
-      
-      const clip = link.clips as unknown as (ClipWithVideo & { videos?: { filename: string } | { filename: string }[] });
-      if (clip) {
-        const videos = clip.videos;
-        const video = Array.isArray(videos) ? videos[0] : videos;
-        clipsByElement[elementId].push({ ...clip, video });
-      }
-    }
+    // Group clips by video
+    const videosWithClips: VideoWithClips[] = (videos as Video[])
+      .map(video => {
+        const videoClips = (clips as (ClipWithVideo & { videos: { filename: string } | null })[])
+          .filter(c => c.video_id === video.id)
+          .map(c => ({
+            ...c,
+            video: c.videos ? { filename: c.videos.filename } : undefined
+          }));
+        
+        return {
+          ...video,
+          clips: videoClips
+        };
+      })
+      .filter(v => v.clips.length > 0); // Only show videos that have clips
 
-    const actsWithElements: ActWithElements[] = (acts as Act[]).map(act => {
-      const actElements = (elements as StoryElement[])
-        .filter(e => e.act_id === act.id)
-        .map(e => ({
-          ...e,
-          clips: clipsByElement[e.id] || []
-        }));
-      
-      const totalClips = actElements.reduce((sum, e) => sum + e.clips.length, 0);
-      
-      return {
-        ...act,
-        story_elements: actElements,
-        total_clips: totalClips
-      };
-    });
-
-    return actsWithElements;
+    return videosWithClips;
   },
-  ['acts-with-elements-v3'],
+  ['videos-with-clips'],
   { revalidate: 60 }
 );
 
@@ -98,8 +94,20 @@ function formatDate() {
 }
 
 export default async function Home() {
-  const acts = await getActsWithElements();
-  const totalClips = acts.reduce((sum, act) => sum + act.total_clips, 0);
+  const videosWithClips = await getVideosWithClips();
+  const totalClips = videosWithClips.reduce((sum, v) => sum + v.clips.length, 0);
+
+  // Group videos by category
+  const categories: Record<string, VideoWithClips[]> = {};
+  for (const video of videosWithClips) {
+    const cat = getCategory(video);
+    if (!categories[cat]) categories[cat] = [];
+    categories[cat].push(video);
+  }
+
+  // Order categories
+  const categoryOrder = ['Pete Dye', 'Construction', 'Milestones', 'Tournaments', 'Documentary', 'Gatherings', 'Archive'];
+  const orderedCategories = categoryOrder.filter(cat => categories[cat]?.length > 0);
 
   return (
     <main className="min-h-screen relative">
@@ -122,11 +130,11 @@ export default async function Home() {
       </header>
 
       {/* Hero */}
-      <section className="pt-32 pb-20 px-6">
+      <section className="pt-32 pb-16 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="animate-slide-up">
             <p className="font-mono text-[10px] tracking-[0.3em] text-[var(--amber)] uppercase mb-6">
-              Documentary Film Project
+              Video Archive
             </p>
             
             <h1 className="text-5xl md:text-7xl font-semibold tracking-tight text-[var(--text-primary)] mb-6 leading-[1.1]">
@@ -148,128 +156,70 @@ export default async function Home() {
             </div>
             <span className="w-px h-6 bg-[var(--border-visible)]" />
             <div className="flex items-center gap-3">
-              <span className="font-mono text-2xl font-medium text-[var(--text-primary)]">3</span>
-              <span className="font-mono text-xs text-[var(--text-muted)] uppercase tracking-wider">Acts</span>
+              <span className="font-mono text-2xl font-medium text-[var(--text-primary)]">{videosWithClips.length}</span>
+              <span className="font-mono text-xs text-[var(--text-muted)] uppercase tracking-wider">Tapes</span>
             </div>
             <span className="w-px h-6 bg-[var(--border-visible)]" />
             <div className="flex items-center gap-3">
-              <span className="font-mono text-2xl font-medium text-[var(--text-primary)]">30-40</span>
-              <span className="font-mono text-xs text-[var(--text-muted)] uppercase tracking-wider">Minutes</span>
+              <span className="font-mono text-2xl font-medium text-[var(--text-primary)]">{orderedCategories.length}</span>
+              <span className="font-mono text-xs text-[var(--text-muted)] uppercase tracking-wider">Categories</span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Acts */}
+      {/* Categories */}
       <section className="px-6 pb-24">
-        <div className="max-w-6xl mx-auto space-y-8 stagger-children">
-          {acts.map((act, actIndex) => (
-            <article key={act.id} className="card overflow-hidden">
-              {/* Act Header */}
-              <Link 
-                href={`/acts/${act.id}`}
-                className="block p-8 md:p-10 group"
-              >
-                <div className="flex items-start justify-between gap-6">
-                  <div className="flex-1">
-                    {/* Act label with timecode style */}
-                    <div className="flex items-center gap-4 mb-4">
-                      <span className="font-mono text-[10px] tracking-[0.2em] text-[var(--amber)] uppercase">
-                        Act {String(act.act_number).padStart(2, '0')}
-                      </span>
-                      <span className="font-mono text-[10px] text-[var(--text-muted)]">
-                        {act.duration_target}
-                      </span>
-                    </div>
-                    
-                    <h2 className="text-3xl md:text-4xl font-semibold text-[var(--text-primary)] mb-3 group-hover:text-[var(--amber)] transition-colors duration-300">
-                      {act.title}
-                    </h2>
-                    
-                    <p className="text-[var(--text-secondary)] max-w-2xl leading-relaxed">
-                      {act.description}
-                    </p>
-                  </div>
-                  
-                  {/* Clip counter */}
-                  <div className="hidden md:flex flex-col items-end">
-                    <span className="font-mono text-4xl font-medium text-[var(--text-muted)] group-hover:text-[var(--amber)] transition-colors">
-                      {String(act.total_clips).padStart(3, '0')}
-                    </span>
-                    <span className="font-mono text-[10px] text-[var(--text-muted)] uppercase tracking-wider mt-1">
-                      clips
-                    </span>
-                  </div>
+        <div className="max-w-6xl mx-auto space-y-16">
+          {orderedCategories.map((categoryName) => {
+            const categoryVideos = categories[categoryName];
+            const categoryClipCount = categoryVideos.reduce((sum, v) => sum + v.clips.length, 0);
+            
+            return (
+              <div key={categoryName}>
+                {/* Category header */}
+                <div className="flex items-center gap-4 mb-8">
+                  <h2 className="text-2xl font-semibold text-[var(--text-primary)]">
+                    {categoryName}
+                  </h2>
+                  <span className="font-mono text-xs text-[var(--text-muted)]">
+                    {categoryClipCount} clips
+                  </span>
+                  <span className="flex-1 h-px bg-[var(--border-subtle)]" />
                 </div>
-              </Link>
 
-              {/* Story Elements */}
-              <div className="border-t border-[var(--border-subtle)]">
-                {act.story_elements.map((element, elementIndex) => {
-                  const isKeyMoment = element.element_type === 'key_moment';
-                  
-                  return (
-                    <div 
-                      key={element.id}
-                      className={`px-8 md:px-10 py-6 border-b border-[var(--border-subtle)] last:border-b-0 ${
-                        isKeyMoment ? 'bg-[var(--amber)]/[0.03]' : ''
-                      }`}
-                    >
-                      {/* Element header */}
-                      <div className="flex items-center gap-4 mb-4">
-                        <span className="font-mono text-[10px] text-[var(--text-muted)]">
-                          {String(actIndex + 1)}.{String(elementIndex + 1).padStart(2, '0')}
-                        </span>
-                        
-                        {isKeyMoment && (
-                          <span className="font-mono text-[9px] tracking-wider text-[var(--amber)] uppercase px-2 py-0.5 border border-[var(--amber)]/30 rounded">
-                            Key Moment
-                          </span>
-                        )}
-                        
-                        <span className={`text-sm font-medium flex-1 ${
-                          isKeyMoment ? 'text-[var(--amber)]' : 'text-[var(--text-primary)]'
-                        }`}>
-                          {element.title}
-                        </span>
-                        
-                        <span className="font-mono text-[10px] text-[var(--text-muted)]">
-                          {element.clips.length} {element.clips.length === 1 ? 'clip' : 'clips'}
-                        </span>
-                      </div>
-                      
-                      {/* Clips carousel */}
-                      {element.clips.length > 0 ? (
-                        <ClipCarousel clips={element.clips} />
-                      ) : (
-                        <div className="h-20 flex items-center justify-center border border-dashed border-[var(--border-subtle)] rounded-lg">
-                          <span className="font-mono text-xs text-[var(--text-muted)]">No clips assigned</span>
+                {/* Videos in category */}
+                <div className="space-y-8">
+                  {categoryVideos.map((video) => (
+                    <article key={video.id} className="card p-6">
+                      <div className="flex items-start justify-between gap-4 mb-4">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-3 mb-2">
+                            <span className="font-mono text-[10px] text-[var(--amber)] uppercase tracking-wider">
+                              Tape
+                            </span>
+                            <span className="font-mono text-[10px] text-[var(--text-muted)]">
+                              {video.clips.length} clips
+                            </span>
+                          </div>
+                          <h3 className="text-lg font-medium text-[var(--text-primary)] truncate">
+                            {video.title || video.filename.replace(/_/g, ' ')}
+                          </h3>
+                          {video.summary && (
+                            <p className="text-sm text-[var(--text-secondary)] mt-2 line-clamp-2">
+                              {video.summary}
+                            </p>
+                          )}
                         </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+                      </div>
 
-              {/* Act footer */}
-              <Link 
-                href={`/acts/${act.id}`}
-                className="flex items-center justify-between px-8 md:px-10 py-4 bg-[var(--bg-elevated)] border-t border-[var(--border-subtle)] group/link"
-              >
-                <span className="font-mono text-xs text-[var(--text-muted)] group-hover/link:text-[var(--text-secondary)] transition-colors">
-                  View full act breakdown
-                </span>
-                <svg 
-                  className="w-4 h-4 text-[var(--text-muted)] group-hover/link:text-[var(--amber)] group-hover/link:translate-x-1 transition-all" 
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-              </Link>
-            </article>
-          ))}
+                      <ClipCarousel clips={video.clips} />
+                    </article>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </section>
 
