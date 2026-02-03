@@ -46,3 +46,23 @@ video-processing/media/**/*.mov
 # Temporary files
 *.tmp
 *.temp
+
+# Video assets (large files)
+videos/
+web-clips/
+
+# Log files
+*.log
+scripts/*.log
+scripts/*-log.txt
+video-processing/*.log
+video-processing/*.txt
+video-processing/*.md
+
+# Node modules
+scripts/node_modules/
+scripts/package-lock.json
+
+# Public symlinks
+web/public/clips
+web/public/thumbnails

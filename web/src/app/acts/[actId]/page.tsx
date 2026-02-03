@@ -79,7 +79,8 @@ function getThumbnailPath(clip: ClipWithVideo): string {
   if (clip.thumbnail_path) return clip.thumbnail_path;
   
   // Otherwise construct local path from video + clip filename
-  const videoFilename = clip.video?.filename || '';
+  // Normalize: DB uses hyphens but thumbnails use underscores
+  const videoFilename = (clip.video?.filename || '').replace(/-/g, '_');
   const clipName = clip.filename?.replace('.mp4', '') || '';
   return `/thumbnails/${videoFilename}__${clipName}.jpg`;
 }
