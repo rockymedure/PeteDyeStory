@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import type { Clip } from '@/lib/types';
 import VideoPlayer from './VideoPlayer';
+import { playSelect, playStop, playNavigate, playHover, initAudio } from '@/lib/sounds';
 
 interface ClipWithVideo extends Clip {
   video?: { filename: string };
@@ -31,16 +32,24 @@ export default function ClipCarousel({ clips }: ClipCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const handleOpenPlayer = (index: number) => {
+    initAudio();
+    playSelect();
     setCurrentIndex(index);
     setPlayerOpen(true);
   };
 
   const handleClosePlayer = () => {
+    playStop();
     setPlayerOpen(false);
   };
 
   const handleNavigate = (index: number) => {
+    playNavigate();
     setCurrentIndex(index);
+  };
+
+  const handleThumbnailHover = () => {
+    playHover();
   };
 
   const displayClips = clips.slice(0, 6);
@@ -56,6 +65,7 @@ export default function ClipCarousel({ clips }: ClipCarouselProps) {
             <div
               key={clip.id}
               onClick={() => handleOpenPlayer(index)}
+              onMouseEnter={handleThumbnailHover}
               className="clip-thumb flex-shrink-0 w-36 md:w-44 cursor-pointer group"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}

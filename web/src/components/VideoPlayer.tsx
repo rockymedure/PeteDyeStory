@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useCallback } from 'react';
 import type { Clip } from '@/lib/types';
+import { playNavigate, playStop, playStart } from '@/lib/sounds';
 
 interface ClipWithVideo extends Clip {
   video?: { filename: string };
@@ -37,19 +38,35 @@ export default function VideoPlayer({ clip, clips, currentIndex, onClose, onNavi
   const hasNext = currentIndex < clips.length - 1;
 
   const handlePrev = useCallback(() => {
-    if (hasPrev) onNavigate(currentIndex - 1);
+    if (hasPrev) {
+      playNavigate();
+      onNavigate(currentIndex - 1);
+    }
   }, [hasPrev, currentIndex, onNavigate]);
 
   const handleNext = useCallback(() => {
-    if (hasNext) onNavigate(currentIndex + 1);
+    if (hasNext) {
+      playNavigate();
+      onNavigate(currentIndex + 1);
+    }
   }, [hasNext, currentIndex, onNavigate]);
+
+  const handleClose = useCallback(() => {
+    playStop();
+    onClose();
+  }, [onClose]);
+
+  // Play start sound when player opens
+  useEffect(() => {
+    playStart();
+  }, []);
 
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       switch (e.key) {
         case 'Escape':
-          onClose();
+          handleClose();
           break;
         case 'ArrowLeft':
           handlePrev();
@@ -72,7 +89,7 @@ export default function VideoPlayer({ clip, clips, currentIndex, onClose, onNavi
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onClose, handlePrev, handleNext]);
+  }, [handleClose, handlePrev, handleNext]);
 
   // Auto-advance to next video when current ends
   const handleEnded = () => {
@@ -93,7 +110,7 @@ export default function VideoPlayer({ clip, clips, currentIndex, onClose, onNavi
     <div className="fixed inset-0 z-[100] bg-black">
       {/* Close button */}
       <button
-        onClick={onClose}
+        onClick={handleClose}
         className="absolute top-6 right-6 z-20 w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
         aria-label="Close"
       >
