@@ -1,0 +1,10 @@
+# Prevent Railway uploads from following local symlinks
+public/clips
+public/thumbnails
+
+# Standard Next.js ignores
+node_modules
+.next
+out
+build
+
