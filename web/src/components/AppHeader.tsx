@@ -42,7 +42,7 @@ export default function AppHeader({
 }) {
   const pathname = usePathname();
   const isOutline = pathname.startsWith('/outline');
-  const indicatorColor = isOutline ? 'var(--amber)' : status === 'Playing' ? 'var(--rec-red)' : 'var(--tape-blue)';
+  const indicatorColor = 'var(--rec-red)';
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-[var(--bg-deep)]/80 border-b border-[var(--border-subtle)]">
