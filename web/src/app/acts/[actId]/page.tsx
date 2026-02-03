@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { unstable_cache } from 'next/cache';
 import type { Act, StoryElement, Clip } from '@/lib/types';
 
 interface ClipWithVideo extends Clip {
@@ -11,53 +12,66 @@ interface PageProps {
   params: Promise<{ actId: string }>;
 }
 
-async function getAct(actId: string) {
-  const { data: act, error } = await supabase
-    .from('acts')
-    .select('*')
-    .eq('id', actId)
-    .single();
-  
-  if (error || !act) return null;
-  return act as Act;
-}
+const getAct = unstable_cache(
+  async (actId: string) => {
+    const { data: act, error } = await supabase
+      .from('acts')
+      .select('*')
+      .eq('id', actId)
+      .single();
+    
+    if (error || !act) return null;
+    return act as Act;
+  },
+  ['act'],
+  { revalidate: 60 }
+);
 
-async function getStoryElements(actId: string) {
-  const { data, error } = await supabase
-    .from('story_elements')
-    .select('*')
-    .eq('act_id', actId)
-    .order('sort_order');
-  
-  if (error) throw error;
-  return data as StoryElement[];
-}
+const getStoryElements = unstable_cache(
+  async (actId: string) => {
+    const { data, error } = await supabase
+      .from('story_elements')
+      .select('*')
+      .eq('act_id', actId)
+      .order('sort_order');
+    
+    if (error) throw error;
+    return data as StoryElement[];
+  },
+  ['story-elements'],
+  { revalidate: 60 }
+);
 
-async function getClipsForStoryElement(storyElementId: string) {
-  const { data, error } = await supabase
-    .from('clip_story_links')
-    .select(`
-      clip_id,
-      is_primary,
-      clips (
-        id,
-        title,
-        filename,
-        storage_path,
-        thumbnail_path,
-        duration_seconds,
-        description,
-        videos (
-          filename
+const getClipsForStoryElement = unstable_cache(
+  async (storyElementId: string) => {
+    const { data, error } = await supabase
+      .from('clip_story_links')
+      .select(`
+        clip_id,
+        is_primary,
+        clips (
+          id,
+          title,
+          filename,
+          storage_path,
+          thumbnail_path,
+          duration_seconds,
+          description,
+          videos (
+            filename
+          )
         )
-      )
-    `)
-    .eq('story_element_id', storyElementId)
-    .order('is_primary', { ascending: false });
-  
-  if (error) return [];
-  return data;
-}
+      `)
+      .eq('story_element_id', storyElementId)
+      .order('is_primary', { ascending: false })
+      .order('clip_id', { ascending: true });
+    
+    if (error) return [];
+    return data;
+  },
+  ['clips-for-story'],
+  { revalidate: 60 }
+);
 
 // Helper to get thumbnail path
 function getThumbnailPath(clip: ClipWithVideo): string {
