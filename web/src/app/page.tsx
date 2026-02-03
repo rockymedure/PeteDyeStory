@@ -19,28 +19,70 @@ interface VideoWithClips extends Video {
   clips: ClipWithVideo[];
 }
 
-// Categorize videos into broader themes
+// Content-based categories
 function getCategory(video: Video): string {
   const title = (video.title || video.filename).toLowerCase();
   
-  if (title.includes('construction') || title.includes('cleaning') || title.includes('thru')) {
-    return 'Construction';
+  // Building the Course — Construction footage
+  if (
+    title.includes('construction') ||
+    title.includes('cleanup') ||
+    title.includes('planting') ||
+    title.includes('progress') ||
+    title.includes('holes 1-9') ||
+    title.includes('irrigation') ||
+    title.includes('early years') ||
+    title.includes('course tour') ||
+    (title.includes('spring 1989') && !title.includes('opening'))
+  ) {
+    return 'Building the Course';
   }
-  if (title.includes('interview') || title.includes('pete dye') && !title.includes('classic')) {
-    return 'Pete Dye';
+  
+  // Celebrations & Milestones — Openings, awards
+  if (
+    title.includes('opening') ||
+    title.includes('grand') ||
+    title.includes('citizen of the year') ||
+    title.includes('award')
+  ) {
+    return 'Celebrations & Milestones';
   }
-  if (title.includes('classic') || title.includes('tour') || title.includes('nationwide')) {
-    return 'Tournaments';
+  
+  // The Legacy — Tournaments, documentaries, media
+  if (
+    title.includes('classic') ||
+    title.includes('nationwide') ||
+    title.includes('tour') ||
+    title.includes('cbs') ||
+    title.includes('narrated') ||
+    title.includes('documentary') ||
+    title.includes('harris holt')
+  ) {
+    return 'The Legacy';
   }
-  if (title.includes('opening') || title.includes('grand') || title.includes('award') || title.includes('ceremony')) {
-    return 'Milestones';
+  
+  // People & Relationships — Interviews, gatherings, guests
+  if (
+    title.includes('interview') ||
+    title.includes('dimaggio') ||
+    title.includes('christmas') ||
+    title.includes('dinner') ||
+    title.includes('party') ||
+    title.includes('papa jim')
+  ) {
+    return 'People & Relationships';
   }
-  if (title.includes('christmas') || title.includes('party') || title.includes('dinner') || title.includes('guest')) {
-    return 'Gatherings';
+  
+  // Family Archives — Personal footage, historic
+  if (
+    title.includes('family') ||
+    title.includes('halloween') ||
+    title.includes('archives') ||
+    title.includes('historic')
+  ) {
+    return 'Family Archives';
   }
-  if (title.includes('narrated') || title.includes('highlights') || title.includes('promo')) {
-    return 'Documentary';
-  }
+  
   return 'Archive';
 }
 
@@ -98,7 +140,7 @@ export default async function Home() {
   }
 
   // Order categories
-  const categoryOrder = ['Pete Dye', 'Construction', 'Milestones', 'Tournaments', 'Documentary', 'Gatherings', 'Archive'];
+  const categoryOrder = ['Building the Course', 'Celebrations & Milestones', 'People & Relationships', 'The Legacy', 'Family Archives', 'Archive'];
   const orderedCategories = categoryOrder.filter(cat => categories[cat]?.length > 0);
 
   return (
