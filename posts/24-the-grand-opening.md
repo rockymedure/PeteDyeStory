@@ -23,7 +23,7 @@ As the day wore on and guests began to arrive, our team performed flawlessly. An
 
 That, to me, was success.
 
-After playing nine holes with Joe DiMaggio, the evening began to unfold in earnest. The state police presence increased. Governor Caperton's helicopter landed. State Senator Joe Manchin, Congressman Alan Mollohan, author Mark Shaw, and many other distinguished guests arrived. Yet despite the stature of those in attendance, the atmosphere never felt stiff. It felt celebratory. Earned.
+After playing nine holes with Joe DiMaggio, the evening began to unfold in earnest. The state police presence increased. West Virginia Governor Gaston Caperton's helicopter landed. State Senator Joe Manchin, Congressman Alan Mollohan, author Mark Shaw, and many other distinguished guests arrived. Yet despite the stature of those in attendance, the atmosphere never felt stiff. It felt celebratory. Earned.
 
 One of the most meaningful moments of the entire weekend happened quietly, earlier that morning.
 
