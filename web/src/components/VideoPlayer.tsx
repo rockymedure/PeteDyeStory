@@ -25,6 +25,13 @@ function formatDuration(seconds: number | null | undefined): string {
   return `${mins}:${String(secs).padStart(2, '0')}`;
 }
 
+function downloadFilename(clip: ClipWithVideo): string {
+  const label = clip.description || clip.filename?.replace('.mp4', '').replace(/-/g, ' ') || 'clip';
+  // Sanitise for filesystem
+  const safe = label.replace(/[^a-zA-Z0-9 _-]/g, '').trim().replace(/\s+/g, '-').slice(0, 80);
+  return `${safe}.mp4`;
+}
+
 export default function VideoPlayer({ clip, clips, currentIndex, onClose, onNavigate }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const clipPath = resolveClipUrl(clip);
@@ -79,12 +86,20 @@ export default function VideoPlayer({ clip, clips, currentIndex, onClose, onNavi
             }
           }
           break;
+        case 'd':
+        case 'D': {
+          const a = document.createElement('a');
+          a.href = clipPath;
+          a.download = downloadFilename(clip);
+          a.click();
+          break;
+        }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleClose, handlePrev, handleNext]);
+  }, [handleClose, handlePrev, handleNext, clip, clipPath]);
 
   // Auto-advance to next video when current ends
   const handleEnded = () => {
@@ -106,16 +121,32 @@ export default function VideoPlayer({ clip, clips, currentIndex, onClose, onNavi
 
   const playerContent = (
     <div className="fixed inset-0 z-[9999] bg-black">
-      {/* Close button */}
-      <button
-        onClick={handleClose}
-        className="absolute top-6 right-6 z-20 w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
-        aria-label="Close"
-      >
-        <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
+      {/* Top-right actions */}
+      <div className="absolute top-6 right-6 z-20 flex items-center gap-2">
+        {/* Download button */}
+        <a
+          href={clipPath}
+          download={downloadFilename(clip)}
+          className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+          aria-label="Download clip"
+          title="Download clip"
+        >
+          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V3" />
+          </svg>
+        </a>
+
+        {/* Close button */}
+        <button
+          onClick={handleClose}
+          className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+          aria-label="Close"
+        >
+          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
 
       {/* Counter */}
       <div className="absolute top-6 left-6 z-20 font-mono text-sm text-white/60">
@@ -193,6 +224,7 @@ export default function VideoPlayer({ clip, clips, currentIndex, onClose, onNavi
           <div className="flex items-center gap-4 mt-4 text-white/40 text-xs font-mono">
             <span>← → Navigate</span>
             <span>Space Pause</span>
+            <span>D Download</span>
             <span>Esc Close</span>
           </div>
         </div>
