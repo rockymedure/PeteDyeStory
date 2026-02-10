@@ -124,16 +124,17 @@ export default function VideoPlayer({ clip, clips, currentIndex, onClose, onNavi
         <span>{clips.length}</span>
       </div>
 
-      {/* Video container */}
-      <div className="absolute inset-0 flex items-center justify-center p-4 md:p-12">
+      {/* Video container — pb-32 reserves space so native controls aren't covered by info bar */}
+      <div className="absolute inset-0 flex items-center justify-center p-4 pb-36 pt-16 md:px-12 md:pb-40 md:pt-20">
         <div className="relative w-full max-w-5xl aspect-video bg-black rounded-lg overflow-hidden shadow-2xl">
           <video
             ref={videoRef}
             src={clipPath}
             autoPlay
             controls
+            playsInline
             onEnded={handleEnded}
-            className="w-full h-full object-contain"
+            className="w-full h-full object-contain relative z-10"
           />
           
           {/* VHS overlay effect */}
@@ -171,8 +172,8 @@ export default function VideoPlayer({ clip, clips, currentIndex, onClose, onNavi
         </button>
       )}
 
-      {/* Bottom info bar */}
-      <div className="absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-black/80 to-transparent p-6 md:p-8">
+      {/* Bottom info bar — z-10 so it doesn't block the video scrubber */}
+      <div className="absolute bottom-0 left-0 right-0 z-[5] bg-gradient-to-t from-black/80 to-transparent p-6 md:p-8 pointer-events-none">
         <div className="max-w-5xl mx-auto">
           <div className="flex items-center gap-4 mb-2">
             <span className="font-mono text-xs text-[var(--amber)] uppercase tracking-wider">
