@@ -7,14 +7,17 @@ type ClipLike = {
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
-function isLocalhost() {
-  if (typeof window === 'undefined') return false;
-  return window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-}
+/**
+ * In local dev we serve clips/thumbnails from the symlinked public/ folder.
+ * On Railway (or any non-local deploy) we serve from Supabase Storage.
+ *
+ * We use NODE_ENV to decide — this is stable across server and client renders
+ * so it won't cause a hydration mismatch.
+ */
+const IS_DEV = process.env.NODE_ENV === 'development';
 
 function supabasePublicUrl(bucket: string, objectName: string) {
   if (!SUPABASE_URL) return null;
-  // objectName here is a single "filename-like" segment (no slashes expected)
   return `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${encodeURIComponent(objectName)}`;
 }
 
@@ -30,21 +33,18 @@ export function resolveThumbnailUrl(clip: ClipLike): string {
     if (clip.thumbnail_path.startsWith('http://') || clip.thumbnail_path.startsWith('https://')) {
       return clip.thumbnail_path;
     }
-
-    // Local dev convenience (symlinked /public/thumbnails)
     if (clip.thumbnail_path.startsWith('/')) return clip.thumbnail_path;
 
-    // Treat as storage object name/path
     const objectName = clip.thumbnail_path.replace(/^\/+/, '');
     return supabasePublicUrl('thumbnails', objectName) ?? `/${objectName}`;
   }
 
   const filename = `${derivedBaseName(clip)}.jpg`;
 
-  // Local dev uses the symlinked public folder
-  if (isLocalhost()) return `/thumbnails/${filename}`;
+  // Dev: use the symlinked /public/thumbnails folder
+  if (IS_DEV) return `/thumbnails/${filename}`;
 
-  // Production: load from Supabase Storage (public bucket)
+  // Production: load from Supabase Storage
   return supabasePublicUrl('thumbnails', filename) ?? `/thumbnails/${filename}`;
 }
 
@@ -60,7 +60,6 @@ export function resolveClipUrl(clip: ClipLike): string {
   }
 
   const filename = `${derivedBaseName(clip)}.mp4`;
-  if (isLocalhost()) return `/clips/${filename}`;
+  if (IS_DEV) return `/clips/${filename}`;
   return supabasePublicUrl('clips', filename) ?? `/clips/${filename}`;
 }
-
