@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import AppHeader from '@/components/AppHeader';
+import ClipCarousel from '@/components/ClipCarousel';
+import { supabase } from '@/lib/supabase';
 import videoAnalyses from '@/data/videoAnalyses.json';
 
 /* ─── Types ─────────────────────────────────────────────────────────────── */
@@ -90,6 +92,53 @@ export default async function VideoDetailPage({
   if (!analysis) notFound();
 
   const { title, content_type, summary, characters, chapters, highlights, quotes, themes } = analysis;
+
+  // Fetch clips for this video from Supabase
+  // Match slug to a Supabase video by finding one whose filename is close
+  const { data: videosData } = await supabase.from('videos').select('id, filename');
+  const { data: clipsData } = await supabase.from('clips').select('*, videos(filename)').order('sort_order');
+
+  // Find the matching video
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let videoClips: any[] = [];
+  if (videosData && clipsData) {
+    const matchedVideo = (videosData as { id: string; filename: string }[]).find((v) =>
+      v.filename === slug ||
+      v.filename.toLowerCase().includes(slug.toLowerCase().slice(0, 20)) ||
+      slug.toLowerCase().includes(v.filename.toLowerCase().slice(0, 20))
+    );
+    if (matchedVideo) {
+      videoClips = (clipsData as { video_id: string; videos: { filename: string } | null; [key: string]: unknown }[])
+        .filter((c) => c.video_id === matchedVideo.id)
+        .map((c) => ({
+          ...c,
+          video: c.videos ? { filename: (c.videos as { filename: string }).filename } : undefined,
+        }));
+    }
+  }
+
+  // Helper: parse timestamp string to seconds for matching clips to chapters
+  function tsToSeconds(ts: string): number {
+    const parts = ts.split(':').map(Number);
+    if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+    if (parts.length === 2) return parts[0] * 60 + parts[1];
+    return parts[0] || 0;
+  }
+
+  // Match clips to chapters by finding which chapter's time range each clip falls into
+  function getClipsForChapter(chapterIndex: number) {
+    if (videoClips.length === 0 || chapters.length === 0) return [];
+    const ch = chapters[chapterIndex];
+    const chStart = tsToSeconds(ch.start_time);
+    const chEnd = tsToSeconds(ch.end_time);
+
+    // If clips have start_time, match by time range; otherwise match by sort order
+    // Most clips are ordered 01, 02, 03... matching chapter order
+    // Simple approach: distribute clips evenly across chapters
+    const clipsPerChapter = Math.ceil(videoClips.length / chapters.length);
+    const start = chapterIndex * clipsPerChapter;
+    return videoClips.slice(start, start + clipsPerChapter);
+  }
 
   return (
     <main className="min-h-screen relative">
@@ -201,31 +250,37 @@ export default async function VideoDetailPage({
               <span className="flex-1 h-px bg-[var(--border-subtle)]" />
             </div>
 
-            <div className="space-y-0.5">
-              {chapters.map((ch, i) => (
-                <div
-                  key={`${ch.start_time}-${i}`}
-                  className="group relative flex gap-3 sm:gap-4 px-3 py-3 sm:px-4 sm:py-4 rounded-lg hover:bg-[var(--bg-card)] transition-colors"
-                >
-                  <div className="flex flex-col items-center shrink-0 pt-0.5">
-                    <span className="timecode text-[10px] sm:text-xs whitespace-nowrap tabular-nums">
-                      {ch.start_time}
-                    </span>
-                    {i < chapters.length - 1 && (
-                      <span className="w-px flex-1 bg-[var(--border-subtle)] mt-1.5 min-h-[0.5rem]" />
+            <div className="space-y-1">
+              {chapters.map((ch, i) => {
+                const chapterClips = getClipsForChapter(i);
+                return (
+                  <div
+                    key={`${ch.start_time}-${i}`}
+                    className="card overflow-hidden"
+                  >
+                    <div className="flex gap-3 sm:gap-4 px-3 py-3 sm:px-4 sm:py-4">
+                      <div className="flex flex-col items-center shrink-0 pt-0.5">
+                        <span className="timecode text-[10px] sm:text-xs whitespace-nowrap tabular-nums">
+                          {ch.start_time}
+                        </span>
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-sm sm:text-base font-semibold text-[var(--text-primary)] leading-snug">
+                          {ch.title}
+                        </h3>
+                        <p className="text-xs text-[var(--text-secondary)] leading-relaxed mt-1 line-clamp-2">
+                          {ch.summary}
+                        </p>
+                      </div>
+                    </div>
+
+                    {chapterClips.length > 0 && (
+                      <ClipCarousel clips={chapterClips} />
                     )}
                   </div>
-
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-sm sm:text-base font-semibold text-[var(--text-primary)] leading-snug">
-                      {ch.title}
-                    </h3>
-                    <p className="text-xs text-[var(--text-secondary)] leading-relaxed mt-1 line-clamp-2">
-                      {ch.summary}
-                    </p>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </section>
         )}
