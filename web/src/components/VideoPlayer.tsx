@@ -122,12 +122,12 @@ export default function VideoPlayer({ clip, clips, currentIndex, onClose, onNavi
   const playerContent = (
     <div className="fixed inset-0 z-[9999] bg-black">
       {/* Top-right actions */}
-      <div className="absolute top-6 right-6 z-20 flex items-center gap-2">
+      <div className="absolute top-3 right-3 sm:top-6 sm:right-6 z-20 flex items-center gap-2">
         {/* Download button */}
         <a
           href={clipPath}
           download={downloadFilename(clip)}
-          className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+          className="w-10 h-10 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 transition-colors"
           aria-label="Download clip"
           title="Download clip"
         >
@@ -139,7 +139,7 @@ export default function VideoPlayer({ clip, clips, currentIndex, onClose, onNavi
         {/* Close button */}
         <button
           onClick={handleClose}
-          className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+          className="w-10 h-10 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 transition-colors"
           aria-label="Close"
         >
           <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -149,15 +149,15 @@ export default function VideoPlayer({ clip, clips, currentIndex, onClose, onNavi
       </div>
 
       {/* Counter */}
-      <div className="absolute top-6 left-6 z-20 font-mono text-sm text-white/60">
+      <div className="absolute top-3 left-3 sm:top-6 sm:left-6 z-20 font-mono text-xs sm:text-sm text-white/60">
         <span className="text-white">{currentIndex + 1}</span>
         <span className="mx-1">/</span>
         <span>{clips.length}</span>
       </div>
 
-      {/* Video container — pb-32 reserves space so native controls aren't covered by info bar */}
-      <div className="absolute inset-0 flex items-center justify-center p-4 pb-36 pt-16 md:px-12 md:pb-40 md:pt-20">
-        <div className="relative w-full max-w-5xl aspect-video bg-black rounded-lg overflow-hidden shadow-2xl">
+      {/* Video container — pb reserves space so native controls aren't covered by info bar */}
+      <div className="absolute inset-0 flex items-center justify-center p-2 pb-28 pt-14 sm:p-4 sm:pb-36 sm:pt-16 md:px-12 md:pb-40 md:pt-20">
+        <div className="relative w-full max-w-5xl aspect-video bg-black rounded-md sm:rounded-lg overflow-hidden shadow-2xl">
           <video
             ref={videoRef}
             src={clipPath}
@@ -178,14 +178,14 @@ export default function VideoPlayer({ clip, clips, currentIndex, onClose, onNavi
         </div>
       </div>
 
-      {/* Navigation arrows */}
+      {/* Navigation arrows — hidden on very small screens, use swipe instead */}
       {hasPrev && (
         <button
           onClick={handlePrev}
-          className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors group"
+          className="absolute left-2 sm:left-4 md:left-8 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 hidden sm:flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 transition-colors group"
           aria-label="Previous clip"
         >
-          <svg className="w-6 h-6 text-white group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
@@ -194,34 +194,53 @@ export default function VideoPlayer({ clip, clips, currentIndex, onClose, onNavi
       {hasNext && (
         <button
           onClick={handleNext}
-          className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors group"
+          className="absolute right-2 sm:right-4 md:right-8 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 hidden sm:flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 transition-colors group"
           aria-label="Next clip"
         >
-          <svg className="w-6 h-6 text-white group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
         </button>
       )}
 
-      {/* Bottom info bar — z-10 so it doesn't block the video scrubber */}
-      <div className="absolute bottom-0 left-0 right-0 z-[5] bg-gradient-to-t from-black/80 to-transparent p-6 md:p-8 pointer-events-none">
+      {/* Mobile navigation — prev/next tappable zones on small screens */}
+      <div className="absolute inset-0 z-[6] flex sm:hidden pointer-events-none">
+        {hasPrev && (
+          <button
+            onClick={handlePrev}
+            className="w-1/4 h-full pointer-events-auto"
+            aria-label="Previous clip"
+          />
+        )}
+        <div className="flex-1" />
+        {hasNext && (
+          <button
+            onClick={handleNext}
+            className="w-1/4 h-full pointer-events-auto"
+            aria-label="Next clip"
+          />
+        )}
+      </div>
+
+      {/* Bottom info bar */}
+      <div className="absolute bottom-0 left-0 right-0 z-[5] bg-gradient-to-t from-black/80 to-transparent p-4 sm:p-6 md:p-8 pointer-events-none">
         <div className="max-w-5xl mx-auto">
-          <div className="flex items-center gap-4 mb-2">
-            <span className="font-mono text-xs text-[var(--amber)] uppercase tracking-wider">
+          <div className="flex items-center gap-3 sm:gap-4 mb-1 sm:mb-2">
+            <span className="font-mono text-[10px] sm:text-xs text-[var(--amber)] uppercase tracking-wider">
               Now Playing
             </span>
             {clip.duration_seconds && (
-              <span className="font-mono text-xs text-white/50">
+              <span className="font-mono text-[10px] sm:text-xs text-white/50">
                 {formatDuration(clip.duration_seconds)}
               </span>
             )}
           </div>
-          <p className="text-white/90 text-sm md:text-base max-w-2xl leading-relaxed">
+          <p className="text-white/90 text-xs sm:text-sm md:text-base max-w-2xl leading-relaxed line-clamp-2 sm:line-clamp-none">
             {clip.description || clip.filename?.replace('.mp4', '').replace(/-/g, ' ')}
           </p>
           
-          {/* Keyboard hints */}
-          <div className="flex items-center gap-4 mt-4 text-white/40 text-xs font-mono">
+          {/* Keyboard hints — hidden on touch/mobile */}
+          <div className="hidden sm:flex items-center gap-4 mt-3 sm:mt-4 text-white/40 text-xs font-mono">
             <span>← → Navigate</span>
             <span>Space Pause</span>
             <span>D Download</span>

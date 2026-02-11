@@ -172,47 +172,47 @@ export default async function Home() {
       <AppHeader />
 
       {/* Hero */}
-      <section className="pt-32 pb-16 px-6">
+      <section className="pt-24 pb-12 px-5 sm:pt-32 sm:pb-16 sm:px-6">
         <div className="max-w-6xl mx-auto">
           <div className="animate-slide-up">
-            <p className="font-mono text-[10px] tracking-[0.3em] text-[var(--amber)] uppercase mb-6">
+            <p className="font-mono text-[10px] tracking-[0.3em] text-[var(--amber)] uppercase mb-4 sm:mb-6">
               Video Archive
             </p>
             
-            <h1 className="text-5xl md:text-7xl font-semibold tracking-tight text-[var(--text-primary)] mb-6 leading-[1.1]">
+            <h1 className="text-3xl sm:text-5xl md:text-7xl font-semibold tracking-tight text-[var(--text-primary)] mb-4 sm:mb-6 leading-[1.1]">
               He designed over 100<br />
               legendary courses.<br />
               <span className="text-[var(--text-muted)]">He put his name on one.</span>
             </h1>
             
-            <p className="text-lg text-[var(--text-secondary)] max-w-xl leading-relaxed">
+            <p className="text-base sm:text-lg text-[var(--text-secondary)] max-w-xl leading-relaxed">
               Carved from an abandoned coal mine in West Virginia, alongside two miners 
               who spent 18 years refusing to quit.
             </p>
           </div>
           
-          <div className="mt-12 flex items-center gap-8 animate-fade-in" style={{ animationDelay: '200ms' }}>
-            <div className="flex items-center gap-3">
-              <span className="font-mono text-2xl font-medium text-[var(--text-primary)]">{totalClips}</span>
-              <span className="font-mono text-xs text-[var(--text-muted)] uppercase tracking-wider">Clips</span>
+          <div className="mt-8 sm:mt-12 flex flex-wrap items-center gap-4 sm:gap-8 animate-fade-in" style={{ animationDelay: '200ms' }}>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <span className="font-mono text-xl sm:text-2xl font-medium text-[var(--text-primary)]">{totalClips}</span>
+              <span className="font-mono text-[10px] sm:text-xs text-[var(--text-muted)] uppercase tracking-wider">Clips</span>
             </div>
-            <span className="w-px h-6 bg-[var(--border-visible)]" />
-            <div className="flex items-center gap-3">
-              <span className="font-mono text-2xl font-medium text-[var(--text-primary)]">{videosWithClips.length}</span>
-              <span className="font-mono text-xs text-[var(--text-muted)] uppercase tracking-wider">Tapes</span>
+            <span className="w-px h-5 sm:h-6 bg-[var(--border-visible)]" />
+            <div className="flex items-center gap-2 sm:gap-3">
+              <span className="font-mono text-xl sm:text-2xl font-medium text-[var(--text-primary)]">{videosWithClips.length}</span>
+              <span className="font-mono text-[10px] sm:text-xs text-[var(--text-muted)] uppercase tracking-wider">Tapes</span>
             </div>
-            <span className="w-px h-6 bg-[var(--border-visible)]" />
-            <div className="flex items-center gap-3">
-              <span className="font-mono text-2xl font-medium text-[var(--text-primary)]">{orderedCategories.length}</span>
-              <span className="font-mono text-xs text-[var(--text-muted)] uppercase tracking-wider">Categories</span>
+            <span className="w-px h-5 sm:h-6 bg-[var(--border-visible)]" />
+            <div className="flex items-center gap-2 sm:gap-3">
+              <span className="font-mono text-xl sm:text-2xl font-medium text-[var(--text-primary)]">{orderedCategories.length}</span>
+              <span className="font-mono text-[10px] sm:text-xs text-[var(--text-muted)] uppercase tracking-wider">Categories</span>
             </div>
           </div>
         </div>
       </section>
 
       {/* Categories */}
-      <section className="px-6 pb-24">
-        <div className="max-w-6xl mx-auto space-y-16">
+      <section className="px-4 pb-16 sm:px-6 sm:pb-24">
+        <div className="max-w-6xl mx-auto space-y-10 sm:space-y-16">
           {orderedCategories.map((categoryName) => {
             const categoryVideos = categories[categoryName];
             const categoryClipCount = categoryVideos.reduce((sum, v) => sum + v.clips.length, 0);
@@ -220,39 +220,34 @@ export default async function Home() {
             return (
               <div key={categoryName}>
                 {/* Category header */}
-                <div className="flex items-center gap-4 mb-8">
-                  <h2 className="text-2xl font-semibold text-[var(--text-primary)]">
+                <div className="flex items-center gap-3 sm:gap-4 mb-5 sm:mb-8">
+                  <h2 className="text-lg sm:text-2xl font-semibold text-[var(--text-primary)] shrink-0">
                     {categoryName}
                   </h2>
-                  <span className="font-mono text-xs text-[var(--text-muted)]">
+                  <span className="font-mono text-[10px] sm:text-xs text-[var(--text-muted)] shrink-0">
                     {categoryClipCount} clips
                   </span>
                   <span className="flex-1 h-px bg-[var(--border-subtle)]" />
                 </div>
 
                 {/* Videos in category */}
-                <div className="space-y-8">
+                <div className="space-y-5 sm:space-y-8">
                   {categoryVideos.map((video) => (
-                    <article key={video.id} className="card p-6">
-                      <div className="flex items-start justify-between gap-4 mb-4">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-3 mb-2">
-                            <span className="font-mono text-[10px] text-[var(--amber)] uppercase tracking-wider">
-                              Tape
-                            </span>
-                            <span className="font-mono text-[10px] text-[var(--text-muted)]">
-                              {video.clips.length} clips
-                            </span>
-                          </div>
-                          <h3 className="text-lg font-medium text-[var(--text-primary)] truncate">
+                    <article key={video.id} className="card overflow-hidden">
+                      <div className="px-4 pt-4 pb-3 sm:px-6 sm:pt-6 sm:pb-5">
+                        <div className="flex items-start sm:items-center justify-between gap-3 sm:gap-4 mb-1 sm:mb-2">
+                          <h3 className="text-base sm:text-xl font-semibold text-[var(--text-primary)] line-clamp-2 sm:truncate">
                             {video.title || video.filename.replace(/_/g, ' ')}
                           </h3>
-                          {video.summary && (
-                            <p className="text-sm text-[var(--text-secondary)] mt-2 line-clamp-2">
-                              {video.summary}
-                            </p>
-                          )}
+                          <span className="font-mono text-[10px] text-[var(--text-muted)] whitespace-nowrap mt-1 sm:mt-0">
+                            {video.clips.length} clips
+                          </span>
                         </div>
+                        {video.summary && (
+                          <p className="text-xs sm:text-sm leading-relaxed text-[var(--text-secondary)] line-clamp-2 sm:line-clamp-3">
+                            {video.summary}
+                          </p>
+                        )}
                       </div>
 
                       <ClipCarousel clips={video.clips} />
@@ -266,12 +261,12 @@ export default async function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-[var(--border-subtle)] px-6 py-8">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <span className="font-mono text-[10px] text-[var(--text-muted)] tracking-wider">
+      <footer className="border-t border-[var(--border-subtle)] px-4 py-6 sm:px-6 sm:py-8">
+        <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
+          <span className="font-mono text-[9px] sm:text-[10px] text-[var(--text-muted)] tracking-wider">
             PETE DYE GOLF CLUB — CLARKSBURG, WV
           </span>
-          <span className="font-mono text-[10px] text-[var(--text-muted)]">
+          <span className="font-mono text-[9px] sm:text-[10px] text-[var(--text-muted)]">
             ◉ 1995
           </span>
         </div>

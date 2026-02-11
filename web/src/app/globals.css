@@ -46,6 +46,7 @@
 
 html {
   scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -54,6 +55,22 @@ body {
   font-family: var(--font-display);
   line-height: 1.5;
   overflow-x: hidden;
+  /* Safe area insets for notched devices */
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* Ensure tappable elements have comfortable touch targets */
+@media (pointer: coarse) {
+  button, a, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Prevent tap highlight flash on mobile */
+button, a {
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -155,8 +172,14 @@ body {
 .card {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
-  border-radius: 1rem;
+  border-radius: 0.75rem;
   transition: all 0.4s var(--ease-out-expo);
+}
+
+@media (min-width: 640px) {
+  .card {
+    border-radius: 1rem;
+  }
 }
 
 .card:hover {
@@ -172,15 +195,15 @@ body {
   position: relative;
   aspect-ratio: 16/9;
   background: var(--bg-elevated);
-  border-radius: 0.5rem;
+  border-radius: 1rem;
   overflow: hidden;
   cursor: pointer;
-  transition: transform 0.3s var(--ease-out-expo), box-shadow 0.3s ease;
+  transition: transform 0.25s var(--ease-out-expo), box-shadow 0.25s ease;
 }
 
 .clip-thumb:hover {
-  transform: scale(1.03);
-  box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.5);
+  transform: scale(1.02);
+  box-shadow: 0 4px 16px -4px rgba(0, 0, 0, 0.4);
 }
 
 .clip-thumb img,

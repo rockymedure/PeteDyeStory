@@ -51,7 +51,7 @@ export default function ClipCarousel({ clips }: ClipCarouselProps) {
 
   return (
     <>
-      <div className="flex gap-3 overflow-x-auto hide-scrollbar pb-1">
+      <div className="flex gap-2.5 sm:gap-3 overflow-x-auto hide-scrollbar pl-4 pb-4 sm:pl-6 sm:pb-6">
         {displayClips.map((clip, index) => {
           const thumbPath = resolveThumbnailUrl(clip);
           
@@ -60,7 +60,7 @@ export default function ClipCarousel({ clips }: ClipCarouselProps) {
               key={clip.id}
               onClick={() => handleOpenPlayer(index)}
               onMouseEnter={handleThumbnailHover}
-              className="clip-thumb flex-shrink-0 w-36 md:w-44 cursor-pointer group"
+              className="clip-thumb flex-shrink-0 w-36 sm:w-44 md:w-56 cursor-pointer group"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -92,7 +92,7 @@ export default function ClipCarousel({ clips }: ClipCarouselProps) {
         {remaining > 0 && (
           <div 
             onClick={() => handleOpenPlayer(6)}
-            className="flex-shrink-0 w-36 md:w-44 aspect-video bg-[var(--bg-elevated)] rounded-md flex flex-col items-center justify-center border border-dashed border-[var(--border-subtle)] cursor-pointer hover:border-[var(--border-visible)] hover:bg-[var(--bg-hover)] transition-colors"
+            className="flex-shrink-0 w-36 sm:w-44 md:w-56 aspect-video bg-[var(--bg-elevated)] flex flex-col items-center justify-center border-l border-dashed border-[var(--border-subtle)] cursor-pointer hover:border-[var(--border-visible)] hover:bg-[var(--bg-hover)] transition-colors"
           >
             <span className="font-mono text-lg text-[var(--text-muted)]">+{remaining}</span>
             <span className="font-mono text-[9px] text-[var(--text-muted)] uppercase tracking-wider mt-1">more</span>
