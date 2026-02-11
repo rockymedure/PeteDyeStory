@@ -309,14 +309,20 @@ export default async function Home() {
                           {/* Title row */}
                           <div className="flex items-start sm:items-center justify-between gap-3 sm:gap-4 mb-2 sm:mb-3">
                             <div className="min-w-0 flex-1">
-                              <Link
-                                href={`/videos/${slug}`}
-                                className="group inline-flex items-baseline gap-2 min-w-0"
-                              >
-                                <h3 className="text-base sm:text-xl font-semibold text-[var(--text-primary)] line-clamp-2 sm:truncate group-hover:text-[var(--amber)] transition-colors">
+                              {analysis ? (
+                                <Link
+                                  href={`/videos/${slug}`}
+                                  className="group inline-flex items-baseline gap-2 min-w-0"
+                                >
+                                  <h3 className="text-base sm:text-xl font-semibold text-[var(--text-primary)] line-clamp-2 sm:truncate group-hover:text-[var(--amber)] transition-colors">
+                                    {displayTitle}
+                                  </h3>
+                                </Link>
+                              ) : (
+                                <h3 className="text-base sm:text-xl font-semibold text-[var(--text-primary)] line-clamp-2 sm:truncate">
                                   {displayTitle}
                                 </h3>
-                              </Link>
+                              )}
                             </div>
                             <span className="font-mono text-[10px] text-[var(--text-muted)] whitespace-nowrap mt-1 sm:mt-0">
                               {video.clips.length} clips

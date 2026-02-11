@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import AppHeader from '@/components/AppHeader';
 import characterProfiles from '@/data/characterProfiles.json';
 
@@ -156,53 +157,58 @@ export default function CharactersPage() {
                 character.appearances[0]?.role ?? 'Unknown role';
 
               return (
-                <article
+                <Link
                   key={character.name}
-                  className="card p-5 sm:p-7 md:p-8 border-l-2 border-l-[var(--amber)]/40"
+                  href={`/characters/${encodeURIComponent(character.name)}`}
+                  className="group block"
                 >
-                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-6 mb-4">
-                    <div className="min-w-0">
-                      <h3 className="text-xl sm:text-2xl md:text-3xl font-semibold text-[var(--text-primary)] mb-1">
-                        {character.name}
-                      </h3>
-                      <p className="font-mono text-[10px] sm:text-xs text-[var(--text-muted)] tracking-wider uppercase">
-                        {primaryRole}
-                      </p>
+                  <article
+                    className="card p-5 sm:p-7 md:p-8 border-l-2 border-l-[var(--amber)]/40 group-hover:border-[var(--border-visible)] transition-colors"
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-6 mb-4">
+                      <div className="min-w-0">
+                        <h3 className="text-xl sm:text-2xl md:text-3xl font-semibold text-[var(--text-primary)] mb-1 group-hover:text-[var(--amber)] transition-colors">
+                          {character.name}
+                        </h3>
+                        <p className="font-mono text-[10px] sm:text-xs text-[var(--text-muted)] tracking-wider uppercase">
+                          {primaryRole}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-3 sm:gap-4 shrink-0">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[var(--amber)]/10 border border-[var(--amber)]/20">
+                          <span className="font-mono text-xs font-medium text-[var(--amber)]">
+                            {character.total_videos}
+                          </span>
+                          <span className="font-mono text-[10px] text-[var(--amber)]/70">
+                            videos
+                          </span>
+                        </span>
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[var(--bg-elevated)] border border-[var(--border-subtle)]">
+                          <span className="font-mono text-xs font-medium text-[var(--text-primary)]">
+                            {character.total_quotes}
+                          </span>
+                          <span className="font-mono text-[10px] text-[var(--text-muted)]">
+                            quotes
+                          </span>
+                        </span>
+                      </div>
                     </div>
 
-                    <div className="flex items-center gap-3 sm:gap-4 shrink-0">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[var(--amber)]/10 border border-[var(--amber)]/20">
-                        <span className="font-mono text-xs font-medium text-[var(--amber)]">
-                          {character.total_videos}
-                        </span>
-                        <span className="font-mono text-[10px] text-[var(--amber)]/70">
-                          videos
-                        </span>
-                      </span>
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[var(--bg-elevated)] border border-[var(--border-subtle)]">
-                        <span className="font-mono text-xs font-medium text-[var(--text-primary)]">
-                          {character.total_quotes}
-                        </span>
-                        <span className="font-mono text-[10px] text-[var(--text-muted)]">
-                          quotes
-                        </span>
-                      </span>
-                    </div>
-                  </div>
-
-                  {firstQuote && (
-                    <blockquote className="border-l-2 border-[var(--amber)]/25 pl-4 sm:pl-5 mt-4">
-                      <p className="text-sm sm:text-base text-[var(--text-secondary)] italic leading-relaxed line-clamp-3">
-                        &ldquo;{firstQuote.text}&rdquo;
-                      </p>
-                      {firstQuote.context && (
-                        <cite className="block mt-2 font-mono text-[10px] text-[var(--text-muted)] not-italic tracking-wider uppercase">
-                          {firstQuote.context}
-                        </cite>
-                      )}
-                    </blockquote>
-                  )}
-                </article>
+                    {firstQuote && (
+                      <blockquote className="border-l-2 border-[var(--amber)]/25 pl-4 sm:pl-5 mt-4">
+                        <p className="text-sm sm:text-base text-[var(--text-secondary)] italic leading-relaxed line-clamp-3">
+                          &ldquo;{firstQuote.text}&rdquo;
+                        </p>
+                        {firstQuote.context && (
+                          <cite className="block mt-2 font-mono text-[10px] text-[var(--text-muted)] not-italic tracking-wider uppercase">
+                            {firstQuote.context}
+                          </cite>
+                        )}
+                      </blockquote>
+                    )}
+                  </article>
+                </Link>
               );
             })}
           </div>
@@ -228,35 +234,40 @@ export default function CharactersPage() {
                 character.appearances[0]?.role ?? 'Unknown role';
 
               return (
-                <div
+                <Link
                   key={character.name}
-                  className="card p-4 sm:p-5 flex flex-col justify-between gap-3"
+                  href={`/characters/${encodeURIComponent(character.name)}`}
+                  className="group block"
                 >
-                  <div className="min-w-0">
-                    <h3 className="text-sm sm:text-base font-semibold text-[var(--text-primary)] mb-1 truncate">
-                      {character.name}
-                    </h3>
-                    <p className="text-[11px] sm:text-xs text-[var(--text-secondary)] line-clamp-2 leading-relaxed">
-                      {primaryRole}
-                    </p>
-                  </div>
+                  <div
+                    className="card p-4 sm:p-5 flex flex-col justify-between gap-3 group-hover:border-[var(--border-visible)] transition-colors"
+                  >
+                    <div className="min-w-0">
+                      <h3 className="text-sm sm:text-base font-semibold text-[var(--text-primary)] mb-1 truncate group-hover:text-[var(--amber)] transition-colors">
+                        {character.name}
+                      </h3>
+                      <p className="text-[11px] sm:text-xs text-[var(--text-secondary)] line-clamp-2 leading-relaxed">
+                        {primaryRole}
+                      </p>
+                    </div>
 
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[var(--amber)]/8 border border-[var(--amber)]/15">
-                      <span className="font-mono text-[10px] font-medium text-[var(--amber)]">
-                        {character.total_videos}
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[var(--amber)]/8 border border-[var(--amber)]/15">
+                        <span className="font-mono text-[10px] font-medium text-[var(--amber)]">
+                          {character.total_videos}
+                        </span>
+                        <span className="font-mono text-[9px] text-[var(--amber)]/60">
+                          vid
+                        </span>
                       </span>
-                      <span className="font-mono text-[9px] text-[var(--amber)]/60">
-                        vid
-                      </span>
-                    </span>
-                    {character.total_quotes > 0 && (
-                      <span className="font-mono text-[10px] text-[var(--text-muted)]">
-                        {character.total_quotes} quotes
-                      </span>
-                    )}
+                      {character.total_quotes > 0 && (
+                        <span className="font-mono text-[10px] text-[var(--text-muted)]">
+                          {character.total_quotes} quotes
+                        </span>
+                      )}
+                    </div>
                   </div>
-                </div>
+                </Link>
               );
             })}
           </div>
