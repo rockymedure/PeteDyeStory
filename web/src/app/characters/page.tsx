@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import AppHeader from '@/components/AppHeader';
+import ClipCarousel from '@/components/ClipCarousel';
+import { supabase } from '@/lib/supabase';
 import characterProfiles from '@/data/characterProfiles.json';
 
 /* ─── Types ─────────────────────────────────────────────────────────────── */
@@ -50,8 +52,54 @@ export const metadata: Metadata = {
 
 /* ─── Page ──────────────────────────────────────────────────────────────── */
 
-export default function CharactersPage() {
+export default async function CharactersPage() {
   const characters = characterProfiles as Character[];
+
+  // Fetch clips from Supabase so we can show carousels on featured character cards
+  const { data: videosData } = await supabase.from('videos').select('id, filename');
+  const { data: clipsData } = await supabase.from('clips').select('*, videos(filename)');
+
+  // Build map: video directory name -> clips
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const clipsByVideoDir: Record<string, any[]> = {};
+  if (videosData && clipsData) {
+    const videoIdToDir: Record<string, string> = {};
+    for (const v of videosData as { id: string; filename: string }[]) {
+      videoIdToDir[v.id] = v.filename;
+    }
+    for (const clip of clipsData as { video_id: string; videos: { filename: string } | null; [key: string]: unknown }[]) {
+      const dir = videoIdToDir[clip.video_id];
+      if (dir) {
+        if (!clipsByVideoDir[dir]) clipsByVideoDir[dir] = [];
+        clipsByVideoDir[dir].push({
+          ...clip,
+          video: clip.videos ? { filename: clip.videos.filename } : undefined,
+        });
+      }
+    }
+  }
+
+  // Helper: get all clips for a character across all their video appearances
+  function getCharacterClips(character: Character) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const clips: any[] = [];
+    for (const app of character.appearances) {
+      const matched = clipsByVideoDir[app.video]
+        || Object.entries(clipsByVideoDir).find(([key]) =>
+          key.toLowerCase().includes(app.video.toLowerCase().slice(0, 20)) ||
+          app.video.toLowerCase().includes(key.toLowerCase().slice(0, 20))
+        )?.[1]
+        || [];
+      clips.push(...matched);
+    }
+    // Deduplicate by clip id
+    const seen = new Set<string>();
+    return clips.filter(c => {
+      if (seen.has(c.id)) return false;
+      seen.add(c.id);
+      return true;
+    }).slice(0, 12); // Cap at 12 clips per character
+  }
 
   // Sort by quote count descending
   const sorted = [...characters].sort(
@@ -157,13 +205,13 @@ export default function CharactersPage() {
                 character.appearances[0]?.role ?? 'Unknown role';
 
               return (
-                <Link
+                <article
                   key={character.name}
-                  href={`/characters/${encodeURIComponent(character.name)}`}
-                  className="group block"
+                  className="card overflow-hidden border-l-2 border-l-[var(--amber)]/40 hover:border-[var(--border-visible)] transition-colors"
                 >
-                  <article
-                    className="card p-5 sm:p-7 md:p-8 border-l-2 border-l-[var(--amber)]/40 group-hover:border-[var(--border-visible)] transition-colors"
+                  <Link
+                    href={`/characters/${encodeURIComponent(character.name)}`}
+                    className="group block p-5 sm:p-7 md:p-8"
                   >
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-6 mb-4">
                       <div className="min-w-0">
@@ -207,8 +255,22 @@ export default function CharactersPage() {
                         )}
                       </blockquote>
                     )}
-                  </article>
-                </Link>
+
+                  </Link>
+
+                  {/* Clips featuring this character (outside the Link to avoid nesting) */}
+                  {(() => {
+                    const charClips = getCharacterClips(character);
+                    if (charClips.length > 0) {
+                      return (
+                        <div className="pb-4 sm:pb-6">
+                          <ClipCarousel clips={charClips} />
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()}
+                </article>
               );
             })}
           </div>
