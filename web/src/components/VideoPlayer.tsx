@@ -225,22 +225,34 @@ export default function VideoPlayer({ clip, clips, currentIndex, onClose, onNavi
       {/* Bottom info bar */}
       <div className="absolute bottom-0 left-0 right-0 z-[5] bg-gradient-to-t from-black/80 to-transparent p-4 sm:p-6 md:p-8 pointer-events-none">
         <div className="max-w-5xl mx-auto">
-          <div className="flex items-center gap-3 sm:gap-4 mb-1 sm:mb-2">
-            <span className="font-mono text-[10px] sm:text-xs text-[var(--amber)] uppercase tracking-wider">
-              Now Playing
-            </span>
+          {/* Source tape */}
+          {clip.video?.filename && (
+            <p className="font-mono text-[9px] sm:text-[10px] text-white/40 tracking-wider uppercase mb-1.5 sm:mb-2">
+              {clip.video.filename.replace(/_/g, ' ').replace(/-/g, ' ')}
+            </p>
+          )}
+
+          {/* Clip title */}
+          <p className="text-white text-sm sm:text-base md:text-lg font-semibold max-w-2xl leading-snug mb-1">
+            {clip.title || clip.filename?.replace('.mp4', '').replace(/^\d+-/, '').replace(/-/g, ' ')}
+          </p>
+
+          {/* Description + duration */}
+          <div className="flex items-center gap-3 sm:gap-4">
+            {clip.description && clip.description !== clip.title && (
+              <p className="text-white/60 text-xs sm:text-sm max-w-xl leading-relaxed line-clamp-1">
+                {clip.description}
+              </p>
+            )}
             {clip.duration_seconds && (
-              <span className="font-mono text-[10px] sm:text-xs text-white/50">
+              <span className="font-mono text-[10px] sm:text-xs text-white/40 shrink-0">
                 {formatDuration(clip.duration_seconds)}
               </span>
             )}
           </div>
-          <p className="text-white/90 text-xs sm:text-sm md:text-base max-w-2xl leading-relaxed line-clamp-2 sm:line-clamp-none">
-            {clip.description || clip.filename?.replace('.mp4', '').replace(/-/g, ' ')}
-          </p>
           
           {/* Keyboard hints — hidden on touch/mobile */}
-          <div className="hidden sm:flex items-center gap-4 mt-3 sm:mt-4 text-white/40 text-xs font-mono">
+          <div className="hidden sm:flex items-center gap-4 mt-3 sm:mt-4 text-white/30 text-[10px] font-mono tracking-wider">
             <span>← → Navigate</span>
             <span>Space Pause</span>
             <span>D Download</span>
