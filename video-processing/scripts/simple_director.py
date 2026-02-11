@@ -175,9 +175,11 @@ class SimpleDirector:
         "additionalProperties": False
     }
 
-    def __init__(self, openai_api_key: str, base_dir: str = None):
+    def __init__(self, openai_api_key: str, base_dir: str = None, model: str = "gpt-5.1", skip_diarization: bool = False):
         self.openai_api_key = openai_api_key
         self.openai_client = OpenAI(api_key=openai_api_key)
+        self.model = model
+        self.skip_diarization = skip_diarization
 
         # Set base directory (defaults to video-processing folder)
         if base_dir:
@@ -375,14 +377,19 @@ class SimpleDirector:
         timestamped = full_transcript.get('timestamped_transcript', [])
 
         # Extract relevant timestamped portions
+        # Note: timestamped items may be TranscriptionWord objects (with attributes)
+        # or dicts, depending on the OpenAI SDK version
         relevant_chunks = []
         for chunk in timestamped:
-            chunk_start = chunk.get('start', 0)
-            chunk_end = chunk.get('end', 0)
+            chunk_start = getattr(chunk, 'start', chunk.get('start', 0) if isinstance(chunk, dict) else 0)
+            chunk_end = getattr(chunk, 'end', chunk.get('end', 0) if isinstance(chunk, dict) else 0)
 
             # If chunk overlaps with segment timeframe
             if (chunk_start < end_time and chunk_end > start_time):
-                relevant_chunks.append(chunk.get('text', ''))
+                word_text = getattr(chunk, 'word', None) or getattr(chunk, 'text', None)
+                if word_text is None and isinstance(chunk, dict):
+                    word_text = chunk.get('word', chunk.get('text', ''))
+                relevant_chunks.append(word_text or '')
 
         if relevant_chunks:
             return ' '.join(relevant_chunks)
@@ -465,7 +472,7 @@ class SimpleDirector:
 
         try:
             response = self.openai_client.chat.completions.create(
-                model="gpt-5.1",
+                model=self.model,
                 messages=[
                     {"role": "system", "content": system_message},
                     {"role": "user", "content": user_message}
@@ -490,7 +497,7 @@ class SimpleDirector:
                 'video_analysis': structured_analysis,
                 'raw_segments': segment_results,
                 'synthesis_metadata': {
-                    'model': 'gpt-5.1',
+                    'model': self.model,
                     'total_segments': len(segment_results),
                     'transcript_length': len(full_transcript_text),
                     'diarization_segments': len(diarization.get('segments', [])) if diarization else 0,
@@ -513,7 +520,7 @@ class SimpleDirector:
                 },
                 'raw_segments': segment_results,
                 'synthesis_metadata': {
-                    'model': 'gpt-5.1',
+                    'model': self.model,
                     'error': str(e)
                 }
             }
@@ -532,7 +539,7 @@ class SimpleDirector:
                 },
                 'raw_segments': segment_results,
                 'synthesis_metadata': {
-                    'model': 'gpt-5.1',
+                    'model': self.model,
                     'error': str(e)
                 }
             }
@@ -703,7 +710,9 @@ class SimpleDirector:
 
         # Run diarization (speaker identification)
         diarization = None
-        if hasattr(self.sub_agent, 'transcribe_audio_diarized'):
+        if self.skip_diarization:
+            print("Diarization: SKIPPED (--skip-diarization flag set)")
+        elif hasattr(self.sub_agent, 'transcribe_audio_diarized'):
             print("Running speaker diarization...")
             try:
                 diarization = self.sub_agent.transcribe_audio_diarized(audio_path)
@@ -760,7 +769,7 @@ class SimpleDirector:
             'speed_improvement': f"{(len(segments) * segment_duration) / processing_time:.1f}x faster than realtime",
             'video_path': video_path,
             'processed_at': time.strftime('%Y-%m-%d %H:%M:%S'),
-            'ai_provider': 'OpenAI (GPT-5.1)',
+            'ai_provider': f'OpenAI ({self.model})',
             'diarization_available': diarization is not None,
             'characters_loaded': len(self.characters.get('characters', []))
         }
