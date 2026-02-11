@@ -28,6 +28,14 @@ function derivedBaseName(clip: ClipLike) {
 }
 
 export function resolveThumbnailUrl(clip: ClipLike): string {
+  // In dev, serve directly from the symlinked /thumbnails/ folder using the DB filename
+  if (IS_DEV && clip.filename) {
+    const fname = clip.filename.endsWith('.mp4')
+      ? clip.filename.replace('.mp4', '.jpg')
+      : `${clip.filename}.jpg`;
+    return `/thumbnails/${fname}`;
+  }
+
   // If DB already provides a URL/path, respect it.
   if (clip.thumbnail_path) {
     if (clip.thumbnail_path.startsWith('http://') || clip.thumbnail_path.startsWith('https://')) {
@@ -40,15 +48,17 @@ export function resolveThumbnailUrl(clip: ClipLike): string {
   }
 
   const filename = `${derivedBaseName(clip)}.jpg`;
-
-  // Dev: use the symlinked /public/thumbnails folder
-  if (IS_DEV) return `/thumbnails/${filename}`;
-
-  // Production: load from Supabase Storage
   return supabasePublicUrl('thumbnails', filename) ?? `/thumbnails/${filename}`;
 }
 
 export function resolveClipUrl(clip: ClipLike): string {
+  // In dev, serve directly from the symlinked /clips/ folder using the DB filename
+  // (which matches web-clips/ filenames exactly after the migration refresh)
+  if (IS_DEV && clip.filename) {
+    const fname = clip.filename.endsWith('.mp4') ? clip.filename : `${clip.filename}.mp4`;
+    return `/clips/${fname}`;
+  }
+
   if (clip.storage_path) {
     if (clip.storage_path.startsWith('http://') || clip.storage_path.startsWith('https://')) {
       return clip.storage_path;
@@ -60,6 +70,5 @@ export function resolveClipUrl(clip: ClipLike): string {
   }
 
   const filename = `${derivedBaseName(clip)}.mp4`;
-  if (IS_DEV) return `/clips/${filename}`;
   return supabasePublicUrl('clips', filename) ?? `/clips/${filename}`;
 }
