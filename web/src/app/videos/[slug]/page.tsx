@@ -117,27 +117,13 @@ export default async function VideoDetailPage({
     }
   }
 
-  // Helper: parse timestamp string to seconds for matching clips to chapters
-  function tsToSeconds(ts: string): number {
-    const parts = ts.split(':').map(Number);
-    if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
-    if (parts.length === 2) return parts[0] * 60 + parts[1];
-    return parts[0] || 0;
-  }
-
-  // Match clips to chapters by finding which chapter's time range each clip falls into
+  // Match clips to chapters by sort_order number -> chapter index
+  // Clips are extracted as 01-{title}, 02-{title}... matching chapter order exactly
   function getClipsForChapter(chapterIndex: number) {
-    if (videoClips.length === 0 || chapters.length === 0) return [];
-    const ch = chapters[chapterIndex];
-    const chStart = tsToSeconds(ch.start_time);
-    const chEnd = tsToSeconds(ch.end_time);
-
-    // If clips have start_time, match by time range; otherwise match by sort order
-    // Most clips are ordered 01, 02, 03... matching chapter order
-    // Simple approach: distribute clips evenly across chapters
-    const clipsPerChapter = Math.ceil(videoClips.length / chapters.length);
-    const start = chapterIndex * clipsPerChapter;
-    return videoClips.slice(start, start + clipsPerChapter);
+    if (videoClips.length === 0) return [];
+    // Clip sort_order is 1-based (01, 02, ...), chapter index is 0-based
+    const targetOrder = chapterIndex + 1;
+    return videoClips.filter((c: { sort_order: number }) => c.sort_order === targetOrder);
   }
 
   return (
