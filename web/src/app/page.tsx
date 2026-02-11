@@ -19,6 +19,25 @@ interface VideoWithClips extends Video {
   clips: ClipWithVideo[];
 }
 
+// Videos where Pete Dye is confirmed on camera or speaking
+// (based on AI analysis CHARACTERS sections from transcripts)
+const PETE_DYE_ON_CAMERA_KEYWORDS = [
+  'construction highlights',    // "Pete Dye: central figure in the video"
+  'pete dye interview',         // direct interview
+  'pete dye & james d',         // on site together
+  'louie ellis documentary',    // documentary with Pete Dye interviews
+  'narrated by harris holt',    // professional narration featuring Pete
+  'back nine opening',          // Pete at opening event
+  'grand opening',              // speeches honoring Pete and Alice Dye
+  'front nine opening',         // Pete at ceremony
+  'first green planting',       // Pete involved in construction
+];
+
+function featuresPeteDye(video: Video): boolean {
+  const title = (video.title || video.filename).toLowerCase();
+  return PETE_DYE_ON_CAMERA_KEYWORDS.some(kw => title.includes(kw));
+}
+
 // Content-based categories
 function getCategory(video: Video): string {
   const title = (video.title || video.filename).toLowerCase();
@@ -134,15 +153,20 @@ export default async function Home() {
   const totalClips = videosWithClips.reduce((sum, v) => sum + v.clips.length, 0);
 
   // Group videos by category
+  // Videos featuring Pete Dye on camera get their own section AND stay in their content category
   const categories: Record<string, VideoWithClips[]> = {};
   for (const video of videosWithClips) {
+    if (featuresPeteDye(video)) {
+      if (!categories['Featuring Pete Dye']) categories['Featuring Pete Dye'] = [];
+      categories['Featuring Pete Dye'].push(video);
+    }
     const cat = getCategory(video);
     if (!categories[cat]) categories[cat] = [];
     categories[cat].push(video);
   }
 
-  // Order categories
-  const categoryOrder = ['Building the Course', 'Celebrations & Milestones', 'People & Relationships', 'The Legacy', 'Family Archives', 'Archive'];
+  // Order categories — Pete Dye first
+  const categoryOrder = ['Featuring Pete Dye', 'Building the Course', 'Celebrations & Milestones', 'People & Relationships', 'The Legacy', 'Family Archives', 'Archive'];
   const orderedCategories = categoryOrder.filter(cat => categories[cat]?.length > 0);
 
   return (
