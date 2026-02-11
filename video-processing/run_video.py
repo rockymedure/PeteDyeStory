@@ -84,7 +84,7 @@ OUTPUT:
 
 
 async def run_analysis(video_path: str, segment_duration: int = 150,
-                       model: str = 'gpt-5.1', skip_diarization: bool = False,
+                       model: str = 'gpt-5.1', enable_diarization: bool = False,
                        reprocess: bool = False):
     """Run video analysis on the specified file"""
     
@@ -108,8 +108,8 @@ async def run_analysis(video_path: str, segment_duration: int = 150,
     print(f"Size: {file_size_mb:.1f} MB")
     print(f"Segment duration: {segment_duration} seconds ({segment_duration/60:.1f} minutes)")
     print(f"Model: {model}")
-    if skip_diarization:
-        print(f"Diarization: SKIPPED")
+    if enable_diarization:
+        print(f"Diarization: ENABLED (adds ~3-5 min)")
     if reprocess:
         print(f"Mode: REPROCESS (forcing re-analysis)")
     print()
@@ -120,7 +120,7 @@ async def run_analysis(video_path: str, segment_duration: int = 150,
         openai_api_key,
         base_dir=base_dir,
         model=model,
-        skip_diarization=skip_diarization
+        enable_diarization=enable_diarization
     )
 
     # Run analysis
@@ -134,7 +134,7 @@ def main():
     parser.add_argument('video_path', help='Path to the video file')
     parser.add_argument('--segment-duration', type=int, default=150, help='Seconds per segment (default: 150)')
     parser.add_argument('--model', choices=['gpt-4o', 'gpt-5.1'], default='gpt-5.1', help='AI model to use (default: gpt-5.1)')
-    parser.add_argument('--skip-diarization', action='store_true', help='Skip speaker diarization for videos with no speech')
+    parser.add_argument('--diarize', action='store_true', help='Enable speaker diarization (slower, adds ~3-5 min per video)')
     parser.add_argument('--reprocess', action='store_true', help='Force re-analysis even if output already exists')
     args = parser.parse_args()
 
@@ -146,7 +146,7 @@ def main():
         args.video_path,
         segment_duration=args.segment_duration,
         model=args.model,
-        skip_diarization=args.skip_diarization,
+        enable_diarization=args.diarize,
         reprocess=args.reprocess
     ))
     

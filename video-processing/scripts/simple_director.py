@@ -175,11 +175,11 @@ class SimpleDirector:
         "additionalProperties": False
     }
 
-    def __init__(self, openai_api_key: str, base_dir: str = None, model: str = "gpt-5.1", skip_diarization: bool = False):
+    def __init__(self, openai_api_key: str, base_dir: str = None, model: str = "gpt-5.1", skip_diarization: bool = True, enable_diarization: bool = False):
         self.openai_api_key = openai_api_key
         self.openai_client = OpenAI(api_key=openai_api_key)
         self.model = model
-        self.skip_diarization = skip_diarization
+        self.skip_diarization = skip_diarization and not enable_diarization
 
         # Set base directory (defaults to video-processing folder)
         if base_dir:
