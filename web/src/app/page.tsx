@@ -250,33 +250,6 @@ export default async function Home() {
             </p>
           </div>
 
-          {/* Stats row */}
-          <div className="mt-8 sm:mt-12 flex flex-wrap items-center gap-4 sm:gap-8 animate-fade-in" style={{ animationDelay: '200ms' }}>
-            <div className="flex items-center gap-2 sm:gap-3">
-              <span className="font-mono text-xl sm:text-2xl font-medium text-[var(--text-primary)]">{totalClips}</span>
-              <span className="font-mono text-[10px] sm:text-xs text-[var(--text-muted)] uppercase tracking-wider">Clips</span>
-            </div>
-            <span className="w-px h-5 sm:h-6 bg-[var(--border-visible)]" />
-            <div className="flex items-center gap-2 sm:gap-3">
-              <span className="font-mono text-xl sm:text-2xl font-medium text-[var(--text-primary)]">{videosWithClips.length}</span>
-              <span className="font-mono text-[10px] sm:text-xs text-[var(--text-muted)] uppercase tracking-wider">Tapes</span>
-            </div>
-            <span className="w-px h-5 sm:h-6 bg-[var(--border-visible)]" />
-            <div className="flex items-center gap-2 sm:gap-3">
-              <span className="font-mono text-xl sm:text-2xl font-medium text-[var(--text-primary)]">{totalCharacters}</span>
-              <span className="font-mono text-[10px] sm:text-xs text-[var(--text-muted)] uppercase tracking-wider">Characters</span>
-            </div>
-            <span className="w-px h-5 sm:h-6 bg-[var(--border-visible)]" />
-            <div className="flex items-center gap-2 sm:gap-3">
-              <span className="font-mono text-xl sm:text-2xl font-medium text-[var(--text-primary)]">{totalQuotes}</span>
-              <span className="font-mono text-[10px] sm:text-xs text-[var(--text-muted)] uppercase tracking-wider">Quotes</span>
-            </div>
-            <span className="w-px h-5 sm:h-6 bg-[var(--border-visible)]" />
-            <div className="flex items-center gap-2 sm:gap-3">
-              <span className="font-mono text-xl sm:text-2xl font-medium text-[var(--text-primary)]">{orderedCategories.length}</span>
-              <span className="font-mono text-[10px] sm:text-xs text-[var(--text-muted)] uppercase tracking-wider">Categories</span>
-            </div>
-          </div>
         </div>
       </section>
 
