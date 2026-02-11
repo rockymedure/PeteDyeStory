@@ -347,7 +347,7 @@ class SimpleDirector:
 
     async def process_segment_with_full_transcript_async(self, segment: VideoSegment, full_transcript: dict):
         """Process one segment with VISUAL analysis only, using full transcript for audio"""
-        print(f"Processing segment {segment.segment_id}: {segment.timestamp_range} (visual analysis)")
+        # Quiet per-segment logging — progress shown at phase level
 
         # Use asyncio executor for visual-only processing
         loop = asyncio.get_event_loop()

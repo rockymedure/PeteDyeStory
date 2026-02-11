@@ -32,12 +32,16 @@ class FastMultimodalVideoTranscriber:
     - Parallel processing for speed
     """
 
+    # Set to True to see every frame extraction line
+    VERBOSE_FRAMES = False
+
     def __init__(self, openai_api_key):
         self.openai_client = OpenAI(api_key=openai_api_key)
 
     def extract_audio_from_video(self, video_path, output_audio="temp_audio.mp3", save_persistent=False):
         """Extract audio from video file using ffmpeg"""
-        print("Extracting audio from video...")
+        if self.VERBOSE_FRAMES:
+            print("Extracting audio from video...")
 
         command = [
             'ffmpeg', '-i', video_path,
@@ -51,23 +55,21 @@ class FastMultimodalVideoTranscriber:
             print(f"FFmpeg error: {result.stderr}")
             raise Exception(f"Failed to extract audio: {result.stderr}")
 
-        print(f"Audio extracted to {output_audio}")
+        if self.VERBOSE_FRAMES:
+            print(f"Audio extracted to {output_audio}")
         return output_audio
 
     def transcribe_audio_openai(self, audio_path):
         """Transcribe audio using OpenAI's APIs, with chunking for large files"""
-        print("Transcribing audio with OpenAI...")
-
         # Check file size - OpenAI has 25MB limit
         file_size_mb = os.path.getsize(audio_path) / (1024 * 1024)
-        print(f"Audio file size: {file_size_mb:.1f} MB")
 
         if file_size_mb > 24:
-            print(f"Audio file too large ({file_size_mb:.1f} MB), splitting into chunks...")
+            if self.VERBOSE_FRAMES:
+                print(f"Audio file too large ({file_size_mb:.1f} MB), splitting into chunks...")
             return self.transcribe_large_audio(audio_path)
 
         with open(audio_path, "rb") as audio_file:
-            print("Getting high-quality transcript with gpt-4o-transcribe...")
             high_quality_response = self.openai_client.audio.transcriptions.create(
                 model="gpt-4o-transcribe",
                 file=audio_file,
@@ -77,7 +79,7 @@ class FastMultimodalVideoTranscriber:
 
             audio_file.seek(0)
 
-            print("Getting timestamped transcript with whisper-1...")
+            
             timestamped_response = self.openai_client.audio.transcriptions.create(
                 model="whisper-1",
                 file=audio_file,
@@ -205,11 +207,8 @@ class FastMultimodalVideoTranscriber:
                     - end (float): End time in seconds
                     - id (str): Segment identifier
         """
-        print("Transcribing audio with speaker diarization (gpt-4o-transcribe-diarize)...")
-
         # Check file size - OpenAI has 25MB limit
         file_size_mb = os.path.getsize(audio_path) / (1024 * 1024)
-        print(f"Audio file size: {file_size_mb:.1f} MB")
 
         if file_size_mb > 24:
             print(f"Audio file too large ({file_size_mb:.1f} MB), splitting into chunks for diarization...")
@@ -393,8 +392,9 @@ class FastMultimodalVideoTranscriber:
 
         frames_data = []
 
-        print(f"Video duration: {duration:.2f} seconds ({duration/60:.2f} minutes)")
-        print(f"Extracting frames every {frame_interval} seconds...")
+        if self.VERBOSE_FRAMES:
+            print(f"Video duration: {duration:.2f} seconds ({duration/60:.2f} minutes)")
+            print(f"Extracting frames every {frame_interval} seconds...")
 
         # Calculate frame positions to extract
         frame_positions = []
@@ -403,7 +403,8 @@ class FastMultimodalVideoTranscriber:
             if frame_num < total_frames:
                 frame_positions.append((frame_num, seconds))
 
-        print(f"Will extract {len(frame_positions)} frames")
+        if self.VERBOSE_FRAMES:
+            print(f"Will extract {len(frame_positions)} frames")
 
         for frame_num, timestamp_seconds in frame_positions:
             cap.set(cv2.CAP_PROP_POS_FRAMES, frame_num)
@@ -436,7 +437,8 @@ class FastMultimodalVideoTranscriber:
                     'filepath': frame_path
                 })
 
-                print(f"Extracted and saved frame at {str(timedelta(seconds=int(timestamp_seconds)))} -> {frame_filename}")
+                if self.VERBOSE_FRAMES:
+                    print(f"Extracted and saved frame at {str(timedelta(seconds=int(timestamp_seconds)))} -> {frame_filename}")
 
         cap.release()
         return frames_data
@@ -483,7 +485,8 @@ class FastMultimodalVideoTranscriber:
 
     def send_batch_to_openai_vision(self, batch_data, batch_num, high_quality_transcript):
         """Send a batch of frames to GPT-5.1 Vision for analysis"""
-        print(f"Processing batch {batch_num} ({len(batch_data)} frames) with GPT-5.1 Vision...")
+        if self.VERBOSE_FRAMES:
+            print(f"Processing batch {batch_num} ({len(batch_data)} frames) with GPT-5.1 Vision...")
 
         # Build the message content with text and images
         content = [{
@@ -563,7 +566,8 @@ Format: [HH:MM:SS] VISUAL: [scene] | PEOPLE: [who] | AUDIO: "[words]" | EVENT: [
 
     def process_video_fast(self, video_path, frame_interval=4):
         """OPTIMIZED: Main processing pipeline with parallel execution"""
-        print(f"Fast processing video: {video_path}")
+        if self.VERBOSE_FRAMES:
+            print(f"Fast processing video: {video_path}")
         start_time = time.time()
 
         # Parallel audio and video extraction
@@ -606,7 +610,8 @@ Format: [HH:MM:SS] VISUAL: [scene] | PEOPLE: [who] | AUDIO: "[words]" | EVENT: [
             os.remove(audio_path)
 
         total_time = time.time() - start_time
-        print(f"\nFast processing completed in {total_time:.1f} seconds!")
+        if self.VERBOSE_FRAMES:
+            print(f"\nFast processing completed in {total_time:.1f} seconds!")
 
         return {
             'processing_time': total_time,
@@ -626,12 +631,15 @@ Format: [HH:MM:SS] VISUAL: [scene] | PEOPLE: [who] | AUDIO: "[words]" | EVENT: [
         This eliminates audio extraction/transcription per segment.
         """
         start_time = time.time()
-        print(f"Visual-only processing video: {video_path}")
+        if self.VERBOSE_FRAMES:
+            print(f"Visual-only processing video: {video_path}")
 
         # Extract frames for visual analysis
-        print("Extracting frames for visual analysis...")
+        if self.VERBOSE_FRAMES:
+            print("Extracting frames for visual analysis...")
         frames_data = self.extract_frames_with_timestamps(video_path, frame_interval)
-        print(f"Extracted {len(frames_data)} frames")
+        if self.VERBOSE_FRAMES:
+            print(f"Extracted {len(frames_data)} frames")
 
         if not frames_data:
             return {'error': 'No frames extracted', 'processing_time': time.time() - start_time}
@@ -642,7 +650,8 @@ Format: [HH:MM:SS] VISUAL: [scene] | PEOPLE: [who] | AUDIO: "[words]" | EVENT: [
         )
 
         total_time = time.time() - start_time
-        print(f"Visual processing completed in {total_time:.1f} seconds!")
+        if self.VERBOSE_FRAMES:
+            print(f"Visual processing completed in {total_time:.1f} seconds!")
 
         return {
             'processing_time': total_time,
@@ -665,12 +674,15 @@ Format: [HH:MM:SS] VISUAL: [scene] | PEOPLE: [who] | AUDIO: "[words]" | EVENT: [
                 speaker, text, start, end, id (or None to fall back to standard processing)
         """
         start_time = time.time()
-        print(f"Visual-only processing with diarization: {video_path}")
+        if self.VERBOSE_FRAMES:
+            print(f"Visual-only processing with diarization: {video_path}")
 
         # Extract frames for visual analysis
-        print("Extracting frames for visual analysis...")
+        if self.VERBOSE_FRAMES:
+            print("Extracting frames for visual analysis...")
         frames_data = self.extract_frames_with_timestamps(video_path, frame_interval)
-        print(f"Extracted {len(frames_data)} frames")
+        if self.VERBOSE_FRAMES:
+            print(f"Extracted {len(frames_data)} frames")
 
         if not frames_data:
             return {'error': 'No frames extracted', 'processing_time': time.time() - start_time}
