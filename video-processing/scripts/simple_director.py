@@ -4,6 +4,13 @@ Main orchestrator system using Agent-as-Tool pattern for parallel video processi
 Uses OpenAI for all AI operations (audio + vision + synthesis).
 
 Part of the Pete Dye Story video processing system.
+
+Stream A overhaul:
+- GPT-5.1 for synthesis with structured JSON output
+- Character knowledge base injection from characters.json
+- Speaker diarization integration
+- Structured output schema with strict validation
+- Human-readable markdown report generated from structured data
 """
 
 import asyncio
@@ -14,7 +21,7 @@ import time
 import re
 from datetime import timedelta
 from dataclasses import dataclass
-from typing import List
+from typing import List, Optional
 from openai import OpenAI
 
 # Import sub-agent from same directory
@@ -35,24 +42,149 @@ class VideoSegment:
 class SimpleDirector:
     """
     SIMPLE Director - 4-Phase Video Analysis Pipeline:
-    1. Extract and transcribe FULL audio first
+    1. Extract and transcribe FULL audio (with diarization) first
     2. Create video segments for visual analysis
     3. Process segments with visual analysis + sync to full transcript
-    4. Send everything to GPT-4o for synthesis
-    
+    4. Send everything to GPT-5.1 for structured synthesis
+
     Uses OpenAI for everything - only one API key needed.
     """
+
+    # Structured output JSON schema for GPT-5.1 response_format
+    # All fields required, all objects have additionalProperties: false
+    ANALYSIS_SCHEMA = {
+        "type": "object",
+        "properties": {
+            "title": {
+                "type": "string"
+            },
+            "content_type": {
+                "type": "string"
+            },
+            "summary": {
+                "type": "string"
+            },
+            "characters": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "type": "string"
+                        },
+                        "role": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "is_speaking": {
+                            "type": "boolean"
+                        }
+                    },
+                    "required": ["name", "role", "description", "is_speaking"],
+                    "additionalProperties": False
+                }
+            },
+            "chapters": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "title": {
+                            "type": "string"
+                        },
+                        "start_time": {
+                            "type": "string"
+                        },
+                        "end_time": {
+                            "type": "string"
+                        },
+                        "summary": {
+                            "type": "string"
+                        },
+                        "characters_present": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "required": ["title", "start_time", "end_time", "summary", "characters_present"],
+                    "additionalProperties": False
+                }
+            },
+            "highlights": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "title": {
+                            "type": "string"
+                        },
+                        "timestamp": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "emotional_tone": {
+                            "type": "string"
+                        },
+                        "characters_involved": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "required": ["title", "timestamp", "description", "emotional_tone", "characters_involved"],
+                    "additionalProperties": False
+                }
+            },
+            "quotes": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "text": {
+                            "type": "string"
+                        },
+                        "speaker": {
+                            "type": "string"
+                        },
+                        "timestamp": {
+                            "type": "string"
+                        },
+                        "context": {
+                            "type": "string"
+                        }
+                    },
+                    "required": ["text", "speaker", "timestamp", "context"],
+                    "additionalProperties": False
+                }
+            },
+            "themes": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                }
+            }
+        },
+        "required": ["title", "content_type", "summary", "characters", "chapters", "highlights", "quotes", "themes"],
+        "additionalProperties": False
+    }
 
     def __init__(self, openai_api_key: str, base_dir: str = None):
         self.openai_api_key = openai_api_key
         self.openai_client = OpenAI(api_key=openai_api_key)
-        
+
         # Set base directory (defaults to video-processing folder)
         if base_dir:
             self.base_dir = base_dir
         else:
             self.base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        
+
         self.base_segments_dir = os.path.join(self.base_dir, "segments")
         self.base_output_dir = os.path.join(self.base_dir, "output")
 
@@ -61,8 +193,60 @@ class SimpleDirector:
             if not os.path.exists(directory):
                 os.makedirs(directory)
 
+        # Load character knowledge base
+        self.characters = self._load_characters()
+
         # Initialize sub-agent (now only needs OpenAI key)
         self.sub_agent = FastMultimodalVideoTranscriber(openai_api_key)
+
+    def _load_characters(self) -> dict:
+        """Load the character knowledge base from characters.json"""
+        characters_path = os.path.join(self.base_dir, "characters.json")
+        if os.path.exists(characters_path):
+            with open(characters_path, 'r') as f:
+                data = json.load(f)
+            print(f"Loaded {len(data.get('characters', []))} characters from knowledge base")
+            return data
+        else:
+            print(f"Warning: characters.json not found at {characters_path}")
+            return {"characters": [], "context": ""}
+
+    def _build_character_context(self) -> str:
+        """Format the characters.json data into a string for prompt injection"""
+        if not self.characters or not self.characters.get("characters"):
+            return ""
+
+        lines = []
+        lines.append("=== CHARACTER KNOWLEDGE BASE ===")
+        lines.append(f"Project Context: {self.characters.get('context', '')}")
+        lines.append("")
+        lines.append("Known people who may appear in the footage:")
+        lines.append("")
+
+        for char in self.characters["characters"]:
+            name = char.get("name", "Unknown")
+            aliases = ", ".join(char.get("aliases", []))
+            role = char.get("role", "")
+            description = char.get("description", "")
+            physical = char.get("physical_description", "")
+            relationships = "; ".join(char.get("relationships", []))
+            quotes = char.get("key_quotes", [])
+
+            lines.append(f"**{name}**")
+            if aliases:
+                lines.append(f"  Aliases: {aliases}")
+            lines.append(f"  Role: {role}")
+            lines.append(f"  Description: {description}")
+            if physical:
+                lines.append(f"  Visual ID: {physical}")
+            if relationships:
+                lines.append(f"  Relationships: {relationships}")
+            if quotes:
+                for q in quotes:
+                    lines.append(f'  Known quote: "{q}"')
+            lines.append("")
+
+        return "\n".join(lines)
 
     def setup_video_folders(self, video_path: str) -> tuple:
         """Create organized folder structure for a specific video"""
@@ -140,7 +324,7 @@ class SimpleDirector:
 
     async def process_segment_async(self, segment: VideoSegment):
         """Process one segment with our proven sub-agent"""
-        print(f"🔄 Processing segment {segment.segment_id}: {segment.timestamp_range}")
+        print(f"Processing segment {segment.segment_id}: {segment.timestamp_range}")
 
         # Use asyncio executor for true parallel processing
         loop = asyncio.get_event_loop()
@@ -161,7 +345,7 @@ class SimpleDirector:
 
     async def process_segment_with_full_transcript_async(self, segment: VideoSegment, full_transcript: dict):
         """Process one segment with VISUAL analysis only, using full transcript for audio"""
-        print(f"🔄 Processing segment {segment.segment_id}: {segment.timestamp_range} (visual analysis)")
+        print(f"Processing segment {segment.segment_id}: {segment.timestamp_range} (visual analysis)")
 
         # Use asyncio executor for visual-only processing
         loop = asyncio.get_event_loop()
@@ -210,155 +394,375 @@ class SimpleDirector:
             end_char = int(end_time * chars_per_second)
             return high_quality[start_char:end_char]
 
-    def openai_synthesis(self, segment_results: List[dict], full_transcript: dict = None) -> dict:
-        """Send all segment results to GPT-4o for final synthesis"""
-        print("🎯 GPT-4o SYNTHESIS - Combining all segments...")
+    def _format_diarization_for_prompt(self, diarization: Optional[dict]) -> str:
+        """Format diarization results into a readable string for the synthesis prompt"""
+        if not diarization or not diarization.get("segments"):
+            return "No speaker diarization data available."
 
-        # Prepare combined content
-        combined_content = "COMPLETE VIDEO ANALYSIS:\n\n"
+        lines = []
+        lines.append("=== SPEAKER DIARIZATION ===")
+        lines.append("Speaker labels (A, B, C, etc.) represent distinct voices detected in the audio.")
+        lines.append("Use the character knowledge base to match speaker labels to real people.")
+        lines.append("")
 
-        # Include full transcript at the top for context
+        for seg in diarization["segments"]:
+            speaker = seg.get("speaker", "?")
+            text = seg.get("text", "")
+            start = seg.get("start", 0)
+            end = seg.get("end", 0)
+            start_ts = str(timedelta(seconds=int(start)))
+            end_ts = str(timedelta(seconds=int(end)))
+            lines.append(f"[{start_ts} - {end_ts}] Speaker {speaker}: {text}")
+
+        return "\n".join(lines)
+
+    def openai_synthesis(self, segment_results: List[dict], full_transcript: dict = None, diarization: Optional[dict] = None) -> dict:
+        """Send all segment results to GPT-5.1 for structured synthesis with JSON schema output"""
+        print("GPT-5.1 SYNTHESIS - Combining all segments with structured output...")
+
+        # Build the character knowledge context
+        character_context = self._build_character_context()
+
+        # Format the diarization data
+        diarization_text = self._format_diarization_for_prompt(diarization)
+
+        # Build the full transcript text (no truncation - GPT-5.1 has 400K context)
+        full_transcript_text = ""
         if full_transcript:
-            combined_content += f"COMPLETE AUDIO TRANSCRIPT:\n{full_transcript.get('high_quality_transcript', '')[:3000]}...\n\n"
+            full_transcript_text = full_transcript.get('high_quality_transcript', '')
 
-        combined_content += "SEGMENT-BY-SEGMENT ANALYSIS:\n\n"
-
+        # Build segment-by-segment visual analysis
+        segment_analysis_text = ""
         for result in segment_results:
-            combined_content += f"=== SEGMENT {result['segment_id']} ({result['timestamp_range']}) ===\n\n"
-            combined_content += f"AUDIO EXCERPT:\n{result.get('audio_transcript_excerpt', result.get('audio_transcript', ''))[:800]}...\n\n"
-            combined_content += f"VISUAL ANALYSIS:\n{result['multimodal_analysis'][:2000]}...\n\n"
+            segment_analysis_text += f"\n=== SEGMENT {result['segment_id']} ({result['timestamp_range']}) ===\n"
+            audio_excerpt = result.get('audio_transcript_excerpt', result.get('audio_transcript', ''))
+            segment_analysis_text += f"\nAUDIO EXCERPT:\n{audio_excerpt}\n"
+            segment_analysis_text += f"\nVISUAL ANALYSIS:\n{result['multimodal_analysis']}\n"
 
-        # Ask GPT-4o to synthesize everything
-        prompt = f"""
-{combined_content}
+        # System message: unbiased documentary analyst with character knowledge
+        system_message = (
+            "You are a documentary film analyst reviewing archival footage from the Pete Dye Golf Club story "
+            "(1978-2004). This archive contains diverse footage including: golf course construction, family "
+            "gatherings, holidays, grand opening ceremonies, interviews, award ceremonies, professional golf "
+            "tournaments, celebrity visits, Christmas parties, and social events. Analyze the content accurately "
+            "based on what you actually see and hear. Do not assume everything is construction footage.\n\n"
+            "You must return a structured JSON analysis following the provided schema exactly.\n\n"
+            f"{character_context}"
+        )
 
-Based on the COMPLETE analysis above, provide the REAL video content synthesis:
-
-**1. SUMMARY** (2-3 sentences about what actually happens in this video):
-
-**2. CHARACTERS** (list the actual people who appear or are mentioned):
-
-**3. CHAPTER BREAKDOWN** (natural story progression with timestamps):
-
-**4. HIGHLIGHTS & MEMORABLE MOMENTS** (actual memorable moments with context):
-
-Be completely accurate to the content. Extract the real story, don't invent anything.
-
-IMPORTANT: This archive contains diverse footage from the Pete Dye Golf Club story (1978-2004). Videos may include:
-- Golf course construction and site work
-- Family gatherings, holidays, and celebrations
-- Grand opening ceremonies and special events
-- Interviews with Pete Dye, the LaRosa family, and others
-- Award ceremonies and recognition events
-- Professional golf tournaments (WV Classic)
-- Visits from celebrities like Joe DiMaggio
-- Christmas parties and social events
-
-Accurately identify what type of content this actually is. Don't assume construction - analyze what you actually see and hear.
-"""
+        # User message: all evidence for synthesis
+        user_message = (
+            f"Analyze the following video evidence and produce a complete structured analysis.\n\n"
+            f"=== COMPLETE AUDIO TRANSCRIPT ===\n{full_transcript_text}\n\n"
+            f"{diarization_text}\n\n"
+            f"=== SEGMENT-BY-SEGMENT VISUAL ANALYSIS ===\n{segment_analysis_text}\n\n"
+            f"Based on ALL of the above evidence (transcript, speaker diarization, and visual analysis), "
+            f"produce a comprehensive video analysis. Identify the content type accurately (e.g., construction "
+            f"footage, interview, ceremony, family gathering, tournament, etc.). Match speaker labels from "
+            f"diarization to real people using the character knowledge base. Extract real quotes with accurate "
+            f"speaker attribution. Create natural chapter breaks that follow the video's actual narrative flow."
+        )
 
         try:
             response = self.openai_client.chat.completions.create(
-                model="gpt-4o",
-                messages=[{"role": "user", "content": prompt}],
-                max_tokens=4000,
-                temperature=0.1
+                model="gpt-5.1",
+                messages=[
+                    {"role": "system", "content": system_message},
+                    {"role": "user", "content": user_message}
+                ],
+                max_completion_tokens=8000,
+                temperature=0.1,
+                response_format={
+                    "type": "json_schema",
+                    "json_schema": {
+                        "name": "video_analysis",
+                        "strict": True,
+                        "schema": self.ANALYSIS_SCHEMA
+                    }
+                }
             )
 
-            synthesis_text = response.choices[0].message.content
+            # Parse the structured JSON response
+            raw_content = response.choices[0].message.content
+            structured_analysis = json.loads(raw_content)
 
             return {
-                'video_analysis': {
-                    'synthesis_text': synthesis_text,
+                'video_analysis': structured_analysis,
+                'raw_segments': segment_results,
+                'synthesis_metadata': {
+                    'model': 'gpt-5.1',
                     'total_segments': len(segment_results),
-                    'total_duration_minutes': sum(r.get('processing_time', 0) for r in segment_results) / 60
+                    'transcript_length': len(full_transcript_text),
+                    'diarization_segments': len(diarization.get('segments', [])) if diarization else 0,
+                    'characters_in_knowledge_base': len(self.characters.get('characters', []))
+                }
+            }
+        except json.JSONDecodeError as e:
+            print(f"JSON parsing error from GPT-5.1 response: {e}")
+            print(f"Raw response: {raw_content[:500]}")
+            return {
+                'video_analysis': {
+                    'title': 'Analysis Error - JSON Parse Failure',
+                    'content_type': 'error',
+                    'summary': f'GPT-5.1 returned invalid JSON: {str(e)}',
+                    'characters': [],
+                    'chapters': [],
+                    'highlights': [],
+                    'quotes': [],
+                    'themes': []
                 },
-                'raw_segments': segment_results
+                'raw_segments': segment_results,
+                'synthesis_metadata': {
+                    'model': 'gpt-5.1',
+                    'error': str(e)
+                }
             }
         except Exception as e:
-            print(f"❌ GPT-4o synthesis failed: {e}")
-            return None
+            print(f"GPT-5.1 synthesis failed: {e}")
+            return {
+                'video_analysis': {
+                    'title': 'Analysis Error',
+                    'content_type': 'error',
+                    'summary': f'GPT-5.1 synthesis failed: {str(e)}',
+                    'characters': [],
+                    'chapters': [],
+                    'highlights': [],
+                    'quotes': [],
+                    'themes': []
+                },
+                'raw_segments': segment_results,
+                'synthesis_metadata': {
+                    'model': 'gpt-5.1',
+                    'error': str(e)
+                }
+            }
+
+    def _generate_markdown_report(self, structured_analysis: dict, processing_time: float, num_segments: int, video_path: str) -> str:
+        """Generate a clean, producer-friendly markdown document from the structured JSON analysis"""
+        lines = []
+
+        title = structured_analysis.get('title', 'Untitled Video')
+        content_type = structured_analysis.get('content_type', 'Unknown')
+        summary = structured_analysis.get('summary', '')
+        characters = structured_analysis.get('characters', [])
+        chapters = structured_analysis.get('chapters', [])
+        highlights = structured_analysis.get('highlights', [])
+        quotes = structured_analysis.get('quotes', [])
+        themes = structured_analysis.get('themes', [])
+
+        # Title and metadata
+        lines.append(f"# {title}")
+        lines.append("")
+        lines.append(f"**Content Type:** {content_type}")
+        lines.append(f"**Source:** `{os.path.basename(video_path)}`")
+        lines.append(f"**Analyzed:** {time.strftime('%Y-%m-%d %H:%M:%S')}")
+        lines.append(f"**AI Provider:** OpenAI (GPT-5.1)")
+        lines.append("")
+
+        # Summary
+        lines.append("## Summary")
+        lines.append("")
+        lines.append(summary)
+        lines.append("")
+
+        # Characters table
+        if characters:
+            lines.append("## Characters")
+            lines.append("")
+            lines.append("| Name | Role | Speaking | Description |")
+            lines.append("|------|------|----------|-------------|")
+            for char in characters:
+                speaking = "Yes" if char.get('is_speaking', False) else "No"
+                name = char.get('name', 'Unknown')
+                role = char.get('role', '')
+                desc = char.get('description', '')
+                # Escape pipe characters in table cells
+                desc = desc.replace('|', '\\|')
+                role = role.replace('|', '\\|')
+                lines.append(f"| {name} | {role} | {speaking} | {desc} |")
+            lines.append("")
+
+        # Chapters with timestamps
+        if chapters:
+            lines.append("## Chapters")
+            lines.append("")
+            for i, chapter in enumerate(chapters, 1):
+                ch_title = chapter.get('title', f'Chapter {i}')
+                start = chapter.get('start_time', '')
+                end = chapter.get('end_time', '')
+                ch_summary = chapter.get('summary', '')
+                ch_chars = chapter.get('characters_present', [])
+
+                lines.append(f"### {i}. {ch_title}")
+                lines.append(f"**{start} - {end}**")
+                lines.append("")
+                lines.append(ch_summary)
+                if ch_chars:
+                    lines.append("")
+                    lines.append(f"*Characters: {', '.join(ch_chars)}*")
+                lines.append("")
+
+        # Highlights
+        if highlights:
+            lines.append("## Highlights")
+            lines.append("")
+            for hl in highlights:
+                hl_title = hl.get('title', '')
+                hl_ts = hl.get('timestamp', '')
+                hl_desc = hl.get('description', '')
+                hl_tone = hl.get('emotional_tone', '')
+                hl_chars = hl.get('characters_involved', [])
+
+                lines.append(f"- **{hl_title}** [{hl_ts}]")
+                lines.append(f"  {hl_desc}")
+                if hl_tone:
+                    lines.append(f"  *Tone: {hl_tone}*")
+                if hl_chars:
+                    lines.append(f"  *Involving: {', '.join(hl_chars)}*")
+                lines.append("")
+
+        # Notable Quotes
+        if quotes:
+            lines.append("## Notable Quotes")
+            lines.append("")
+            for q in quotes:
+                q_text = q.get('text', '')
+                q_speaker = q.get('speaker', 'Unknown')
+                q_ts = q.get('timestamp', '')
+                q_context = q.get('context', '')
+
+                lines.append(f'> "{q_text}"')
+                lines.append(f"> — **{q_speaker}** [{q_ts}]")
+                if q_context:
+                    lines.append(f"> *{q_context}*")
+                lines.append("")
+
+        # Themes
+        if themes:
+            lines.append("## Themes")
+            lines.append("")
+            for theme in themes:
+                lines.append(f"- {theme}")
+            lines.append("")
+
+        # Processing metadata footer
+        lines.append("---")
+        lines.append("")
+        lines.append("## Processing Metadata")
+        lines.append("")
+        lines.append(f"- **Processing Time:** {processing_time / 60:.1f} minutes")
+        lines.append(f"- **Segments Processed:** {num_segments}")
+        lines.append(f"- **AI Provider:** OpenAI (GPT-5.1)")
+        lines.append(f"- **Schema:** Structured JSON with strict validation")
+        lines.append("")
+
+        return "\n".join(lines)
 
     async def analyze_video(self, video_path: str, segment_duration: int = 150) -> dict:
         """
         MAIN ENTRY POINT - 4-Phase Video Analysis Pipeline:
-        1. Extract and transcribe FULL audio first
+        1. Extract and transcribe FULL audio (with diarization) first
         2. Create video segments for visual analysis
         3. Process segments with visual analysis + sync to full transcript
-        4. Send everything to GPT-4o for synthesis
+        4. Send everything to GPT-5.1 for structured synthesis
         """
-        print("🎬 SIMPLE DIRECTOR SYSTEM - Pete Dye Story")
+        print("SIMPLE DIRECTOR SYSTEM - Pete Dye Story")
         print("=" * 50)
-        print("Using OpenAI for all AI operations")
+        print("Using OpenAI for all AI operations (GPT-5.1 synthesis)")
         print("=" * 50)
         start_time = time.time()
 
         # Setup organized folders for this video
-        print("📁 Setting up organized folders...")
+        print("Setting up organized folders...")
         video_output_dir, video_segments_dir = self.setup_video_folders(video_path)
         print(f"Output directory: {video_output_dir}")
 
-        # PHASE 1: Extract and transcribe FULL audio first
-        print("🎵 Phase 1: Extracting and transcribing complete audio...")
+        # PHASE 1: Extract and transcribe FULL audio (with diarization)
+        print("Phase 1: Extracting and transcribing complete audio (with diarization)...")
         full_audio_path = f"{video_output_dir}/audio/full_audio.mp3"
         os.makedirs(os.path.dirname(full_audio_path), exist_ok=True)
 
         # Extract full audio from source video
         audio_path = self.sub_agent.extract_audio_from_video(video_path, full_audio_path)
-        print(f"✅ Full audio extracted to {audio_path}")
+        print(f"Full audio extracted to {audio_path}")
 
-        # Transcribe the complete audio
+        # Transcribe the complete audio (standard transcription)
         full_transcript = self.sub_agent.transcribe_audio_openai(audio_path)
 
         # Check if transcription was successful
         if full_transcript and 'high_quality_transcript' in full_transcript:
             transcript_length = len(full_transcript['high_quality_transcript'])
-            print(f"✅ Complete audio transcribed ({transcript_length} characters)")
+            print(f"Complete audio transcribed ({transcript_length} characters)")
         else:
-            print(f"❌ Audio transcription failed: {full_transcript}")
+            print(f"Audio transcription failed: {full_transcript}")
             # Continue with empty transcript rather than failing completely
             full_transcript = {
                 'high_quality_transcript': '',
                 'timestamped_transcript': []
             }
 
+        # Run diarization (speaker identification)
+        diarization = None
+        if hasattr(self.sub_agent, 'transcribe_audio_diarized'):
+            print("Running speaker diarization...")
+            try:
+                diarization = self.sub_agent.transcribe_audio_diarized(audio_path)
+                if diarization and diarization.get('segments'):
+                    num_speakers = len(set(seg.get('speaker', '') for seg in diarization['segments']))
+                    print(f"Diarization complete: {num_speakers} speakers detected, {len(diarization['segments'])} segments")
+                else:
+                    print("Diarization returned no segments")
+                    diarization = None
+            except Exception as e:
+                print(f"Diarization failed (continuing without it): {e}")
+                diarization = None
+        else:
+            print("Sub-agent does not support diarization (transcribe_audio_diarized not available)")
+
         # PHASE 2: Prepare video segments (for visual analysis only)
-        print("📝 Phase 2: Creating video segments...")
+        print("Phase 2: Creating video segments...")
         segments = self.create_segments(video_path, video_segments_dir, segment_duration)
         print(f"Created {len(segments)} segments")
 
         # Extract video segments
-        print("✂️ Extracting video segments...")
+        print("Extracting video segments...")
         for segment in segments:
             if not self.extract_segment(video_path, segment):
-                print(f"❌ Failed to extract segment {segment.segment_id}")
+                print(f"Failed to extract segment {segment.segment_id}")
                 continue
 
         # PHASE 3: Process segments with visual analysis + full transcript sync
-        print(f"🚀 Phase 3: Processing {len(segments)} segments with visual analysis...")
+        print(f"Phase 3: Processing {len(segments)} segments with visual analysis...")
 
         tasks = [self.process_segment_with_full_transcript_async(segment, full_transcript) for segment in segments]
         segment_results = await asyncio.gather(*tasks, return_exceptions=True)
 
         # Filter out exceptions
-        valid_results = [r for r in segment_results if not isinstance(r, Exception)]
-        print(f"✅ Processed {len(valid_results)}/{len(segments)} segments")
+        valid_results = []
+        for r in segment_results:
+            if isinstance(r, Exception):
+                print(f"Segment processing exception: {r}")
+            else:
+                valid_results.append(r)
+        print(f"Processed {len(valid_results)}/{len(segments)} segments")
 
-        # PHASE 4: GPT-4o synthesis
-        print("🎯 Phase 4: GPT-4o synthesis...")
-        final_synthesis = self.openai_synthesis(valid_results, full_transcript)
+        # PHASE 4: GPT-5.1 structured synthesis
+        print("Phase 4: GPT-5.1 structured synthesis...")
+        final_synthesis = self.openai_synthesis(valid_results, full_transcript, diarization)
 
         # Save results
         processing_time = time.time() - start_time
-        print(f"💾 Saving results...")
+        print("Saving results...")
 
-        # Save JSON
+        # Add processing metadata
         final_synthesis['processing_metadata'] = {
             'total_processing_time_minutes': processing_time / 60,
             'speed_improvement': f"{(len(segments) * segment_duration) / processing_time:.1f}x faster than realtime",
             'video_path': video_path,
             'processed_at': time.strftime('%Y-%m-%d %H:%M:%S'),
-            'ai_provider': 'OpenAI (GPT-4o)'
+            'ai_provider': 'OpenAI (GPT-5.1)',
+            'diarization_available': diarization is not None,
+            'characters_loaded': len(self.characters.get('characters', []))
         }
 
         # Save full transcript separately
@@ -366,33 +770,45 @@ Accurately identify what type of content this actually is. Don't assume construc
         with open(transcript_path, 'w') as f:
             f.write(full_transcript.get('high_quality_transcript', ''))
 
+        # Save diarization if available
+        if diarization:
+            diarization_path = f"{video_output_dir}/analysis/diarization.json"
+            with open(diarization_path, 'w') as f:
+                json.dump(diarization, f, indent=2, default=str)
+
         analysis_json_path = f"{video_output_dir}/analysis/simple_director_analysis.json"
         analysis_md_path = f"{video_output_dir}/analysis/simple_director_analysis.md"
 
+        # Save structured JSON
         with open(analysis_json_path, 'w') as f:
             json.dump(final_synthesis, f, indent=2, default=str)
 
-        # Save Markdown
+        # Generate human-readable markdown FROM the structured JSON
+        structured_analysis = final_synthesis.get('video_analysis', {})
+        markdown_report = self._generate_markdown_report(
+            structured_analysis,
+            processing_time,
+            len(valid_results),
+            video_path
+        )
+
         with open(analysis_md_path, 'w') as f:
-            f.write("# 🎬 Pete Dye Story - Video Analysis\n\n")
-            f.write(final_synthesis['video_analysis']['synthesis_text'])
-            f.write(f"\n\n---\n\n**Processing Time**: {processing_time/60:.1f} minutes\n")
-            f.write(f"**Speed**: {(len(segments) * segment_duration) / processing_time:.1f}x faster than realtime\n")
-            f.write(f"**Segments Processed**: {len(valid_results)}\n")
-            f.write(f"**AI Provider**: OpenAI (GPT-4o)\n")
+            f.write(markdown_report)
 
         # Cleanup segments
-        print("🧹 Cleaning up...")
+        print("Cleaning up temporary segment files...")
         for segment in segments:
             if os.path.exists(segment.file_path):
                 os.remove(segment.file_path)
 
         total_time = time.time() - start_time
-        print(f"🎉 COMPLETE! Processed in {total_time/60:.1f} minutes")
-        print(f"📁 Results: {video_output_dir}/analysis/")
+        print(f"COMPLETE! Processed in {total_time / 60:.1f} minutes")
+        print(f"Results: {video_output_dir}/analysis/")
         print(f"   JSON: {analysis_json_path}")
         print(f"   MD:   {analysis_md_path}")
         print(f"   Transcript: {transcript_path}")
+        if diarization:
+            print(f"   Diarization: {video_output_dir}/analysis/diarization.json")
 
         return final_synthesis
 
@@ -419,10 +835,10 @@ async def main():
     video_path = "../test/test_video.mp4"
 
     if os.path.exists(video_path):
-        print("🎬 RUNNING SIMPLE DIRECTOR")
+        print("RUNNING SIMPLE DIRECTOR")
         print("-" * 70)
         result = await director.analyze_video(video_path)
-        print(f"\n🎯 Analysis complete!")
+        print(f"\nAnalysis complete!")
     else:
         print(f"Test video not found: {video_path}")
 

@@ -4,6 +4,12 @@ Optimized processing engine for video analysis with parallel execution.
 Uses OpenAI for both audio transcription AND visual analysis.
 
 Part of the Pete Dye Story video processing system.
+
+Models used:
+  - gpt-4o-transcribe: High-quality audio transcription
+  - gpt-4o-transcribe-diarize: Speaker-diarized audio transcription
+  - whisper-1: Timestamped word-level transcription
+  - gpt-5.1: Vision analysis of video frames
 """
 
 import cv2
@@ -21,7 +27,8 @@ class FastMultimodalVideoTranscriber:
     """
     Optimized video transcriber that uses OpenAI for everything:
     - GPT-4o-transcribe for audio transcription
-    - GPT-4o (vision) for visual analysis
+    - GPT-4o-transcribe-diarize for speaker diarization
+    - GPT-5.1 (vision) for visual analysis
     - Parallel processing for speed
     """
 
@@ -50,15 +57,15 @@ class FastMultimodalVideoTranscriber:
     def transcribe_audio_openai(self, audio_path):
         """Transcribe audio using OpenAI's APIs, with chunking for large files"""
         print("Transcribing audio with OpenAI...")
-        
+
         # Check file size - OpenAI has 25MB limit
         file_size_mb = os.path.getsize(audio_path) / (1024 * 1024)
         print(f"Audio file size: {file_size_mb:.1f} MB")
-        
+
         if file_size_mb > 24:
             print(f"Audio file too large ({file_size_mb:.1f} MB), splitting into chunks...")
             return self.transcribe_large_audio(audio_path)
-        
+
         with open(audio_path, "rb") as audio_file:
             print("Getting high-quality transcript with gpt-4o-transcribe...")
             high_quality_response = self.openai_client.audio.transcriptions.create(
@@ -89,7 +96,7 @@ class FastMultimodalVideoTranscriber:
         import subprocess
         import tempfile
         import shutil
-        
+
         # Get audio duration
         result = subprocess.run(
             ['ffprobe', '-v', 'quiet', '-show_entries', 'format=duration', '-of', 'csv=p=0', audio_path],
@@ -97,20 +104,20 @@ class FastMultimodalVideoTranscriber:
         )
         total_duration = float(result.stdout.strip())
         print(f"Total audio duration: {total_duration/60:.1f} minutes")
-        
+
         # Split into 10-minute chunks (should be under 25MB each)
         chunk_duration = 600  # 10 minutes
         chunk_dir = tempfile.mkdtemp(prefix="audio_chunks_")
-        
+
         try:
             chunks = []
             start_time = 0
             chunk_num = 0
-            
+
             while start_time < total_duration:
                 chunk_path = os.path.join(chunk_dir, f"chunk_{chunk_num:03d}.mp3")
                 duration = min(chunk_duration, total_duration - start_time)
-                
+
                 # Extract chunk with ffmpeg
                 subprocess.run([
                     'ffmpeg', '-i', audio_path,
@@ -119,26 +126,26 @@ class FastMultimodalVideoTranscriber:
                     '-acodec', 'mp3', '-ab', '64k',  # Lower bitrate to reduce size
                     '-y', chunk_path
                 ], capture_output=True, text=True)
-                
+
                 chunks.append({
                     'path': chunk_path,
                     'start_time': start_time,
                     'duration': duration
                 })
-                
+
                 print(f"  Created chunk {chunk_num}: {start_time/60:.1f} - {(start_time + duration)/60:.1f} min")
                 start_time += chunk_duration
                 chunk_num += 1
-            
+
             print(f"Split into {len(chunks)} chunks, now transcribing...")
-            
+
             # Transcribe each chunk
             all_transcripts = []
             all_words = []
-            
+
             for i, chunk in enumerate(chunks):
                 print(f"  Transcribing chunk {i+1}/{len(chunks)}...")
-                
+
                 with open(chunk['path'], 'rb') as audio_file:
                     # High-quality transcript
                     response = self.openai_client.audio.transcriptions.create(
@@ -147,10 +154,10 @@ class FastMultimodalVideoTranscriber:
                         response_format="text",
                         prompt="Archival footage from Pete Dye Golf Club story (1978-2004). May include construction, interviews, celebrations, family events, or tournaments."
                     )
-                    
+
                     transcript_text = response.text if hasattr(response, 'text') else str(response)
                     all_transcripts.append(transcript_text)
-                    
+
                     # Get timestamped version too
                     audio_file.seek(0)
                     timestamped = self.openai_client.audio.transcriptions.create(
@@ -160,7 +167,7 @@ class FastMultimodalVideoTranscriber:
                         timestamp_granularities=["word"],
                         prompt="Pete Dye Golf Club archival footage including construction, celebrations, interviews, and events."
                     )
-                    
+
                     # Adjust timestamps for chunk offset
                     if hasattr(timestamped, 'words'):
                         for word in timestamped.words:
@@ -170,18 +177,208 @@ class FastMultimodalVideoTranscriber:
                                 'end': getattr(word, 'end', 0) + chunk['start_time']
                             }
                             all_words.append(adjusted_word)
-            
+
             # Combine all transcripts
             full_transcript = '\n\n'.join(all_transcripts)
-            print(f"✅ Transcription complete: {len(full_transcript)} characters")
-            
+            print(f"Transcription complete: {len(full_transcript)} characters")
+
             return {
                 'high_quality_transcript': full_transcript,
                 'timestamped_transcript': all_words
             }
-            
+
         finally:
             # Cleanup chunk files
+            shutil.rmtree(chunk_dir, ignore_errors=True)
+
+    def transcribe_audio_diarized(self, audio_path):
+        """
+        Transcribe audio with speaker diarization using OpenAI's diarize model.
+
+        Returns:
+            dict with keys:
+                - text (str): Full transcript text
+                - segments (list[dict]): Speaker-labeled segments, each with:
+                    - speaker (str): Speaker label (e.g. "A", "B")
+                    - text (str): What the speaker said
+                    - start (float): Start time in seconds
+                    - end (float): End time in seconds
+                    - id (str): Segment identifier
+        """
+        print("Transcribing audio with speaker diarization (gpt-4o-transcribe-diarize)...")
+
+        # Check file size - OpenAI has 25MB limit
+        file_size_mb = os.path.getsize(audio_path) / (1024 * 1024)
+        print(f"Audio file size: {file_size_mb:.1f} MB")
+
+        if file_size_mb > 24:
+            print(f"Audio file too large ({file_size_mb:.1f} MB), splitting into chunks for diarization...")
+            return self._transcribe_large_audio_diarized(audio_path)
+
+        with open(audio_path, "rb") as audio_file:
+            try:
+                response = self.openai_client.audio.transcriptions.create(
+                    model="gpt-4o-transcribe-diarize",
+                    file=audio_file,
+                    response_format="diarized_json",
+                    chunking_strategy="auto"
+                )
+            except Exception as e:
+                print(f"Diarization error: {e}")
+                return {"text": "", "segments": []}
+
+        # Parse the response
+        if hasattr(response, 'text'):
+            text = response.text
+        elif isinstance(response, dict) and 'text' in response:
+            text = response['text']
+        else:
+            text = str(response) if response else ""
+
+        segments = []
+        raw_segments = None
+        if hasattr(response, 'segments'):
+            raw_segments = response.segments
+        elif isinstance(response, dict) and 'segments' in response:
+            raw_segments = response['segments']
+
+        if raw_segments:
+            for seg in raw_segments:
+                if isinstance(seg, dict):
+                    segments.append({
+                        'speaker': seg.get('speaker', 'unknown'),
+                        'text': seg.get('text', ''),
+                        'start': float(seg.get('start', 0)),
+                        'end': float(seg.get('end', 0)),
+                        'id': seg.get('id', '')
+                    })
+                else:
+                    segments.append({
+                        'speaker': getattr(seg, 'speaker', 'unknown'),
+                        'text': getattr(seg, 'text', ''),
+                        'start': float(getattr(seg, 'start', 0)),
+                        'end': float(getattr(seg, 'end', 0)),
+                        'id': getattr(seg, 'id', '')
+                    })
+
+        print(f"Diarization complete: {len(segments)} segments, {len(set(s['speaker'] for s in segments))} speakers")
+        return {"text": text, "segments": segments}
+
+    def _transcribe_large_audio_diarized(self, audio_path):
+        """Transcribe large audio files with diarization by splitting into chunks"""
+        import tempfile
+        import shutil
+
+        # Get audio duration
+        result = subprocess.run(
+            ['ffprobe', '-v', 'quiet', '-show_entries', 'format=duration', '-of', 'csv=p=0', audio_path],
+            capture_output=True, text=True
+        )
+        total_duration = float(result.stdout.strip())
+        print(f"Total audio duration: {total_duration/60:.1f} minutes")
+
+        # Split into 10-minute chunks
+        chunk_duration = 600  # 10 minutes
+        chunk_dir = tempfile.mkdtemp(prefix="audio_diarize_chunks_")
+
+        try:
+            chunks = []
+            start_time = 0
+            chunk_num = 0
+
+            while start_time < total_duration:
+                chunk_path = os.path.join(chunk_dir, f"diarize_chunk_{chunk_num:03d}.mp3")
+                duration = min(chunk_duration, total_duration - start_time)
+
+                # Extract chunk with ffmpeg
+                subprocess.run([
+                    'ffmpeg', '-i', audio_path,
+                    '-ss', str(start_time),
+                    '-t', str(duration),
+                    '-acodec', 'mp3', '-ab', '64k',
+                    '-y', chunk_path
+                ], capture_output=True, text=True)
+
+                chunks.append({
+                    'path': chunk_path,
+                    'start_time': start_time,
+                    'duration': duration
+                })
+
+                print(f"  Created diarization chunk {chunk_num}: {start_time/60:.1f} - {(start_time + duration)/60:.1f} min")
+                start_time += chunk_duration
+                chunk_num += 1
+
+            print(f"Split into {len(chunks)} chunks, now diarizing...")
+
+            all_text_parts = []
+            all_segments = []
+            segment_counter = 0
+
+            for i, chunk in enumerate(chunks):
+                print(f"  Diarizing chunk {i+1}/{len(chunks)}...")
+
+                with open(chunk['path'], 'rb') as audio_file:
+                    try:
+                        response = self.openai_client.audio.transcriptions.create(
+                            model="gpt-4o-transcribe-diarize",
+                            file=audio_file,
+                            response_format="diarized_json",
+                            chunking_strategy="auto"
+                        )
+                    except Exception as e:
+                        print(f"  Diarization error on chunk {i}: {e}")
+                        continue
+
+                # Extract text
+                if hasattr(response, 'text'):
+                    chunk_text = response.text
+                elif isinstance(response, dict) and 'text' in response:
+                    chunk_text = response['text']
+                else:
+                    chunk_text = str(response) if response else ""
+
+                if chunk_text:
+                    all_text_parts.append(chunk_text)
+
+                # Extract and adjust segments
+                raw_segments = None
+                if hasattr(response, 'segments'):
+                    raw_segments = response.segments
+                elif isinstance(response, dict) and 'segments' in response:
+                    raw_segments = response['segments']
+
+                if raw_segments:
+                    for seg in raw_segments:
+                        if isinstance(seg, dict):
+                            seg_start = float(seg.get('start', 0))
+                            seg_end = float(seg.get('end', 0))
+                            seg_speaker = seg.get('speaker', 'unknown')
+                            seg_text = seg.get('text', '')
+                            seg_id = seg.get('id', '')
+                        else:
+                            seg_start = float(getattr(seg, 'start', 0))
+                            seg_end = float(getattr(seg, 'end', 0))
+                            seg_speaker = getattr(seg, 'speaker', 'unknown')
+                            seg_text = getattr(seg, 'text', '')
+                            seg_id = getattr(seg, 'id', '')
+
+                        # Adjust timestamps by chunk offset
+                        all_segments.append({
+                            'speaker': seg_speaker,
+                            'text': seg_text,
+                            'start': seg_start + chunk['start_time'],
+                            'end': seg_end + chunk['start_time'],
+                            'id': seg_id if seg_id else f"seg_{segment_counter}"
+                        })
+                        segment_counter += 1
+
+            full_text = '\n\n'.join(all_text_parts)
+            print(f"Diarization complete: {len(all_segments)} segments, {len(set(s['speaker'] for s in all_segments))} speakers")
+
+            return {"text": full_text, "segments": all_segments}
+
+        finally:
             shutil.rmtree(chunk_dir, ignore_errors=True)
 
     def extract_frames_with_timestamps(self, video_path, frame_interval=4, output_dir="frames"):
@@ -213,10 +410,10 @@ class FastMultimodalVideoTranscriber:
             success, frame = cap.read()
 
             if success:
-                # OPTIMIZATION: Smaller frame size (400px instead of 800px)
+                # Resize to 512px width for better person identification
                 height, width = frame.shape[:2]
-                if width > 400:
-                    scale = 400 / width
+                if width > 512:
+                    scale = 512 / width
                     new_width = int(width * scale)
                     new_height = int(height * scale)
                     frame = cv2.resize(frame, (new_width, new_height))
@@ -285,32 +482,30 @@ class FastMultimodalVideoTranscriber:
         return synchronized_data
 
     def send_batch_to_openai_vision(self, batch_data, batch_num, high_quality_transcript):
-        """Send a batch of frames to OpenAI GPT-4o Vision for analysis"""
-        print(f"Processing batch {batch_num} ({len(batch_data)} frames) with GPT-4o Vision...")
+        """Send a batch of frames to GPT-5.1 Vision for analysis"""
+        print(f"Processing batch {batch_num} ({len(batch_data)} frames) with GPT-5.1 Vision...")
 
         # Build the message content with text and images
         content = [{
             "type": "text",
-            "text": f"""Analyze this video segment with synchronized audio transcription.
+            "text": f"""Analyze this video segment from the Pete Dye Golf Club archival collection (1978-2004).
+This footage may contain: construction, interviews, family gatherings, ceremonies, celebrations, tournaments, award events, or social occasions.
 
-FULL AUDIO TRANSCRIPT (High Quality):
+FULL AUDIO TRANSCRIPT:
 {high_quality_transcript[:3000]}
 
-FRAME-BY-FRAME ANALYSIS FOR BATCH {batch_num}:
-Below are video frames from this segment, each paired with actual spoken words during that time.
+For each frame, provide:
+1. **Visual Scene**: What is happening visually (people, setting, activity)
+2. **People**: Who appears to be present (describe appearance, clothing, approximate age)
+3. **Audio Context**: Relevant spoken words from transcript for this timeframe
+4. **Event Type**: What type of event/activity this appears to be
+5. **Era Estimate**: Approximate time period based on visual cues
 
-For each frame, create a timeline entry with:
-1. **Visual Scene**: What's happening visually
-2. **Spoken Words**: Actual dialogue/speech from audio
-3. **Speaker Context**: Who appears to be speaking
-4. **Cross-Modal Analysis**: How visual and audio relate
-5. **Narrative Flow**: How this fits the overall story
-
-Format: [HH:MM:SS] **VISUAL**: [scene] | **AUDIO**: "[words]" | **CONTEXT**: [analysis]"""
+Format: [HH:MM:SS] VISUAL: [scene] | PEOPLE: [who] | AUDIO: "[words]" | EVENT: [type]"""
         }]
 
         for data in batch_data:
-            speech_indicator = "🎤 SPEECH" if data['has_speech'] else "🔇 NO SPEECH"
+            speech_indicator = "SPEECH" if data['has_speech'] else "NO SPEECH"
 
             content.append({
                 "type": "text",
@@ -327,9 +522,9 @@ Format: [HH:MM:SS] **VISUAL**: [scene] | **AUDIO**: "[words]" | **CONTEXT**: [an
 
         try:
             response = self.openai_client.chat.completions.create(
-                model="gpt-4o",
+                model="gpt-5.1",
                 messages=[{"role": "user", "content": content}],
-                max_tokens=4000,
+                max_completion_tokens=4000,
                 temperature=0.1
             )
 
@@ -343,7 +538,7 @@ Format: [HH:MM:SS] **VISUAL**: [scene] | **AUDIO**: "[words]" | **CONTEXT**: [an
 
     def send_multimodal_analysis_batched(self, synchronized_data, high_quality_transcript):
         """Send frames in batches for parallel processing using OpenAI Vision"""
-        print("Preparing batched multimodal analysis with GPT-4o Vision...")
+        print("Preparing batched multimodal analysis with GPT-5.1 Vision...")
 
         # Split into batches of 20 frames each (smaller batches for OpenAI)
         batch_size = 20
@@ -411,7 +606,7 @@ Format: [HH:MM:SS] **VISUAL**: [scene] | **AUDIO**: "[words]" | **CONTEXT**: [an
             os.remove(audio_path)
 
         total_time = time.time() - start_time
-        print(f"\n✅ Fast processing completed in {total_time:.1f} seconds!")
+        print(f"\nFast processing completed in {total_time:.1f} seconds!")
 
         return {
             'processing_time': total_time,
@@ -447,7 +642,7 @@ Format: [HH:MM:SS] **VISUAL**: [scene] | **AUDIO**: "[words]" | **CONTEXT**: [an
         )
 
         total_time = time.time() - start_time
-        print(f"✅ Visual processing completed in {total_time:.1f} seconds!")
+        print(f"Visual processing completed in {total_time:.1f} seconds!")
 
         return {
             'processing_time': total_time,
@@ -456,6 +651,151 @@ Format: [HH:MM:SS] **VISUAL**: [scene] | **AUDIO**: "[words]" | **CONTEXT**: [an
             'audio_transcript': full_transcript,
             'success': True
         }
+
+    def process_video_visual_only_with_diarization(self, video_path, frame_interval=4, full_transcript=None, diarization_segments=None):
+        """
+        Process video with VISUAL analysis only, using provided full transcript AND
+        speaker diarization segments for richer audio context.
+
+        Args:
+            video_path: Path to the video file
+            frame_interval: Seconds between frame extractions
+            full_transcript: Dict with 'high_quality_transcript' key (or None)
+            diarization_segments: List of diarization segment dicts with keys:
+                speaker, text, start, end, id (or None to fall back to standard processing)
+        """
+        start_time = time.time()
+        print(f"Visual-only processing with diarization: {video_path}")
+
+        # Extract frames for visual analysis
+        print("Extracting frames for visual analysis...")
+        frames_data = self.extract_frames_with_timestamps(video_path, frame_interval)
+        print(f"Extracted {len(frames_data)} frames")
+
+        if not frames_data:
+            return {'error': 'No frames extracted', 'processing_time': time.time() - start_time}
+
+        high_quality_text = ''
+        if full_transcript:
+            high_quality_text = full_transcript.get('high_quality_transcript', '') if isinstance(full_transcript, dict) else str(full_transcript)
+
+        # If no diarization segments, fall back to standard visual-only processing
+        if not diarization_segments:
+            print("No diarization segments provided, falling back to standard visual-only processing")
+            multimodal_analysis = self.create_multimodal_analysis_with_transcript(
+                frames_data, full_transcript
+            )
+        else:
+            print(f"Using {len(diarization_segments)} diarization segments for speaker context")
+            multimodal_analysis = self._create_analysis_with_diarization(
+                frames_data, high_quality_text, diarization_segments
+            )
+
+        total_time = time.time() - start_time
+        print(f"Visual processing with diarization completed in {total_time:.1f} seconds!")
+
+        return {
+            'processing_time': total_time,
+            'frames_count': len(frames_data),
+            'multimodal_analysis': multimodal_analysis,
+            'audio_transcript': full_transcript,
+            'diarization_segments': diarization_segments,
+            'success': True
+        }
+
+    def _create_analysis_with_diarization(self, frames_data, high_quality_text, diarization_segments):
+        """Create multimodal analysis using frames, transcript, and diarization segments"""
+        batch_size = 20
+        all_analyses = []
+
+        for i in range(0, len(frames_data), batch_size):
+            batch = frames_data[i:i + batch_size]
+            batch_num = i // batch_size + 1
+
+            analysis = self._process_frames_batch_with_diarization(
+                batch, batch_num, high_quality_text, diarization_segments
+            )
+            if analysis:
+                all_analyses.append(analysis)
+
+        return '\n\n'.join(all_analyses) if all_analyses else "No visual analysis available"
+
+    def _process_frames_batch_with_diarization(self, batch_data, batch_num, full_transcript_text, diarization_segments):
+        """Process a batch of frames with diarization context using GPT-5.1 Vision"""
+        # Build per-frame speaker context from diarization segments
+        frame_speaker_contexts = []
+        for data in batch_data:
+            frame_start = data['seconds']
+            frame_end = frame_start + 4  # 4-second window
+
+            # Find diarization segments overlapping this frame's time window
+            overlapping = []
+            for seg in diarization_segments:
+                seg_start = seg.get('start', 0)
+                seg_end = seg.get('end', 0)
+                if seg_start <= frame_end and seg_end >= frame_start:
+                    speaker = seg.get('speaker', 'unknown')
+                    text = seg.get('text', '').strip()
+                    if text:
+                        overlapping.append(f"Speaker {speaker}: \"{text}\"")
+
+            if overlapping:
+                speaker_text = " | ".join(overlapping)
+            else:
+                speaker_text = "(no speech detected)"
+
+            frame_speaker_contexts.append({
+                'timestamp': data['timestamp'],
+                'seconds': data['seconds'],
+                'speaker_context': speaker_text,
+                'frame_data': data['frame_data']
+            })
+
+        content = [{
+            "type": "text",
+            "text": f"""Analyze these video frames from Pete Dye Golf Club archival footage (1978-2004).
+Content types include: construction, interviews, family gatherings, grand opening ceremonies, award events, golf tournaments, celebrity visits, Christmas parties, and more.
+
+COMPLETE AUDIO TRANSCRIPT:
+{full_transcript_text[:2000]}
+
+SPEAKER-IDENTIFIED DIALOGUE is provided per frame below, showing WHO is speaking WHEN.
+
+For each frame, provide:
+1. **Visual Scene**: What is happening visually
+2. **People**: Who is visible (describe them for identification)
+3. **Speaker & Dialogue**: Who is speaking and what they say (using speaker labels)
+4. **Event Type**: Type of event/activity
+5. **Narrative Flow**: How this fits the overall story
+
+Format: [HH:MM:SS] VISUAL: [scene] | PEOPLE: [who] | SPEAKER: [speaker] says "[words]" | EVENT: [type]"""
+        }]
+
+        for ctx in frame_speaker_contexts:
+            content.append({
+                "type": "image_url",
+                "image_url": {
+                    "url": f"data:image/jpeg;base64,{ctx['frame_data']}",
+                    "detail": "low"
+                }
+            })
+            content.append({
+                "type": "text",
+                "text": f"Frame at {ctx['timestamp']} ({ctx['seconds']:.1f}s) -- DIALOGUE: {ctx['speaker_context']}"
+            })
+
+        try:
+            response = self.openai_client.chat.completions.create(
+                model="gpt-5.1",
+                messages=[{"role": "user", "content": content}],
+                max_completion_tokens=4000,
+                temperature=0.1
+            )
+
+            return response.choices[0].message.content
+        except Exception as e:
+            print(f"Exception in diarized batch {batch_num}: {e}")
+            return None
 
     def create_multimodal_analysis_with_transcript(self, frames_data, full_transcript):
         """Create multimodal analysis using frames and provided full transcript"""
@@ -476,25 +816,23 @@ Format: [HH:MM:SS] **VISUAL**: [scene] | **AUDIO**: "[words]" | **CONTEXT**: [an
         return '\n\n'.join(all_analyses) if all_analyses else "No visual analysis available"
 
     def process_frames_batch_with_transcript(self, batch_data, batch_num, full_transcript_text):
-        """Process a batch of frames with full transcript context using OpenAI Vision"""
+        """Process a batch of frames with full transcript context using GPT-5.1 Vision"""
         content = [{
             "type": "text",
-            "text": f"""Analyze this video segment with complete audio transcript context.
+            "text": f"""Analyze these video frames from Pete Dye Golf Club archival footage (1978-2004).
+Content types include: construction, interviews, family gatherings, grand opening ceremonies, award events, golf tournaments, celebrity visits, Christmas parties, and more.
 
 COMPLETE AUDIO TRANSCRIPT:
-{full_transcript_text[:2000]}...
+{full_transcript_text[:2000]}
 
-VISUAL ANALYSIS FOR BATCH {batch_num}:
-Analyze the frames below in context of the complete audio transcript.
-
-For each frame, create entries with:
-1. **Visual Scene**: What's happening visually
-2. **Audio Context**: Relevant spoken words from transcript that match this timeframe
-3. **Speaker Analysis**: Who appears to be speaking based on visual cues
-4. **Cross-Modal Sync**: How visual and audio elements relate
+For each frame, provide:
+1. **Visual Scene**: What is happening visually
+2. **People**: Who is visible (describe them for identification)
+3. **Audio Context**: What is being said at this point in the transcript
+4. **Event Type**: Type of event/activity
 5. **Narrative Flow**: How this fits the overall story
 
-Format: [HH:MM:SS] **VISUAL**: [scene] | **AUDIO**: "[words]" | **CONTEXT**: [analysis]"""
+Format: [HH:MM:SS] VISUAL: [scene] | PEOPLE: [who] | AUDIO: "[words]" | EVENT: [type]"""
         }]
 
         # Add frame data
@@ -513,9 +851,9 @@ Format: [HH:MM:SS] **VISUAL**: [scene] | **AUDIO**: "[words]" | **CONTEXT**: [an
 
         try:
             response = self.openai_client.chat.completions.create(
-                model="gpt-4o",
+                model="gpt-5.1",
                 messages=[{"role": "user", "content": content}],
-                max_tokens=4000,
+                max_completion_tokens=4000,
                 temperature=0.1
             )
 
@@ -539,10 +877,10 @@ def main():
     video_path = "../test/test_video.mp4"
 
     if os.path.exists(video_path):
-        print("🚀 RUNNING OPTIMIZED MULTIMODAL PROCESSING")
+        print("RUNNING OPTIMIZED MULTIMODAL PROCESSING")
         print("-" * 70)
         results = transcriber.process_video_fast(video_path, frame_interval=4)
-        print(f"\n🎯 Total processing time: {results['processing_time']:.1f} seconds")
+        print(f"\nTotal processing time: {results['processing_time']:.1f} seconds")
     else:
         print(f"Test video not found: {video_path}")
 

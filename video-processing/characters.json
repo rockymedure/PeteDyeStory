@@ -1,0 +1,174 @@
+{
+  "characters": [
+    {
+      "name": "James D. LaRosa",
+      "aliases": ["Papa Jim", "James D.", "JDL", "Mr. LaRosa"],
+      "role": "Founder of the Pete Dye Golf Club",
+      "description": "Son of Italian immigrants who worked the coal mines in West Virginia. Built a successful business and became the dreamer who founded the Pete Dye Golf Club. Pete Dye called him 'the toughest, most tenacious, never-give-up son of a gun I ever worked for.' He spent nearly two decades turning his vision of a world-class golf course in the West Virginia mountains into reality.",
+      "physical_description": "Older Italian-American man, distinguished appearance, often seen on the construction site or at formal club events",
+      "time_period": "1978-2004",
+      "relationships": [
+        "Father of Jimmy LaRosa",
+        "Hired and worked directly with Pete Dye for 18 years",
+        "Close friend of Joe DiMaggio",
+        "Friend of Louie Ellis"
+      ],
+      "key_quotes": []
+    },
+    {
+      "name": "Jimmy LaRosa",
+      "aliases": ["Jim", "JJL", "Jimmy", "Young Jim"],
+      "role": "James D.'s son and project co-manager; primary narrator of the documentary",
+      "description": "James D. LaRosa's son who worked alongside his father and Pete Dye for 18 years building the golf club. Managed day-to-day operations and secured financing. Serves as the primary narrator of the documentary, telling the story of his father's dream and the decades-long journey to build the course.",
+      "physical_description": "Younger man compared to his father, appears in both construction-era footage and modern interview settings",
+      "time_period": "1978-2004",
+      "relationships": [
+        "Son of James D. LaRosa",
+        "Worked closely with Pete Dye on the course design and construction",
+        "Business partner in the golf club project"
+      ],
+      "key_quotes": []
+    },
+    {
+      "name": "Pete Dye",
+      "aliases": ["Mr. Dye", "Pete"],
+      "role": "Golf course architect and designer of the Pete Dye Golf Club",
+      "description": "One of the greatest golf course architects ever. Known for designing TPC Sawgrass (Island Green), Whistling Straits, the Ocean Course at Kiawah Island, and over 100 other courses. A relentless perfectionist. He designed the Pete Dye Golf Club course and it is the only course he ever put his own name on. His design fee was reportedly 'just a couple hundred dollars to get back to Florida.'",
+      "physical_description": "Older man with distinctive white hair, often seen on-site surveying the course or directing construction work",
+      "time_period": "1978-2004",
+      "relationships": [
+        "Married to Alice Dye, his design collaborator",
+        "Hired by James D. LaRosa to design the course",
+        "Worked with Jimmy LaRosa for 18 years on the project"
+      ],
+      "key_quotes": [
+        "He's the toughest, most tenacious, never-give-up son of a gun I ever worked for.",
+        "Just a couple hundred dollars to get back to Florida."
+      ]
+    },
+    {
+      "name": "Alice Dye",
+      "aliases": ["Mrs. Dye", "Alice"],
+      "role": "Pete Dye's wife and design collaborator",
+      "description": "Pete Dye's wife and lifelong collaborator in golf course design. A champion amateur golfer in her own right. She pushed for the Pete Dye Golf Club course to be welcoming and playable for all golfers, not just elite men. Her influence shaped the forward tees and overall accessibility of the design.",
+      "physical_description": "Older woman, often seen alongside Pete Dye on the course or at club events",
+      "time_period": "1978-2004",
+      "relationships": [
+        "Wife of Pete Dye",
+        "Design collaborator on the golf course",
+        "Advocate for inclusive course design"
+      ],
+      "key_quotes": [
+        "Pete, if this is designed to be a men's club, you won't finish the course."
+      ]
+    },
+    {
+      "name": "Gary Grandstaff",
+      "aliases": ["Gary"],
+      "role": "Golf course superintendent for over 30 years",
+      "description": "The superintendent who maintained the Pete Dye Golf Club course for over three decades. Joined the project in 1989 and became the steward of the grounds, ensuring Pete Dye's design vision was preserved through meticulous course maintenance.",
+      "physical_description": "Typically seen in groundskeeping or maintenance attire on the course",
+      "time_period": "1989-2004+",
+      "relationships": [
+        "Worked under the LaRosa family",
+        "Maintained Pete Dye's course design"
+      ],
+      "key_quotes": []
+    },
+    {
+      "name": "Bill Stines",
+      "aliases": ["Bill"],
+      "role": "Head Golf Professional, came from The Honors Course",
+      "description": "Head Golf Professional at the Pete Dye Golf Club. Previously served at The Honors Course, another prestigious private club. Brought professional golf operations expertise to the club.",
+      "physical_description": "Professional golfer appearance, often seen in golf attire at the club",
+      "time_period": "1990s-2004",
+      "relationships": [
+        "Head professional at the Pete Dye Golf Club",
+        "Previously at The Honors Course"
+      ],
+      "key_quotes": []
+    },
+    {
+      "name": "Jim Jamieson",
+      "aliases": ["Jamieson"],
+      "role": "Director of Golf, former PGA Tour player",
+      "description": "Director of Golf at the Pete Dye Golf Club. A former PGA Tour player who brought tournament-level golf experience to the club's operations and helped establish its reputation in the professional golf community.",
+      "physical_description": "Athletic build, professional golfer, seen in golf settings",
+      "time_period": "1990s-2004",
+      "relationships": [
+        "Director of Golf operations at the club",
+        "Former PGA Tour professional"
+      ],
+      "key_quotes": []
+    },
+    {
+      "name": "Joe DiMaggio",
+      "aliases": ["DiMaggio", "Joltin' Joe", "The Yankee Clipper"],
+      "role": "Baseball legend and regular visitor to the club",
+      "description": "Legendary New York Yankees baseball player and American icon. Was a regular visitor to the Pete Dye Golf Club and a friend of the LaRosa family. Attended both opening ceremonies of the club, lending star power and prestige to the events.",
+      "physical_description": "Distinguished older gentleman, iconic American sports figure, recognizable face",
+      "time_period": "1990s (club openings and visits)",
+      "relationships": [
+        "Friend of the LaRosa family",
+        "Celebrity guest at the club",
+        "Attended both club opening ceremonies"
+      ],
+      "key_quotes": []
+    },
+    {
+      "name": "Louie Ellis",
+      "aliases": ["Louie"],
+      "role": "Family friend and unofficial documentarian who filmed the project for 20 years",
+      "description": "A family friend who took it upon himself to document the entire Pete Dye Golf Club project over approximately 20 years. His amateur footage forms a significant portion of the archival material in the documentary. Known for his signature sign-off at the end of recordings.",
+      "physical_description": "Often behind the camera rather than in front of it; when visible, appears as a friendly older man",
+      "time_period": "1978-2004",
+      "relationships": [
+        "Family friend of the LaRosas",
+        "Husband of Nancy Ellis",
+        "Self-appointed documentarian of the project"
+      ],
+      "key_quotes": [
+        "No charge—Louie signing off."
+      ]
+    },
+    {
+      "name": "Nancy Ellis",
+      "aliases": ["Nancy"],
+      "role": "Louie's wife, also helped document the project",
+      "description": "Wife of Louie Ellis. Together with her husband, she helped document the Pete Dye Golf Club project over the years, contributing to the archival footage that forms the backbone of the documentary.",
+      "physical_description": "Older woman, often seen alongside Louie Ellis at club events",
+      "time_period": "1978-2004",
+      "relationships": [
+        "Wife of Louie Ellis",
+        "Friend of the LaRosa family"
+      ],
+      "key_quotes": []
+    },
+    {
+      "name": "Harris Holt",
+      "aliases": ["Holt"],
+      "role": "Professional narrator of a course overview video",
+      "description": "Professional narrator who recorded a narration video about the Pete Dye Golf Club course. His voiceover provides polished, broadcast-quality descriptions of the course and its history.",
+      "physical_description": "Professional narrator voice; may not appear on camera (voiceover only)",
+      "time_period": "Unknown (narration recording)",
+      "relationships": [
+        "Professional narrator hired for club promotional material"
+      ],
+      "key_quotes": []
+    },
+    {
+      "name": "Governor Gaston Caperton",
+      "aliases": ["Governor Caperton", "Caperton", "the Governor"],
+      "role": "Governor of West Virginia during the club's development",
+      "description": "Governor of West Virginia who appears in footage related to the Pete Dye Golf Club. His presence underscores the significance of the project to the state of West Virginia. NOTE: A previous AI analysis incorrectly identified him as 'Governor Bill Clinton' — this is WRONG. The correct identification is Governor Gaston Caperton of West Virginia.",
+      "physical_description": "Distinguished gentleman in formal or political attire, appearing at official club events or ceremonies",
+      "time_period": "Late 1980s-1990s (during his governorship)",
+      "relationships": [
+        "Governor of West Virginia",
+        "Attended Pete Dye Golf Club events in official capacity"
+      ],
+      "key_quotes": []
+    }
+  ],
+  "context": "The Pete Dye Golf Club documentary (working title: 'The Pete Dye Story') chronicles the 25+ year journey (1978-2004) of building a world-class golf course in the mountains of West Virginia. The archive contains diverse footage including: golf course construction and earthmoving, family gatherings and holidays, grand opening ceremonies, interviews with Pete Dye and the LaRosa family, award ceremonies, professional golf tournaments (WV Classic), celebrity visits (Joe DiMaggio), Christmas parties, and social events. The central narrative follows James D. LaRosa — a son of Italian immigrants and former coal miner — who hired legendary golf architect Pete Dye to build the only course Dye ever put his own name on. The project spanned nearly two decades of construction, with LaRosa's son Jimmy managing operations and financing. The story is one of perseverance, family legacy, and an unlikely partnership between a West Virginia dreamer and one of golf's greatest designers."
+}

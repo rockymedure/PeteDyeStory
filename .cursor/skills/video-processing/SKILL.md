@@ -5,7 +5,7 @@ description: Process Pete Dye construction videos to extract transcripts, chapte
 
 # Video Processing
 
-Multimodal video analysis for Pete Dye Golf Club footage using OpenAI (GPT-4o).
+Multimodal video analysis for Pete Dye Golf Club footage using OpenAI GPT-5.1.
 
 ## Quick Start
 
@@ -13,6 +13,35 @@ Multimodal video analysis for Pete Dye Golf Club footage using OpenAI (GPT-4o).
 cd /Users/rockymedure/Desktop/PeteDyeStory/video-processing
 source venv/bin/activate
 python run_video.py media/VIDEO_FILE.mp4
+```
+
+## CLI Flags
+
+| Flag | Description | Default |
+|------|-------------|---------|
+| `--model gpt-5.1` | AI model for vision + synthesis | `gpt-5.1` |
+| `--model gpt-4o` | Legacy model | - |
+| `--skip-diarization` | Skip speaker diarization (no-speech videos) | off |
+| `--segment-duration N` | Seconds per video segment | `150` |
+| `--reprocess` | Force re-analysis even if output exists | off |
+
+### Examples
+
+```bash
+# Standard analysis (GPT-5.1, 2.5-min segments)
+python run_video.py media/construction_footage.mp4
+
+# Legacy model
+python run_video.py media/old_video.mp4 --model gpt-4o
+
+# Silent footage (no speech to diarize)
+python run_video.py media/timelapse.mp4 --skip-diarization
+
+# Longer segments for very long videos
+python run_video.py media/full_day.mp4 --segment-duration 300
+
+# Re-analyze a previously processed video
+python run_video.py media/construction_footage.mp4 --reprocess
 ```
 
 ## Setup (one-time)
@@ -26,11 +55,16 @@ pip install -r requirements.txt
 
 API key is already configured in `.env`.
 
-## Processing a Video
+Required system dependency: `brew install ffmpeg`
 
-1. Place video in `video-processing/media/`
-2. Run: `python run_video.py media/FILENAME.mp4`
-3. Optional: specify segment duration (default 150s): `python run_video.py media/FILENAME.mp4 300`
+## Models Used
+
+| Model | Purpose |
+|-------|---------|
+| **GPT-5.1** | Vision analysis of video frames + final synthesis |
+| **gpt-4o-transcribe** | Audio-to-text transcript generation |
+| **gpt-4o-transcribe-diarize** | Speaker diarization (who said what) |
+| **whisper-1** | Word-level timestamp alignment |
 
 ## Output Location
 
@@ -38,8 +72,8 @@ Results saved to `video-processing/output/<video_name>/analysis/`:
 
 | File | Contents |
 |------|----------|
-| `simple_director_analysis.md` | Human-readable report with summary, chapters, highlights |
-| `simple_director_analysis.json` | Machine-readable structured data |
+| `simple_director_analysis.json` | Structured data (see schema below) |
+| `simple_director_analysis.md` | Human-readable report |
 | `full_transcript.txt` | Complete audio transcript |
 
 ## Output Structure (JSON)
@@ -47,40 +81,87 @@ Results saved to `video-processing/output/<video_name>/analysis/`:
 ```json
 {
   "video_analysis": {
-    "synthesis_text": "Summary, characters, chapters, highlights...",
-    "total_segments": 12
+    "title": "Construction Day 47 - Bunker Shaping",
+    "content_type": "construction_footage",
+    "summary": "Pete Dye supervises bunker shaping on hole 14...",
+    "characters": [
+      {
+        "name": "Pete Dye",
+        "is_speaking": true,
+        "description": "Lead architect, directing bunker placement"
+      }
+    ],
+    "chapters": [
+      {
+        "title": "Morning Setup",
+        "start_time": "00:00:00",
+        "end_time": "00:05:30",
+        "summary": "Crew arrives and reviews the day's plan"
+      }
+    ],
+    "highlights": [
+      {
+        "timestamp": "00:12:45",
+        "description": "Pete Dye walks into the bunker to demonstrate the slope"
+      }
+    ],
+    "quotes": [
+      {
+        "speaker": "Pete Dye",
+        "text": "Make it look natural, like God put it there.",
+        "timestamp": "00:15:20"
+      }
+    ],
+    "themes": ["bunker_design", "hands_on_leadership", "craftsmanship"]
   },
   "processing_metadata": {
     "total_processing_time_minutes": 5.2,
-    "speed_improvement": "15x faster than realtime"
+    "model": "gpt-5.1",
+    "segments_processed": 12
   }
 }
 ```
 
-## Integration with Project
+## Character Knowledge Base
 
-The output feeds into:
-- `posts/` - Blog post content and quotes
-- `FILM-OUTLINE.md` - Documentary structure and scenes
-- Character documentation and timeline
+The file `video-processing/characters.json` contains known people across all videos. The analysis pipeline uses this to identify recurring characters consistently. Update this file when new people are identified.
 
-## What It Extracts
+## Cross-Video Synthesis
 
-- **Summary**: 2-3 sentence overview of video content
-- **Characters**: People who appear (Pete Dye, workers, etc.)
-- **Chapters**: Natural story progression with timestamps
-- **Highlights**: Memorable moments with context
-- **Full Transcript**: Word-level accurate transcription
+After processing multiple videos, generate a cross-video synthesis that connects themes, characters, and timeline across all footage:
 
-## Extracting Clips from Highlights
+```bash
+python cross_video_synthesis.py
+```
 
-After analysis completes, extract video clips based on identified highlights.
+This reads all `simple_director_analysis.json` files from `output/` and produces a unified timeline and character map.
 
-### Clip Extraction Process
+## Batch Processing
 
-1. **Review the analysis** to identify key moments from `simple_director_analysis.md`
-2. **Find timestamps** in the transcript or segment data
-3. **Extract clips** using ffmpeg:
+Process multiple videos from a queue file (`video_queue.txt`):
+
+```bash
+# Standard batch run
+python batch_processor.py
+
+# Force re-analysis of all videos (even already-processed ones)
+python batch_processor.py --reprocess
+```
+
+Features:
+- Reads video list from `video_queue.txt` (one filename per line, `#` comments supported)
+- Skips already-processed videos unless `--reprocess` is set
+- Exponential backoff on rate limit errors (60s -> 120s -> 240s, max 3 retries)
+- 2-hour timeout per video
+- Automatic validation after each video
+- Clip extraction (up to 10 per video)
+- Summary report written to `batch_summary.md`
+
+## Clip Extraction
+
+After analysis completes, clips are automatically extracted from identified highlights. You can also extract manually:
+
+### Manual Clip Extraction
 
 ```bash
 VIDEO="/path/to/original/video.mp4"
@@ -103,7 +184,6 @@ ffmpeg -i "$VIDEO" -ss 00:10:00 -t 00:03:00 -c:v libx264 -c:a aac "$CLIPS/clip-n
 
 ### Clip Output Location
 
-Clips are saved to:
 ```
 video-processing/output/<video_name>/clips/
 ├── 01-descriptive-name.mp4
@@ -118,36 +198,12 @@ Use numbered prefixes with descriptive names:
 - `02-pete-dye-site-visit.mp4`
 - `03-grand-opening-ceremony.mp4`
 
-### Example: Extract Multiple Clips
-
-```bash
-VIDEO="/Users/rockymedure/Downloads/Construction-1989.mp4"
-CLIPS="video-processing/output/Construction_1989/clips"
-mkdir -p "$CLIPS"
-
-# Pete arrives on site (5:00 - 8:00)
-ffmpeg -i "$VIDEO" -ss 00:05:00 -t 00:03:00 -c:v libx264 -c:a aac -y "$CLIPS/01-pete-arrives.mp4"
-
-# Workers shaping bunker (22:30 - 25:00)
-ffmpeg -i "$VIDEO" -ss 00:22:30 -t 00:02:30 -c:v libx264 -c:a aac -y "$CLIPS/02-bunker-shaping.mp4"
-
-# Sunset over course (1:15:00 - 1:17:00)
-ffmpeg -i "$VIDEO" -ss 01:15:00 -t 00:02:00 -c:v libx264 -c:a aac -y "$CLIPS/03-sunset-beauty-shot.mp4"
-```
-
 ### Finding Timestamps
 
-1. **From segment analysis**: Each segment has a `timestamp_range` field
-2. **From transcript**: Search `full_transcript.txt` for keywords
-3. **From highlights**: The synthesis identifies memorable moments
-
-```bash
-# Search transcript for keywords
-grep -i "pete\|bunker\|opening" output/<video>/analysis/full_transcript.txt
-
-# Find segment timestamps
-grep "timestamp_range" output/<video>/analysis/simple_director_analysis.json
-```
+1. **From chapters**: Each chapter has `start_time` and `end_time`
+2. **From highlights**: Each highlight has a `timestamp`
+3. **From transcript**: Search `full_transcript.txt` for keywords
+4. **From quotes**: Each quote has a `timestamp`
 
 ## Troubleshooting
 
@@ -156,3 +212,11 @@ grep "timestamp_range" output/<video>/analysis/simple_director_analysis.json
 **API error**: Check `.env` file has valid `OPENAI_API_KEY`
 
 **Video format issues**: Convert with `ffmpeg -i input.mov output.mp4`
+
+**Rate limit errors**: The batch processor handles this automatically with exponential backoff. For single video runs, wait a few minutes and retry.
+
+**Empty transcript**: Some construction footage has no audio. Use `--skip-diarization` flag for these videos.
+
+**Timeout on long videos**: Increase segment duration with `--segment-duration 300` to reduce the number of API calls.
+
+**Old format output**: Run with `--reprocess` to regenerate output with the current structured schema (title, characters, chapters, etc.).

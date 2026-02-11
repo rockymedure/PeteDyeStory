@@ -4,17 +4,19 @@ Pete Dye Story - Overnight Batch Video Processor
 
 Processes multiple videos sequentially with:
 - Validation after each video
-- Retry/recovery on failure
+- Retry/recovery on failure with exponential backoff
 - Automatic highlight clip extraction
 - Comprehensive logging
 
 Usage:
     python batch_processor.py
+    python batch_processor.py --reprocess
     
     Or run in background:
     nohup python batch_processor.py > batch_output.log 2>&1 &
 """
 
+import argparse
 import asyncio
 import sys
 import os
@@ -47,12 +49,13 @@ load_env()
 
 
 class BatchProcessor:
-    def __init__(self):
+    def __init__(self, reprocess: bool = False):
         self.base_dir = SCRIPT_DIR
         self.videos_dir = os.path.join(os.path.dirname(SCRIPT_DIR), 'videos')
         self.output_dir = os.path.join(SCRIPT_DIR, 'output')
         self.log_file = os.path.join(SCRIPT_DIR, 'batch_log.txt')
         self.summary_file = os.path.join(SCRIPT_DIR, 'batch_summary.md')
+        self.reprocess = reprocess
         
         self.results = {
             'full_success': [],
@@ -111,15 +114,18 @@ class BatchProcessor:
             sys.executable,
             run_script,
             video_path,
-            str(segment_duration)
+            '--segment-duration', str(segment_duration)
         ]
+        
+        if self.reprocess:
+            cmd.append('--reprocess')
         
         try:
             result = subprocess.run(
                 cmd,
                 capture_output=True,
                 text=True,
-                timeout=3600  # 1 hour timeout per video
+                timeout=7200  # 2 hour timeout per video
             )
             
             if result.returncode == 0:
@@ -129,9 +135,38 @@ class BatchProcessor:
                 return False, result.returncode, error_msg
                 
         except subprocess.TimeoutExpired:
-            return False, -1, "Process timeout (exceeded 1 hour)"
+            return False, -1, "Process timeout (exceeded 2 hours)"
         except Exception as e:
             return False, -2, str(e)
+    
+    def process_video_with_backoff(self, video_path: str, segment_duration: int = 150) -> tuple:
+        """
+        Process a single video with exponential backoff for rate limit errors.
+        Starts at 60s, doubles each retry, max 3 retries.
+        Returns (success: bool, exit_code: int, error_message: str)
+        """
+        backoff_delay = 60  # Start at 60 seconds
+        max_retries = 3
+
+        success, exit_code, error = self.process_video(video_path, segment_duration)
+        
+        if success:
+            return success, exit_code, error
+
+        # Check for rate limit errors and retry with exponential backoff
+        retry_count = 0
+        while retry_count < max_retries and error and 'rate' in error.lower():
+            retry_count += 1
+            self.results['retries'] += 1
+            self.log(f"  Rate limit detected. Backoff retry {retry_count}/{max_retries}, waiting {backoff_delay}s...")
+            time.sleep(backoff_delay)
+            backoff_delay *= 2  # Double the delay each retry
+            
+            success, exit_code, error = self.process_video(video_path, segment_duration)
+            if success:
+                return success, exit_code, error
+
+        return success, exit_code, error
     
     def diagnose_and_fix(self, video_path: str, validation: ValidationResult) -> str:
         """
@@ -180,14 +215,17 @@ class BatchProcessor:
         
         start_time = time.time()
         
-        # Check if already processed
+        # Check if already processed (skip unless --reprocess flag is set)
         analysis_json = os.path.join(output_path, 'analysis', 'simple_director_analysis.json')
-        if os.path.exists(analysis_json):
+        if os.path.exists(analysis_json) and not self.reprocess:
             self.log(f"  Already processed, skipping to clip extraction...")
             result['status'] = 'already_processed'
         else:
-            # Process video
-            success, exit_code, error = self.process_video(video_path)
+            if os.path.exists(analysis_json) and self.reprocess:
+                self.log(f"  --reprocess flag set, re-analyzing with GPT-5.1...")
+            
+            # Process video with exponential backoff for rate limits
+            success, exit_code, error = self.process_video_with_backoff(video_path)
             
             if not success:
                 self.log(f"  Processing failed (exit {exit_code}): {error}")
@@ -196,7 +234,7 @@ class BatchProcessor:
                 # Retry with longer segments
                 self.log(f"  Retrying with 300s segments...")
                 self.results['retries'] += 1
-                success, exit_code, error = self.process_video(video_path, segment_duration=300)
+                success, exit_code, error = self.process_video_with_backoff(video_path, segment_duration=300)
                 
                 if not success:
                     self.log(f"  Retry failed: {error}")
@@ -270,8 +308,12 @@ class BatchProcessor:
         
         with open(self.summary_file, 'w') as f:
             f.write("# Batch Processing Summary\n\n")
+            f.write(f"Model: GPT-5.1\n")
             f.write(f"Completed: {self.results['end_time'].strftime('%Y-%m-%d %H:%M:%S')}\n")
-            f.write(f"Duration: {hours}h {minutes}m\n\n")
+            f.write(f"Duration: {hours}h {minutes}m\n")
+            if self.reprocess:
+                f.write(f"Mode: Reprocess (forced re-analysis)\n")
+            f.write("\n")
             
             f.write("## Results\n\n")
             f.write(f"- Total: {len(self.results['full_success']) + len(self.results['partial_success'])} videos\n")
@@ -313,7 +355,8 @@ class BatchProcessor:
         
         # Initialize log
         with open(self.log_file, 'w') as f:
-            f.write(f"=== BATCH PROCESSING STARTED: {self.results['start_time'].strftime('%Y-%m-%d %H:%M:%S')} ===\n\n")
+            f.write(f"=== BATCH PROCESSING STARTED: {self.results['start_time'].strftime('%Y-%m-%d %H:%M:%S')} ===\n")
+            f.write(f"=== Model: GPT-5.1 | Reprocess: {self.reprocess} ===\n\n")
         
         self.log("Loading video queue...")
         videos = self.load_queue()
@@ -322,7 +365,8 @@ class BatchProcessor:
             self.log("ERROR: No videos in queue!")
             return
         
-        self.log(f"Found {len(videos)} videos to process\n")
+        self.log(f"Found {len(videos)} videos to process")
+        self.log(f"Using GPT-5.1 for analysis (2h timeout per video)\n")
         
         # Process each video
         for i, video in enumerate(videos, 1):
@@ -347,7 +391,11 @@ class BatchProcessor:
 
 
 def main():
-    processor = BatchProcessor()
+    parser = argparse.ArgumentParser(description='Pete Dye Story - Batch Video Processor')
+    parser.add_argument('--reprocess', action='store_true', help='Force re-analysis of already-processed videos')
+    args = parser.parse_args()
+    
+    processor = BatchProcessor(reprocess=args.reprocess)
     asyncio.run(processor.run())
 
 

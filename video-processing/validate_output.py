@@ -7,6 +7,7 @@ Validates that video processing completed successfully by checking:
 2. Analysis MD file exists and has content
 3. Analysis JSON is valid and has required fields
 4. Transcript file exists and has content
+5. Structured JSON schema fields (warnings only for backward compatibility)
 """
 
 import os
@@ -20,11 +21,88 @@ class ValidationResult:
     """Result of video output validation"""
     passed: bool = False
     issues: List[str] = field(default_factory=list)
+    warnings: List[str] = field(default_factory=list)
     details: dict = field(default_factory=dict)
     
     def add_issue(self, issue: str):
         self.issues.append(issue)
         self.passed = False
+    
+    def add_warning(self, warning: str):
+        self.warnings.append(warning)
+
+
+def validate_structured_fields(data: dict, result: ValidationResult):
+    """
+    Validate the new structured JSON schema fields.
+    
+    Checks video_analysis for required structured fields:
+    - title (string), content_type (string), summary (string)
+    - characters[], chapters[], highlights[], quotes[], themes[]
+    - Each character must have name and is_speaking
+    - Each chapter must have title, start_time, end_time
+    
+    All issues are added as warnings (not failures) to maintain
+    backward compatibility with the old format.
+    
+    Args:
+        data: The parsed JSON data from simple_director_analysis.json
+        result: ValidationResult to add warnings to
+    """
+    video_analysis = data.get('video_analysis')
+    if not video_analysis:
+        result.add_warning("Structured schema: 'video_analysis' key missing, cannot validate structured fields")
+        return
+    
+    # If video_analysis is a string (old format), skip structured validation
+    if isinstance(video_analysis, str):
+        result.add_warning("Structured schema: 'video_analysis' is a string (old format), skipping structured field validation")
+        return
+    
+    if not isinstance(video_analysis, dict):
+        result.add_warning(f"Structured schema: 'video_analysis' is {type(video_analysis).__name__}, expected dict")
+        return
+    
+    # Check required string fields
+    for field_name in ('title', 'content_type', 'summary'):
+        value = video_analysis.get(field_name)
+        if value is None:
+            result.add_warning(f"Structured schema: 'video_analysis.{field_name}' is missing")
+        elif not isinstance(value, str):
+            result.add_warning(f"Structured schema: 'video_analysis.{field_name}' should be a string, got {type(value).__name__}")
+        elif not value.strip():
+            result.add_warning(f"Structured schema: 'video_analysis.{field_name}' is empty")
+    
+    # Check required array fields
+    for array_name in ('characters', 'chapters', 'highlights', 'quotes', 'themes'):
+        value = video_analysis.get(array_name)
+        if value is None:
+            result.add_warning(f"Structured schema: 'video_analysis.{array_name}' is missing")
+        elif not isinstance(value, list):
+            result.add_warning(f"Structured schema: 'video_analysis.{array_name}' should be an array, got {type(value).__name__}")
+    
+    # Validate character entries
+    characters = video_analysis.get('characters')
+    if isinstance(characters, list):
+        for i, character in enumerate(characters):
+            if not isinstance(character, dict):
+                result.add_warning(f"Structured schema: 'video_analysis.characters[{i}]' should be an object, got {type(character).__name__}")
+                continue
+            if 'name' not in character:
+                result.add_warning(f"Structured schema: 'video_analysis.characters[{i}]' missing 'name' field")
+            if 'is_speaking' not in character:
+                result.add_warning(f"Structured schema: 'video_analysis.characters[{i}]' missing 'is_speaking' field")
+    
+    # Validate chapter entries
+    chapters = video_analysis.get('chapters')
+    if isinstance(chapters, list):
+        for i, chapter in enumerate(chapters):
+            if not isinstance(chapter, dict):
+                result.add_warning(f"Structured schema: 'video_analysis.chapters[{i}]' should be an object, got {type(chapter).__name__}")
+                continue
+            for required_field in ('title', 'start_time', 'end_time'):
+                if required_field not in chapter:
+                    result.add_warning(f"Structured schema: 'video_analysis.chapters[{i}]' missing '{required_field}' field")
 
 
 def validate_video_output(output_dir: str) -> ValidationResult:
@@ -81,6 +159,9 @@ def validate_video_output(output_dir: str) -> ValidationResult:
                 result.add_issue("Analysis JSON missing 'processing_metadata' field")
             
             result.details['json_valid'] = True
+            
+            # Check 5: Validate new structured JSON schema (warnings only)
+            validate_structured_fields(data, result)
             
         except json.JSONDecodeError as e:
             result.add_issue(f"Analysis JSON is invalid: {e}")
@@ -143,5 +224,10 @@ if __name__ == "__main__":
             print("Issues:")
             for issue in result.issues:
                 print(f"  - {issue}")
+        
+        if result.warnings:
+            print("Warnings (structured schema):")
+            for warning in result.warnings:
+                print(f"  - {warning}")
     else:
         print("Usage: python validate_output.py <output_directory>")
