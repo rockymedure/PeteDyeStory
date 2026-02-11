@@ -59,14 +59,26 @@ class FastMultimodalVideoTranscriber:
             print(f"Audio extracted to {output_audio}")
         return output_audio
 
+    def _get_audio_duration(self, audio_path):
+        """Get audio duration in seconds using ffprobe"""
+        try:
+            result = subprocess.run(
+                ['ffprobe', '-v', 'quiet', '-show_entries', 'format=duration', '-of', 'csv=p=0', audio_path],
+                capture_output=True, text=True
+            )
+            return float(result.stdout.strip())
+        except Exception:
+            return 0.0
+
     def transcribe_audio_openai(self, audio_path):
         """Transcribe audio using OpenAI's APIs, with chunking for large files"""
-        # Check file size - OpenAI has 25MB limit
+        # Check file size (25MB limit) AND duration (1400s limit for gpt-4o-transcribe)
         file_size_mb = os.path.getsize(audio_path) / (1024 * 1024)
+        audio_duration = self._get_audio_duration(audio_path)
 
-        if file_size_mb > 24:
+        if file_size_mb > 24 or audio_duration > 1350:
             if self.VERBOSE_FRAMES:
-                print(f"Audio file too large ({file_size_mb:.1f} MB), splitting into chunks...")
+                print(f"Audio needs chunking (size: {file_size_mb:.1f}MB, duration: {audio_duration:.0f}s)")
             return self.transcribe_large_audio(audio_path)
 
         with open(audio_path, "rb") as audio_file:
