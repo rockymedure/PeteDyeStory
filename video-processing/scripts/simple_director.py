@@ -425,7 +425,7 @@ class SimpleDirector:
 
     def openai_synthesis(self, segment_results: List[dict], full_transcript: dict = None, diarization: Optional[dict] = None) -> dict:
         """Send all segment results to GPT-5.1 for structured synthesis with JSON schema output"""
-        print("GPT-5.1 SYNTHESIS - Combining all segments with structured output...")
+        print(f"   ├─ Building synthesis prompt...")
 
         # Build the character knowledge context
         character_context = self._build_character_context()
@@ -505,8 +505,8 @@ class SimpleDirector:
                 }
             }
         except json.JSONDecodeError as e:
-            print(f"JSON parsing error from GPT-5.1 response: {e}")
-            print(f"Raw response: {raw_content[:500]}")
+            print(f"   ├─ ❌ JSON parsing error: {e}")
+            print(f"   ├─ Raw response: {raw_content[:300]}")
             return {
                 'video_analysis': {
                     'title': 'Analysis Error - JSON Parse Failure',
@@ -525,7 +525,7 @@ class SimpleDirector:
                 }
             }
         except Exception as e:
-            print(f"GPT-5.1 synthesis failed: {e}")
+            print(f"   ├─ ❌ Synthesis failed: {e}")
             return {
                 'video_analysis': {
                     'title': 'Analysis Error',
@@ -673,95 +673,177 @@ class SimpleDirector:
         3. Process segments with visual analysis + sync to full transcript
         4. Send everything to GPT-5.1 for structured synthesis
         """
-        print("SIMPLE DIRECTOR SYSTEM - Pete Dye Story")
-        print("=" * 50)
-        print("Using OpenAI for all AI operations (GPT-5.1 synthesis)")
-        print("=" * 50)
+        video_basename = os.path.basename(video_path)
+        print()
+        print("🎬 ══════════════════════════════════════════════════")
+        print(f"🎬  PETE DYE STORY — VIDEO ANALYSIS")
+        print(f"🎬  {video_basename}")
+        print(f"🎬  Model: {self.model} | Characters loaded: {len(self.characters.get('characters', []))}")
+        print("🎬 ══════════════════════════════════════════════════")
+        print()
         start_time = time.time()
 
         # Setup organized folders for this video
-        print("Setting up organized folders...")
         video_output_dir, video_segments_dir = self.setup_video_folders(video_path)
-        print(f"Output directory: {video_output_dir}")
 
-        # PHASE 1: Extract and transcribe FULL audio (with diarization)
-        print("Phase 1: Extracting and transcribing complete audio (with diarization)...")
+        # ── PHASE 1: AUDIO ─────────────────────────────────────
+        phase1_start = time.time()
+        print("🎙️  PHASE 1 — AUDIO EXTRACTION & TRANSCRIPTION")
+        print("   ├─ Extracting audio track...")
         full_audio_path = f"{video_output_dir}/audio/full_audio.mp3"
         os.makedirs(os.path.dirname(full_audio_path), exist_ok=True)
 
-        # Extract full audio from source video
         audio_path = self.sub_agent.extract_audio_from_video(video_path, full_audio_path)
-        print(f"Full audio extracted to {audio_path}")
+        audio_size_mb = os.path.getsize(audio_path) / (1024 * 1024)
+        print(f"   ├─ ✅ Audio extracted ({audio_size_mb:.1f} MB)")
 
-        # Transcribe the complete audio (standard transcription)
+        print("   ├─ Transcribing with gpt-4o-transcribe...")
         full_transcript = self.sub_agent.transcribe_audio_openai(audio_path)
 
-        # Check if transcription was successful
         if full_transcript and 'high_quality_transcript' in full_transcript:
-            transcript_length = len(full_transcript['high_quality_transcript'])
-            print(f"Complete audio transcribed ({transcript_length} characters)")
+            transcript_text = full_transcript['high_quality_transcript']
+            transcript_length = len(transcript_text)
+            word_count = len(transcript_text.split())
+            # Show a preview of the first sentence
+            first_sentence = transcript_text.strip().split('.')[0][:120]
+            print(f"   ├─ ✅ Transcript: {word_count:,} words ({transcript_length:,} chars)")
+            print(f"   ├─ 💬 Preview: \"{first_sentence}...\"")
+            
+            # Count timestamped words
+            ts_count = len(full_transcript.get('timestamped_transcript', []))
+            if ts_count:
+                print(f"   ├─ ⏱️  Word-level timestamps: {ts_count:,} words mapped")
         else:
-            print(f"Audio transcription failed: {full_transcript}")
-            # Continue with empty transcript rather than failing completely
+            print(f"   ├─ ⚠️  Transcription failed — continuing with visual analysis only")
             full_transcript = {
                 'high_quality_transcript': '',
                 'timestamped_transcript': []
             }
 
-        # Run diarization (speaker identification)
+        # Diarization (opt-in)
         diarization = None
         if self.skip_diarization:
-            print("Diarization: SKIPPED (--skip-diarization flag set)")
+            print("   ├─ 🔇 Speaker diarization: skipped (use --diarize to enable)")
         elif hasattr(self.sub_agent, 'transcribe_audio_diarized'):
-            print("Running speaker diarization...")
+            print("   ├─ 🗣️  Running speaker diarization...")
             try:
                 diarization = self.sub_agent.transcribe_audio_diarized(audio_path)
                 if diarization and diarization.get('segments'):
                     num_speakers = len(set(seg.get('speaker', '') for seg in diarization['segments']))
-                    print(f"Diarization complete: {num_speakers} speakers detected, {len(diarization['segments'])} segments")
+                    print(f"   ├─ ✅ Diarization: {num_speakers} distinct speakers, {len(diarization['segments'])} segments")
                 else:
-                    print("Diarization returned no segments")
+                    print("   ├─ ⚠️  Diarization returned no segments")
                     diarization = None
             except Exception as e:
-                print(f"Diarization failed (continuing without it): {e}")
+                print(f"   ├─ ⚠️  Diarization failed: {e}")
                 diarization = None
         else:
-            print("Sub-agent does not support diarization (transcribe_audio_diarized not available)")
+            pass  # silently skip if sub-agent doesn't support it
 
-        # PHASE 2: Prepare video segments (for visual analysis only)
-        print("Phase 2: Creating video segments...")
+        phase1_time = time.time() - phase1_start
+        print(f"   └─ 🕐 Phase 1 complete: {phase1_time:.0f}s")
+        print()
+
+        # ── PHASE 2: SEGMENTATION ──────────────────────────────
+        phase2_start = time.time()
+        print("✂️  PHASE 2 — VIDEO SEGMENTATION")
         segments = self.create_segments(video_path, video_segments_dir, segment_duration)
-        print(f"Created {len(segments)} segments")
+        total_duration = sum(s.duration for s in segments)
+        print(f"   ├─ Video duration: {total_duration/60:.1f} min")
+        print(f"   ├─ Segments: {len(segments)} × {segment_duration/60:.1f} min each")
 
-        # Extract video segments
-        print("Extracting video segments...")
+        print("   ├─ Extracting segments with ffmpeg...")
+        extract_failures = 0
         for segment in segments:
             if not self.extract_segment(video_path, segment):
-                print(f"Failed to extract segment {segment.segment_id}")
-                continue
+                extract_failures += 1
 
-        # PHASE 3: Process segments with visual analysis + full transcript sync
-        print(f"Phase 3: Processing {len(segments)} segments with visual analysis...")
+        if extract_failures:
+            print(f"   ├─ ⚠️  {extract_failures} segments failed to extract")
+        
+        phase2_time = time.time() - phase2_start
+        print(f"   └─ 🕐 Phase 2 complete: {phase2_time:.0f}s")
+        print()
+
+        # ── PHASE 3: VISUAL ANALYSIS ───────────────────────────
+        phase3_start = time.time()
+        print(f"👁️  PHASE 3 — VISUAL ANALYSIS ({len(segments)} segments in parallel)")
+        print(f"   ├─ Extracting frames every 4s → sending to {self.model} vision...")
 
         tasks = [self.process_segment_with_full_transcript_async(segment, full_transcript) for segment in segments]
         segment_results = await asyncio.gather(*tasks, return_exceptions=True)
 
-        # Filter out exceptions
         valid_results = []
+        errors = []
         for r in segment_results:
             if isinstance(r, Exception):
-                print(f"Segment processing exception: {r}")
+                errors.append(str(r))
             else:
                 valid_results.append(r)
-        print(f"Processed {len(valid_results)}/{len(segments)} segments")
 
-        # PHASE 4: GPT-5.1 structured synthesis
-        print("Phase 4: GPT-5.1 structured synthesis...")
+        if errors:
+            unique_errors = list(set(errors))
+            for err in unique_errors[:3]:
+                print(f"   ├─ ⚠️  Segment error: {err[:100]}")
+
+        phase3_time = time.time() - phase3_start
+        print(f"   ├─ ✅ Analyzed {len(valid_results)}/{len(segments)} segments")
+        print(f"   └─ 🕐 Phase 3 complete: {phase3_time:.0f}s ({phase3_time/len(segments):.0f}s avg per segment)")
+        print()
+
+        # ── PHASE 4: SYNTHESIS ──────────────────────────────────
+        phase4_start = time.time()
+        print(f"🧠 PHASE 4 — {self.model.upper()} STRUCTURED SYNTHESIS")
+        print(f"   ├─ Sending {len(valid_results)} visual analyses + full transcript to {self.model}...")
         final_synthesis = self.openai_synthesis(valid_results, full_transcript, diarization)
 
-        # Save results
+        # Show what we learned
+        va = final_synthesis.get('video_analysis', {})
+        phase4_time = time.time() - phase4_start
+
+        print(f"   ├─ ✅ Synthesis complete in {phase4_time:.0f}s")
+        print(f"   │")
+        print(f"   ├─ 📋 TITLE: {va.get('title', 'Unknown')}")
+        print(f"   ├─ 🏷️  TYPE: {va.get('content_type', 'Unknown')}")
+        
+        characters = va.get('characters', [])
+        speaking = [c for c in characters if c.get('is_speaking')]
+        print(f"   ├─ 👥 CHARACTERS: {len(characters)} found ({len(speaking)} speaking)")
+        for c in characters[:6]:
+            icon = "🗣️" if c.get('is_speaking') else "👤"
+            print(f"   │   {icon} {c.get('name', '?')} — {c.get('role', '?')}")
+        if len(characters) > 6:
+            print(f"   │   ... and {len(characters) - 6} more")
+
+        chapters = va.get('chapters', [])
+        print(f"   ├─ 📖 CHAPTERS: {len(chapters)}")
+        for ch in chapters[:5]:
+            print(f"   │   [{ch.get('start_time', '?')} → {ch.get('end_time', '?')}] {ch.get('title', '?')}")
+        if len(chapters) > 5:
+            print(f"   │   ... and {len(chapters) - 5} more")
+
+        quotes = va.get('quotes', [])
+        highlights = va.get('highlights', [])
+        themes = va.get('themes', [])
+        print(f"   ├─ 💬 QUOTES: {len(quotes)} extracted")
+        print(f"   ├─ ⭐ HIGHLIGHTS: {len(highlights)}")
+        print(f"   ├─ 🎯 THEMES: {', '.join(themes[:5])}")
+        if len(themes) > 5:
+            print(f"   │   ... and {len(themes) - 5} more")
+        print(f"   │")
+
+        # Summary preview
+        summary = va.get('summary', '')
+        if summary:
+            preview = summary[:200] + ('...' if len(summary) > 200 else '')
+            print(f"   ├─ 📝 SUMMARY: {preview}")
+        
+        print(f"   └─ 🕐 Phase 4 complete: {phase4_time:.0f}s")
+        print()
+
+        # ── SAVE RESULTS ────────────────────────────────────────
         processing_time = time.time() - start_time
-        print("Saving results...")
+        print("💾 SAVING RESULTS")
 
         # Add processing metadata
         final_synthesis['processing_metadata'] = {
@@ -805,19 +887,25 @@ class SimpleDirector:
             f.write(markdown_report)
 
         # Cleanup segments
-        print("Cleaning up temporary segment files...")
         for segment in segments:
             if os.path.exists(segment.file_path):
                 os.remove(segment.file_path)
 
         total_time = time.time() - start_time
-        print(f"COMPLETE! Processed in {total_time / 60:.1f} minutes")
-        print(f"Results: {video_output_dir}/analysis/")
-        print(f"   JSON: {analysis_json_path}")
-        print(f"   MD:   {analysis_md_path}")
-        print(f"   Transcript: {transcript_path}")
+        speed = (total_duration / total_time) if total_time > 0 else 0
+
+        print()
+        print("🏁 ══════════════════════════════════════════════════")
+        print(f"🏁  ANALYSIS COMPLETE — {total_time / 60:.1f} min ({speed:.1f}x faster than realtime)")
+        print("🏁 ══════════════════════════════════════════════════")
+        print(f"   📄 JSON:       {analysis_json_path}")
+        print(f"   📝 Report:     {analysis_md_path}")
+        print(f"   🎙️  Transcript: {transcript_path}")
         if diarization:
-            print(f"   Diarization: {video_output_dir}/analysis/diarization.json")
+            print(f"   🗣️  Diarize:   {video_output_dir}/analysis/diarization.json")
+        print()
+        print(f"   ⏱️  Breakdown: Audio {phase1_time:.0f}s → Segments {phase2_time:.0f}s → Vision {phase3_time:.0f}s → Synthesis {phase4_time:.0f}s")
+        print()
 
         return final_synthesis
 
