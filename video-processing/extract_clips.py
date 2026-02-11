@@ -447,6 +447,28 @@ def extract_clips_from_analysis(video_path: str, output_dir: str, max_clips: int
     # Sort by start time for consistent ordering
     clip_infos.sort(key=lambda x: parse_timestamp(x.start_time))
 
+    # Clamp all clip timestamps to the actual video duration
+    # (GPT-5.1 sometimes hallucinates timestamps beyond the video end)
+    video_duration = get_video_duration(video_path)
+    if video_duration > 0:
+        valid_clip_infos = []
+        for clip in clip_infos:
+            start_secs = parse_timestamp(clip.start_time)
+            dur_secs = int(clip.duration) if clip.duration.isdigit() else parse_timestamp(clip.duration)
+            
+            # Skip clips that start beyond the video
+            if start_secs >= video_duration:
+                continue
+            
+            # Clamp duration so clip doesn't extend past video end
+            max_dur = video_duration - start_secs
+            if dur_secs > max_dur:
+                dur_secs = max(30, max_dur)  # At least 30 seconds if possible
+            
+            clip.duration = str(dur_secs)
+            valid_clip_infos.append(clip)
+        clip_infos = valid_clip_infos
+
     # Extract clips
     extracted = []
 
@@ -462,8 +484,10 @@ def extract_clips_from_analysis(video_path: str, output_dir: str, max_clips: int
             clip_info.duration
         )
 
-        if success and os.path.exists(clip_path):
+        if success and os.path.exists(clip_path) and os.path.getsize(clip_path) > 1000:
             extracted.append(clip_path)
+        elif os.path.exists(clip_path) and os.path.getsize(clip_path) < 1000:
+            os.remove(clip_path)  # Clean up empty/corrupt clips
 
     return extracted
 
