@@ -166,91 +166,63 @@ export default async function VideoDetailPage({
         </div>
       </section>
 
-      <div className="max-w-4xl mx-auto px-5 sm:px-6 pb-16 sm:pb-24 space-y-12 sm:space-y-16">
+      <div className="max-w-4xl mx-auto px-5 sm:px-6 pb-16 sm:pb-24 space-y-10 sm:space-y-12">
 
-        {/* ── Characters ────────────────────────────────────────────────── */}
+        {/* ── Characters (compact inline) ─────────────────────────────── */}
         {characters.length > 0 && (
-          <section className="animate-fade-in" style={{ animationDelay: '100ms' }}>
-            <div className="flex items-center gap-3 mb-5 sm:mb-6">
-              <h2 className="text-lg sm:text-2xl font-semibold text-[var(--text-primary)] shrink-0">Characters</h2>
+          <section>
+            <div className="flex items-center gap-3 mb-4">
+              <h2 className="text-base sm:text-lg font-semibold text-[var(--text-primary)] shrink-0">Characters</h2>
               <span className="flex-1 h-px bg-[var(--border-subtle)]" />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <div className="flex flex-wrap gap-2">
               {characters.map((char) => (
-                <div
+                <span
                   key={char.name}
-                  className="card px-4 py-4 sm:px-5 sm:py-5"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border-subtle)] text-xs sm:text-sm"
                 >
-                  <div className="flex items-start justify-between gap-3 mb-2">
-                    <div className="min-w-0">
-                      <h3 className="text-sm sm:text-base font-semibold text-[var(--text-primary)] truncate">
-                        {char.name}
-                      </h3>
-                      <p className="font-mono text-[10px] sm:text-xs text-[var(--text-muted)] uppercase tracking-wider mt-0.5 line-clamp-1">
-                        {char.role}
-                      </p>
-                    </div>
-                    {char.is_speaking && (
-                      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[var(--amber)]/10 border border-[var(--amber)]/20 shrink-0">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[var(--amber)] animate-pulse" />
-                        <span className="font-mono text-[8px] sm:text-[9px] text-[var(--amber)] uppercase tracking-widest">Speaking</span>
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed line-clamp-3">
-                    {char.description}
-                  </p>
-                </div>
+                  {char.is_speaking && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-[var(--amber)]" />
+                  )}
+                  <span className="text-[var(--text-primary)] font-medium">{char.name}</span>
+                  <span className="text-[var(--text-muted)] font-mono text-[9px] uppercase tracking-wider hidden sm:inline">{char.role.split(/[,;]/)[0].trim()}</span>
+                </span>
               ))}
             </div>
           </section>
         )}
 
-        {/* ── Chapters ──────────────────────────────────────────────────── */}
+        {/* ── Chapters (the core content) ─────────────────────────────── */}
         {chapters.length > 0 && (
-          <section className="animate-fade-in" style={{ animationDelay: '200ms' }}>
-            <div className="flex items-center gap-3 mb-5 sm:mb-6">
-              <h2 className="text-lg sm:text-2xl font-semibold text-[var(--text-primary)] shrink-0">Chapters</h2>
+          <section>
+            <div className="flex items-center gap-3 mb-4">
+              <h2 className="text-base sm:text-lg font-semibold text-[var(--text-primary)] shrink-0">Chapters</h2>
               <span className="flex-1 h-px bg-[var(--border-subtle)]" />
             </div>
 
-            <div className="space-y-1">
+            <div className="space-y-0.5">
               {chapters.map((ch, i) => (
                 <div
                   key={`${ch.start_time}-${i}`}
-                  className="group relative flex gap-4 sm:gap-5 px-4 py-4 sm:px-5 sm:py-5 rounded-xl border border-transparent hover:border-[var(--border-subtle)] hover:bg-[var(--bg-card)] transition-all"
+                  className="group relative flex gap-3 sm:gap-4 px-3 py-3 sm:px-4 sm:py-4 rounded-lg hover:bg-[var(--bg-card)] transition-colors"
                 >
-                  {/* Timeline connector */}
                   <div className="flex flex-col items-center shrink-0 pt-0.5">
                     <span className="timecode text-[10px] sm:text-xs whitespace-nowrap tabular-nums">
                       {ch.start_time}
                     </span>
                     {i < chapters.length - 1 && (
-                      <span className="w-px flex-1 bg-[var(--border-subtle)] mt-2 min-h-[1rem]" />
+                      <span className="w-px flex-1 bg-[var(--border-subtle)] mt-1.5 min-h-[0.5rem]" />
                     )}
                   </div>
 
-                  {/* Content */}
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-sm sm:text-base font-semibold text-[var(--text-primary)] mb-1">
+                    <h3 className="text-sm sm:text-base font-semibold text-[var(--text-primary)] leading-snug">
                       {ch.title}
                     </h3>
-                    <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed mb-2 line-clamp-3">
+                    <p className="text-xs text-[var(--text-secondary)] leading-relaxed mt-1 line-clamp-2">
                       {ch.summary}
                     </p>
-                    {ch.characters_present.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5">
-                        {ch.characters_present.map((name) => (
-                          <span
-                            key={name}
-                            className="inline-flex items-center px-1.5 py-0.5 rounded bg-[var(--bg-elevated)] text-[var(--text-muted)] font-mono text-[8px] sm:text-[9px] border border-[var(--border-subtle)] leading-tight"
-                          >
-                            {name}
-                          </span>
-                        ))}
-                      </div>
-                    )}
                   </div>
                 </div>
               ))}
@@ -258,83 +230,26 @@ export default async function VideoDetailPage({
           </section>
         )}
 
-        {/* ── Highlights ────────────────────────────────────────────────── */}
-        {highlights.length > 0 && (
-          <section className="animate-fade-in" style={{ animationDelay: '300ms' }}>
-            <div className="flex items-center gap-3 mb-5 sm:mb-6">
-              <h2 className="text-lg sm:text-2xl font-semibold text-[var(--text-primary)] shrink-0">Highlights</h2>
-              <span className="flex-1 h-px bg-[var(--border-subtle)]" />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-              {highlights.map((hl, i) => {
-                const colors = emotionColor(hl.emotional_tone);
-                return (
-                  <div
-                    key={`${hl.timestamp}-${i}`}
-                    className="card px-4 py-4 sm:px-5 sm:py-5"
-                  >
-                    <div className="flex items-start justify-between gap-3 mb-2">
-                      <span className="timecode text-[10px] sm:text-xs shrink-0">{hl.timestamp}</span>
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full font-mono text-[8px] sm:text-[9px] uppercase tracking-widest border ${colors.bg} ${colors.text} ${colors.border} shrink-0`}>
-                        {hl.emotional_tone}
-                      </span>
-                    </div>
-                    <h3 className="text-sm sm:text-base font-semibold text-[var(--text-primary)] mb-1.5">
-                      {hl.title}
-                    </h3>
-                    <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed mb-2 line-clamp-3">
-                      {hl.description}
-                    </p>
-                    {hl.characters_involved.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5">
-                        {hl.characters_involved.map((name) => (
-                          <span
-                            key={name}
-                            className="inline-flex items-center px-1.5 py-0.5 rounded bg-[var(--bg-elevated)] text-[var(--text-muted)] font-mono text-[8px] sm:text-[9px] border border-[var(--border-subtle)] leading-tight"
-                          >
-                            {name}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </section>
-        )}
-
-        {/* ── Quotes ────────────────────────────────────────────────────── */}
+        {/* ── Key Quotes (top 5 only) ─────────────────────────────────── */}
         {quotes.length > 0 && (
-          <section className="animate-fade-in" style={{ animationDelay: '400ms' }}>
-            <div className="flex items-center gap-3 mb-5 sm:mb-6">
-              <h2 className="text-lg sm:text-2xl font-semibold text-[var(--text-primary)] shrink-0">Quotes</h2>
+          <section>
+            <div className="flex items-center gap-3 mb-4">
+              <h2 className="text-base sm:text-lg font-semibold text-[var(--text-primary)] shrink-0">Key Quotes</h2>
               <span className="flex-1 h-px bg-[var(--border-subtle)]" />
             </div>
 
-            <div className="space-y-4 sm:space-y-5">
-              {quotes.map((q, i) => (
+            <div className="space-y-4">
+              {quotes.slice(0, 5).map((q, i) => (
                 <blockquote
                   key={`${q.timestamp}-${i}`}
-                  className="relative pl-4 sm:pl-5 border-l-2 border-[var(--amber)]/30"
+                  className="relative pl-4 border-l-2 border-[var(--amber)]/30"
                 >
-                  <p className="text-sm sm:text-base text-[var(--text-primary)] leading-relaxed italic mb-2">
+                  <p className="text-sm text-[var(--text-primary)] leading-relaxed italic">
                     &ldquo;{q.text}&rdquo;
                   </p>
-                  <footer className="flex flex-wrap items-center gap-2 sm:gap-3">
-                    <span className="text-xs sm:text-sm font-medium text-[var(--amber)]">
-                      {q.speaker}
-                    </span>
+                  <footer className="flex items-center gap-2 mt-1.5">
+                    <span className="text-xs font-medium text-[var(--amber)]">{q.speaker}</span>
                     <span className="timecode text-[10px]">{q.timestamp}</span>
-                    {q.context && (
-                      <>
-                        <span className="w-px h-3 bg-[var(--border-visible)]" />
-                        <span className="text-[10px] sm:text-xs text-[var(--text-muted)] line-clamp-1">
-                          {q.context}
-                        </span>
-                      </>
-                    )}
                   </footer>
                 </blockquote>
               ))}
@@ -342,19 +257,19 @@ export default async function VideoDetailPage({
           </section>
         )}
 
-        {/* ── Themes ────────────────────────────────────────────────────── */}
+        {/* ── Themes (compact tags) ───────────────────────────────────── */}
         {themes.length > 0 && (
-          <section className="animate-fade-in" style={{ animationDelay: '500ms' }}>
-            <div className="flex items-center gap-3 mb-5 sm:mb-6">
-              <h2 className="text-lg sm:text-2xl font-semibold text-[var(--text-primary)] shrink-0">Themes</h2>
+          <section>
+            <div className="flex items-center gap-3 mb-4">
+              <h2 className="text-base sm:text-lg font-semibold text-[var(--text-primary)] shrink-0">Themes</h2>
               <span className="flex-1 h-px bg-[var(--border-subtle)]" />
             </div>
 
-            <div className="flex flex-wrap gap-2 sm:gap-2.5">
+            <div className="flex flex-wrap gap-2">
               {themes.map((theme) => (
                 <span
                   key={theme}
-                  className="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-[var(--bg-elevated)] text-[var(--text-secondary)] text-xs sm:text-sm border border-[var(--border-subtle)] hover:border-[var(--border-visible)] hover:text-[var(--text-primary)] transition-colors"
+                  className="inline-flex items-center px-3 py-1 rounded-full bg-[var(--bg-elevated)] text-[var(--text-secondary)] text-xs border border-[var(--border-subtle)]"
                 >
                   {theme}
                 </span>
