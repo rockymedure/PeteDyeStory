@@ -23,7 +23,7 @@ interface VideoWithClips extends Video {
 function getCategory(video: Video): string {
   const title = (video.title || video.filename).toLowerCase();
   
-  // Building the Course — Construction footage
+  // Building the Course — Construction footage, behind-the-scenes docs
   if (
     title.includes('construction') ||
     title.includes('cleanup') ||
@@ -33,6 +33,7 @@ function getCategory(video: Video): string {
     title.includes('irrigation') ||
     title.includes('early years') ||
     title.includes('course tour') ||
+    title.includes('louie ellis documentary') ||
     (title.includes('spring 1989') && !title.includes('opening'))
   ) {
     return 'Building the Course';
@@ -73,10 +74,11 @@ function getCategory(video: Video): string {
     return 'People & Relationships';
   }
   
-  // Family Archives — Personal footage, historic
+  // Family Archives — Personal footage, historic, family holidays
   if (
     title.includes('family') ||
     title.includes('halloween') ||
+    title.includes('holidays') ||
     title.includes('archives') ||
     title.includes('historic')
   ) {
