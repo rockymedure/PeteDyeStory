@@ -26,7 +26,6 @@ const PETE_DYE_ON_CAMERA_KEYWORDS = [
   'pete dye interview',         // direct interview
   'pete dye & james d',         // on site together
   'louie ellis documentary',    // documentary with Pete Dye interviews
-  'narrated by harris holt',    // professional narration featuring Pete
   'grand opening',              // speeches honoring Pete and Alice Dye
   'front nine opening',         // Pete at ceremony
   'first green planting',       // Pete involved in construction
