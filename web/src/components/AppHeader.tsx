@@ -44,6 +44,8 @@ export default function AppHeader({
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           <nav className="flex items-center gap-1 sm:gap-2">
             <NavLink href="/">Clips</NavLink>
+            <NavLink href="/characters">Characters</NavLink>
+            <NavLink href="/timeline">Timeline</NavLink>
             <NavLink href="/outline">Outline</NavLink>
           </nav>
         </div>

@@ -1,8 +1,12 @@
 import { supabase } from '@/lib/supabase';
 import { unstable_cache } from 'next/cache';
 import type { Clip } from '@/lib/types';
+import Link from 'next/link';
 import ClipCarousel from '@/components/ClipCarousel';
 import AppHeader from '@/components/AppHeader';
+import videoAnalyses from '@/data/videoAnalyses.json';
+
+/* ─── Types ─────────────────────────────────────────────────────────────── */
 
 interface Video {
   id: string;
@@ -19,16 +23,68 @@ interface VideoWithClips extends Video {
   clips: ClipWithVideo[];
 }
 
+interface VideoAnalysis {
+  title: string;
+  content_type: string;
+  summary: string;
+  characters: { name: string; role: string; description: string; is_speaking: boolean }[];
+  chapters: { title: string; start_time: string; end_time: string; summary: string; characters_present: string[] }[];
+  highlights: { title: string; timestamp: string; description: string; emotional_tone: string; characters_involved: string[] }[];
+  quotes: { text: string; speaker: string; timestamp: string; context: string }[];
+  themes: string[];
+}
+
+/* ─── Analysis lookup ───────────────────────────────────────────────────── */
+
+const analyses = videoAnalyses as Record<string, VideoAnalysis>;
+
+function getAnalysis(video: Video): VideoAnalysis | null {
+  const dirName = (video.filename || '')
+    .replace(/\.mp4$/i, '')
+    .replace(/[^\w\-]/g, '_')
+    .replace(/_+/g, '_');
+
+  if (analyses[dirName]) return analyses[dirName];
+
+  for (const [key, val] of Object.entries(analyses)) {
+    if (
+      key.toLowerCase().includes(dirName.toLowerCase().slice(0, 20)) ||
+      dirName.toLowerCase().includes(key.toLowerCase().slice(0, 20))
+    ) {
+      return val;
+    }
+  }
+  return null;
+}
+
+function getSlug(video: Video): string {
+  return (video.filename || '')
+    .replace(/\.mp4$/i, '')
+    .replace(/[^\w\-]/g, '_')
+    .replace(/_+/g, '_');
+}
+
+/* ─── Aggregate stats from all analyses ─────────────────────────────────── */
+
+const allCharacterNames = new Set<string>();
+let totalQuotes = 0;
+for (const a of Object.values(analyses)) {
+  for (const c of a.characters ?? []) allCharacterNames.add(c.name);
+  totalQuotes += (a.quotes ?? []).length;
+}
+const totalCharacters = allCharacterNames.size;
+
+/* ─── Category logic (analysis-enriched) ────────────────────────────────── */
+
 // Videos where Pete Dye is confirmed on camera or speaking
-// (based on AI analysis CHARACTERS sections from transcripts)
 const PETE_DYE_ON_CAMERA_KEYWORDS = [
-  'construction highlights',    // "Pete Dye: central figure in the video"
-  'pete dye interview',         // direct interview
-  'pete dye & james d',         // on site together
-  'louie ellis documentary',    // documentary with Pete Dye interviews
-  'grand opening',              // speeches honoring Pete and Alice Dye
-  'front nine opening',         // Pete at ceremony
-  'first green planting',       // Pete involved in construction
+  'construction highlights',
+  'pete dye interview',
+  'pete dye & james d',
+  'louie ellis documentary',
+  'grand opening',
+  'front nine opening',
+  'first green planting',
 ];
 
 function featuresPeteDye(video: Video): boolean {
@@ -36,94 +92,83 @@ function featuresPeteDye(video: Video): boolean {
   return PETE_DYE_ON_CAMERA_KEYWORDS.some(kw => title.includes(kw));
 }
 
-// Content-based categories
-function getCategory(video: Video): string {
+function getCategoryFromAnalysis(contentType: string): string | null {
+  const ct = contentType.toLowerCase();
+  if (ct.includes('construction')) return 'Building the Course';
+  if (ct.includes('interview')) return 'People & Relationships';
+  if (ct.includes('ceremony') || ct.includes('opening') || ct.includes('grand') || ct.includes('award') || ct.includes('banquet')) return 'Celebrations & Milestones';
+  if (ct.includes('tournament') || ct.includes('broadcast')) return 'The Legacy';
+  if (ct.includes('party') || ct.includes('dinner') || ct.includes('family') || ct.includes('social') || ct.includes('gathering')) return 'Family & Friends';
+  if (ct.includes('narrated') || ct.includes('promotional') || ct.includes('promo') || ct.includes('overview') || ct.includes('featurette')) return 'The Legacy';
+  return null;
+}
+
+function getCategoryFallback(video: Video): string {
   const title = (video.title || video.filename).toLowerCase();
-  
-  // Building the Course — Construction footage, behind-the-scenes docs
+
   if (
-    title.includes('construction') ||
-    title.includes('cleanup') ||
-    title.includes('planting') ||
-    title.includes('progress') ||
-    title.includes('holes 1-9') ||
-    title.includes('irrigation') ||
-    title.includes('early years') ||
-    title.includes('course tour') ||
+    title.includes('construction') || title.includes('cleanup') ||
+    title.includes('planting') || title.includes('progress') ||
+    title.includes('holes 1-9') || title.includes('irrigation') ||
+    title.includes('early years') || title.includes('course tour') ||
     title.includes('louie ellis documentary') ||
     (title.includes('spring 1989') && !title.includes('opening'))
-  ) {
-    return 'Building the Course';
-  }
-  
-  // Celebrations & Milestones — Openings, awards
+  ) return 'Building the Course';
+
   if (
-    title.includes('opening') ||
-    title.includes('grand') ||
-    title.includes('citizen of the year') ||
-    title.includes('award')
-  ) {
-    return 'Celebrations & Milestones';
-  }
-  
-  // The Legacy — Tournaments, documentaries, media
+    title.includes('opening') || title.includes('grand') ||
+    title.includes('citizen of the year') || title.includes('award')
+  ) return 'Celebrations & Milestones';
+
   if (
-    title.includes('classic') ||
-    title.includes('nationwide') ||
-    title.includes('tour') ||
-    title.includes('cbs') ||
-    title.includes('narrated') ||
-    title.includes('documentary') ||
+    title.includes('classic') || title.includes('nationwide') ||
+    title.includes('tour') || title.includes('cbs') ||
+    title.includes('narrated') || title.includes('documentary') ||
     title.includes('harris holt')
-  ) {
-    return 'The Legacy';
-  }
-  
-  // People & Relationships — Interviews, gatherings, guests
+  ) return 'The Legacy';
+
   if (
-    title.includes('interview') ||
-    title.includes('dimaggio') ||
-    title.includes('christmas') ||
-    title.includes('dinner') ||
-    title.includes('party') ||
-    title.includes('papa jim')
-  ) {
-    return 'People & Relationships';
-  }
-  
-  // Family Archives — Personal footage, historic, family holidays
+    title.includes('interview') || title.includes('dimaggio') ||
+    title.includes('christmas') || title.includes('dinner') ||
+    title.includes('party') || title.includes('papa jim')
+  ) return 'People & Relationships';
+
   if (
-    title.includes('family') ||
-    title.includes('halloween') ||
-    title.includes('holidays') ||
-    title.includes('archives') ||
+    title.includes('family') || title.includes('halloween') ||
+    title.includes('holidays') || title.includes('archives') ||
     title.includes('historic')
-  ) {
-    return 'Family Archives';
-  }
-  
+  ) return 'Family Archives';
+
   return 'Archive';
 }
 
+function getCategory(video: Video): string {
+  const analysis = getAnalysis(video);
+  if (analysis) {
+    const cat = getCategoryFromAnalysis(analysis.content_type);
+    if (cat) return cat;
+  }
+  return getCategoryFallback(video);
+}
+
+/* ─── Supabase fetch (unchanged) ────────────────────────────────────────── */
+
 const getVideosWithClips = unstable_cache(
   async () => {
-    // Get all videos
     const { data: videos, error: videosError } = await supabase
       .from('videos')
       .select('*')
       .order('title');
-    
+
     if (videosError) throw videosError;
 
-    // Get all clips with video info
     const { data: clips, error: clipsError } = await supabase
       .from('clips')
       .select('*, videos(filename)')
       .order('filename');
-    
+
     if (clipsError) throw clipsError;
 
-    // Group clips by video
     const videosWithClips: VideoWithClips[] = (videos as Video[])
       .map(video => {
         const videoClips = (clips as (ClipWithVideo & { videos: { filename: string } | null })[])
@@ -132,13 +177,10 @@ const getVideosWithClips = unstable_cache(
             ...c,
             video: c.videos ? { filename: c.videos.filename } : undefined
           }));
-        
-        return {
-          ...video,
-          clips: videoClips
-        };
+
+        return { ...video, clips: videoClips };
       })
-      .filter(v => v.clips.length > 0); // Only show videos that have clips
+      .filter(v => v.clips.length > 0);
 
     return videosWithClips;
   },
@@ -146,12 +188,13 @@ const getVideosWithClips = unstable_cache(
   { revalidate: 60 }
 );
 
+/* ─── Page ──────────────────────────────────────────────────────────────── */
+
 export default async function Home() {
   const videosWithClips = await getVideosWithClips();
   const totalClips = videosWithClips.reduce((sum, v) => sum + v.clips.length, 0);
 
   // Group videos by category
-  // Videos featuring Pete Dye on camera get their own section AND stay in their content category
   const categories: Record<string, VideoWithClips[]> = {};
   for (const video of videosWithClips) {
     if (featuresPeteDye(video)) {
@@ -163,34 +206,43 @@ export default async function Home() {
     categories[cat].push(video);
   }
 
-  // Order categories — Pete Dye first
-  const categoryOrder = ['Featuring Pete Dye', 'Building the Course', 'Celebrations & Milestones', 'People & Relationships', 'The Legacy', 'Family Archives', 'Archive'];
+  const categoryOrder = [
+    'Featuring Pete Dye',
+    'Building the Course',
+    'Celebrations & Milestones',
+    'People & Relationships',
+    'The Legacy',
+    'Family & Friends',
+    'Family Archives',
+    'Archive',
+  ];
   const orderedCategories = categoryOrder.filter(cat => categories[cat]?.length > 0);
 
   return (
     <main className="min-h-screen relative">
       <AppHeader />
 
-      {/* Hero */}
+      {/* ── Hero ────────────────────────────────────────────────────────── */}
       <section className="pt-24 pb-12 px-5 sm:pt-32 sm:pb-16 sm:px-6">
         <div className="max-w-6xl mx-auto">
           <div className="animate-slide-up">
             <p className="font-mono text-[10px] tracking-[0.3em] text-[var(--amber)] uppercase mb-4 sm:mb-6">
               Video Archive
             </p>
-            
+
             <h1 className="text-3xl sm:text-5xl md:text-7xl font-semibold tracking-tight text-[var(--text-primary)] mb-4 sm:mb-6 leading-[1.1]">
               He designed over 100<br />
               legendary courses.<br />
               <span className="text-[var(--text-muted)]">He put his name on one.</span>
             </h1>
-            
+
             <p className="text-base sm:text-lg text-[var(--text-secondary)] max-w-xl leading-relaxed">
-              Carved from an abandoned coal mine in West Virginia, alongside two miners 
+              Carved from an abandoned coal mine in West Virginia, alongside two miners
               who spent 18 years refusing to quit.
             </p>
           </div>
-          
+
+          {/* Stats row */}
           <div className="mt-8 sm:mt-12 flex flex-wrap items-center gap-4 sm:gap-8 animate-fade-in" style={{ animationDelay: '200ms' }}>
             <div className="flex items-center gap-2 sm:gap-3">
               <span className="font-mono text-xl sm:text-2xl font-medium text-[var(--text-primary)]">{totalClips}</span>
@@ -203,6 +255,16 @@ export default async function Home() {
             </div>
             <span className="w-px h-5 sm:h-6 bg-[var(--border-visible)]" />
             <div className="flex items-center gap-2 sm:gap-3">
+              <span className="font-mono text-xl sm:text-2xl font-medium text-[var(--text-primary)]">{totalCharacters}</span>
+              <span className="font-mono text-[10px] sm:text-xs text-[var(--text-muted)] uppercase tracking-wider">Characters</span>
+            </div>
+            <span className="w-px h-5 sm:h-6 bg-[var(--border-visible)]" />
+            <div className="flex items-center gap-2 sm:gap-3">
+              <span className="font-mono text-xl sm:text-2xl font-medium text-[var(--text-primary)]">{totalQuotes}</span>
+              <span className="font-mono text-[10px] sm:text-xs text-[var(--text-muted)] uppercase tracking-wider">Quotes</span>
+            </div>
+            <span className="w-px h-5 sm:h-6 bg-[var(--border-visible)]" />
+            <div className="flex items-center gap-2 sm:gap-3">
               <span className="font-mono text-xl sm:text-2xl font-medium text-[var(--text-primary)]">{orderedCategories.length}</span>
               <span className="font-mono text-[10px] sm:text-xs text-[var(--text-muted)] uppercase tracking-wider">Categories</span>
             </div>
@@ -210,13 +272,13 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Categories */}
+      {/* ── Categories ──────────────────────────────────────────────────── */}
       <section className="px-4 pb-16 sm:px-6 sm:pb-24">
         <div className="max-w-6xl mx-auto space-y-10 sm:space-y-16">
           {orderedCategories.map((categoryName) => {
             const categoryVideos = categories[categoryName];
             const categoryClipCount = categoryVideos.reduce((sum, v) => sum + v.clips.length, 0);
-            
+
             return (
               <div key={categoryName}>
                 {/* Category header */}
@@ -232,27 +294,90 @@ export default async function Home() {
 
                 {/* Videos in category */}
                 <div className="space-y-5 sm:space-y-8">
-                  {categoryVideos.map((video) => (
-                    <article key={video.id} className="card overflow-hidden">
-                      <div className="px-4 pt-4 pb-3 sm:px-6 sm:pt-6 sm:pb-5">
-                        <div className="flex items-start sm:items-center justify-between gap-3 sm:gap-4 mb-1 sm:mb-2">
-                          <h3 className="text-base sm:text-xl font-semibold text-[var(--text-primary)] line-clamp-2 sm:truncate">
-                            {video.title || video.filename.replace(/_/g, ' ')}
-                          </h3>
-                          <span className="font-mono text-[10px] text-[var(--text-muted)] whitespace-nowrap mt-1 sm:mt-0">
-                            {video.clips.length} clips
-                          </span>
-                        </div>
-                        {video.summary && (
-                          <p className="text-xs sm:text-sm leading-relaxed text-[var(--text-secondary)] line-clamp-2 sm:line-clamp-3">
-                            {video.summary}
-                          </p>
-                        )}
-                      </div>
+                  {categoryVideos.map((video) => {
+                    const analysis = getAnalysis(video);
+                    const slug = getSlug(video);
+                    const displayTitle = analysis?.title || video.title || video.filename.replace(/_/g, ' ');
+                    const displaySummary = analysis?.summary || video.summary;
+                    const characters = analysis?.characters?.slice(0, 4) ?? [];
+                    const quoteCount = analysis?.quotes?.length ?? 0;
+                    const chapterCount = analysis?.chapters?.length ?? 0;
 
-                      <ClipCarousel clips={video.clips} />
-                    </article>
-                  ))}
+                    return (
+                      <article key={video.id} className="card overflow-hidden">
+                        <div className="px-4 pt-4 pb-3 sm:px-6 sm:pt-6 sm:pb-5">
+                          {/* Title row */}
+                          <div className="flex items-start sm:items-center justify-between gap-3 sm:gap-4 mb-2 sm:mb-3">
+                            <div className="min-w-0 flex-1">
+                              <Link
+                                href={`/videos/${slug}`}
+                                className="group inline-flex items-baseline gap-2 min-w-0"
+                              >
+                                <h3 className="text-base sm:text-xl font-semibold text-[var(--text-primary)] line-clamp-2 sm:truncate group-hover:text-[var(--amber)] transition-colors">
+                                  {displayTitle}
+                                </h3>
+                              </Link>
+                            </div>
+                            <span className="font-mono text-[10px] text-[var(--text-muted)] whitespace-nowrap mt-1 sm:mt-0">
+                              {video.clips.length} clips
+                            </span>
+                          </div>
+
+                          {/* Content type badge + meta row */}
+                          <div className="flex flex-wrap items-center gap-2 mb-2.5 sm:mb-3">
+                            {analysis?.content_type && (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-[var(--amber)]/10 text-[var(--amber)] font-mono text-[9px] sm:text-[10px] tracking-wider uppercase border border-[var(--amber)]/20 leading-tight">
+                                {analysis.content_type.length > 40
+                                  ? analysis.content_type.slice(0, 40) + '…'
+                                  : analysis.content_type}
+                              </span>
+                            )}
+                            {chapterCount > 0 && (
+                              <span className="font-mono text-[9px] sm:text-[10px] text-[var(--text-muted)] tracking-wide">
+                                {chapterCount} chapters
+                              </span>
+                            )}
+                            {quoteCount > 0 && (
+                              <span className="font-mono text-[9px] sm:text-[10px] text-[var(--text-muted)] tracking-wide">
+                                {quoteCount} quotes
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Character tags */}
+                          {characters.length > 0 && (
+                            <div className="flex flex-wrap gap-1.5 mb-2.5 sm:mb-3">
+                              {characters.map((char) => (
+                                <span
+                                  key={char.name}
+                                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[var(--bg-elevated)] text-[var(--text-secondary)] font-mono text-[9px] sm:text-[10px] border border-[var(--border-subtle)] leading-tight"
+                                >
+                                  {char.is_speaking && (
+                                    <span className="w-1 h-1 rounded-full bg-[var(--amber)] shrink-0" />
+                                  )}
+                                  {char.name}
+                                </span>
+                              ))}
+                              {(analysis?.characters?.length ?? 0) > 4 && (
+                                <span className="font-mono text-[9px] text-[var(--text-muted)] self-center">
+                                  +{(analysis?.characters?.length ?? 0) - 4} more
+                                </span>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Summary */}
+                          {displaySummary && (
+                            <p className="text-xs sm:text-sm leading-relaxed text-[var(--text-secondary)] line-clamp-2 sm:line-clamp-3">
+                              {displaySummary}
+                            </p>
+                          )}
+                        </div>
+
+                        <ClipCarousel clips={video.clips} />
+                      </article>
+                    );
+                  })}
                 </div>
               </div>
             );
@@ -260,7 +385,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Footer */}
+      {/* ── Footer ──────────────────────────────────────────────────────── */}
       <footer className="border-t border-[var(--border-subtle)] px-4 py-6 sm:px-6 sm:py-8">
         <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
           <span className="font-mono text-[9px] sm:text-[10px] text-[var(--text-muted)] tracking-wider">

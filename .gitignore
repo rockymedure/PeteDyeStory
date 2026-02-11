@@ -47,8 +47,8 @@ video-processing/media/**/*.mov
 *.tmp
 *.temp
 
-# Video assets (large files)
-videos/
+# Video assets (large files - root level only)
+/videos/
 web-clips/
 
 # Log files

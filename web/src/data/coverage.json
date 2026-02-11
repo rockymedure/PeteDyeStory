@@ -1,0 +1,1060 @@
+{
+  "total_videos": 49,
+  "total_characters": 252,
+  "content_type_breakdown": {
+    "company_event / holiday_party": 1,
+    "unknown": 20,
+    "family gathering / social event at home & clubhouse (with billiards exhibition)": 1,
+    "Construction footage and on\u2011site narrated walkthrough": 1,
+    "Professional tournament TV broadcast (Nationwide Tour event with promos and commercials)": 1,
+    "Professional tournament TV broadcast": 1,
+    "Civic / Chamber of Commerce awards banquet and keynote presentation": 1,
+    "mixed: construction interview, informal site meeting, TV news insert, family celebration, pets home\u2011movie": 1,
+    "Construction-site interview and crew featurette": 1,
+    "celebrity visit / VIP luncheon ceremony": 1,
+    "Historical prologue & archival montage (family home movies, mining/industrial footage, early site work, community life)": 1,
+    "Grand opening event, guest-house tour, and member\u2011guest golf tournament coverage": 1,
+    "Television promo / network bumper": 1,
+    "Construction footage with on\u2011site interviews and planning-room discussion": 1,
+    "Formal banquet / tribute ceremony with speeches and Q&A": 1,
+    "social event / club dinner party with live band and dancing": 1,
+    "Grand opening ceremonies, member golf outing, on\u2011course interviews, and social/family events": 1,
+    "Mixed: neighborhood history tour, family/heritage interview, and golf course construction documentation": 1,
+    "Professional tournament broadcast and award ceremony": 1,
+    "Construction footage with on\u2011site commentary, informal play, and course tour": 1,
+    "Construction and on\u2011site commentary documentary": 1,
+    "Construction footage with on\u2011course narrated tour": 1,
+    "Promotional course overview and design explainer video": 1,
+    "construction footage with on\u2011course commentary and informal interviews": 1,
+    "construction & historical-location documentary": 1,
+    "Construction footage with on-site narration, informal interviews, and environmental/feature documentation": 1,
+    "Mixed: construction documentary, on\u2011site interviews, hospital/personal segment, and scenic course feature footage": 1,
+    "Televised professional tournament coverage with commercials and studio segments": 1,
+    "Mixed archival reel (construction documentation, design presentation, interviews, family/club life, and scenic course footage)": 1,
+    "Promotional course overview / architectural featurette": 1
+  },
+  "time_period_coverage": {
+    "Unknown": 28,
+    "1978-1985": 3,
+    "2000-2004": 5,
+    "1990-1995": 10,
+    "1985-1990": 3
+  },
+  "footage_gaps": [
+    "No footage from 1983-1984",
+    "No footage from 1986",
+    "No footage from 1988",
+    "No footage from 1990-1991",
+    "No footage from 1996-2003"
+  ],
+  "most_featured_characters": [
+    {
+      "name": "James D. LaRosa",
+      "video_count": 20
+    },
+    {
+      "name": "Pete Dye",
+      "video_count": 18
+    },
+    {
+      "name": "Louie Ellis",
+      "video_count": 15
+    },
+    {
+      "name": "Gary Grandstaff",
+      "video_count": 10
+    },
+    {
+      "name": "Harris Holt",
+      "video_count": 10
+    },
+    {
+      "name": "Jimmy LaRosa",
+      "video_count": 9
+    },
+    {
+      "name": "Nancy Ellis",
+      "video_count": 6
+    },
+    {
+      "name": "Keith \u201cSparky\u201d Sparkman",
+      "video_count": 5
+    },
+    {
+      "name": "D.A. Points",
+      "video_count": 4
+    },
+    {
+      "name": "Darron Stiles",
+      "video_count": 4
+    },
+    {
+      "name": "Gavin Coles",
+      "video_count": 4
+    },
+    {
+      "name": "Brian Anderson",
+      "video_count": 4
+    },
+    {
+      "name": "Jerry Foltz",
+      "video_count": 4
+    },
+    {
+      "name": "Louis (Louie) Ellis",
+      "video_count": 3
+    },
+    {
+      "name": "Bryce Molder",
+      "video_count": 3
+    },
+    {
+      "name": "Nick Watney",
+      "video_count": 3
+    },
+    {
+      "name": "Val Skinner",
+      "video_count": 3
+    },
+    {
+      "name": "Mike Ritz",
+      "video_count": 3
+    },
+    {
+      "name": "Bob Andrew",
+      "video_count": 3
+    },
+    {
+      "name": "Sam Oliverio",
+      "video_count": 3
+    },
+    {
+      "name": "Max Robinson",
+      "video_count": 3
+    },
+    {
+      "name": "Nick Cassini",
+      "video_count": 2
+    },
+    {
+      "name": "Charles Warren",
+      "video_count": 2
+    },
+    {
+      "name": "Troy Matteson",
+      "video_count": 2
+    },
+    {
+      "name": "Kurt Byram",
+      "video_count": 2
+    },
+    {
+      "name": "Hunter Haas",
+      "video_count": 2
+    },
+    {
+      "name": "Ryuji Imada",
+      "video_count": 2
+    },
+    {
+      "name": "Paul Gow",
+      "video_count": 2
+    },
+    {
+      "name": "Ty Tryon",
+      "video_count": 2
+    },
+    {
+      "name": "Bill Stines",
+      "video_count": 2
+    },
+    {
+      "name": "Jim Jamieson",
+      "video_count": 2
+    },
+    {
+      "name": "PB Dye",
+      "video_count": 2
+    },
+    {
+      "name": "Jimmy (Jimmy Joe) LaRosa",
+      "video_count": 2
+    },
+    {
+      "name": "Jimmy LaRosa (Jimmy Joe / Jimmy Joe LaRosa)",
+      "video_count": 1
+    },
+    {
+      "name": "Raymond Priscillo",
+      "video_count": 1
+    },
+    {
+      "name": "Mike Renzelli",
+      "video_count": 1
+    },
+    {
+      "name": "Whip Gabriel",
+      "video_count": 1
+    },
+    {
+      "name": "Julie Gabriel",
+      "video_count": 1
+    },
+    {
+      "name": "Ann Nash",
+      "video_count": 1
+    },
+    {
+      "name": "Bob Smallwood",
+      "video_count": 1
+    },
+    {
+      "name": "Unnamed LaRosa/office staff & guests",
+      "video_count": 1
+    },
+    {
+      "name": "Jimmy (Jimmy Joe) LaRosa Jr.",
+      "video_count": 1
+    },
+    {
+      "name": "\u2018Sheriff\u2019 (Florida friend)",
+      "video_count": 1
+    },
+    {
+      "name": "Willie Mosconi",
+      "video_count": 1
+    },
+    {
+      "name": "Frank (storyteller from Miami)",
+      "video_count": 1
+    },
+    {
+      "name": "Raymond (chef/caterer)",
+      "video_count": 1
+    },
+    {
+      "name": "Unidentified professional chef(s)",
+      "video_count": 1
+    },
+    {
+      "name": "Vice Mayor Louie Aquino",
+      "video_count": 1
+    },
+    {
+      "name": "Various Florida & out\u2011of\u2011state friends (Vito & Ron Verga, Whitey Bridges, Benny Lorenzo, Frank Luccio, etc.)",
+      "video_count": 1
+    },
+    {
+      "name": "Gene Glenn",
+      "video_count": 1
+    },
+    {
+      "name": "Julian (LaRosa cousin)",
+      "video_count": 1
+    },
+    {
+      "name": "Steve Konya & son",
+      "video_count": 1
+    },
+    {
+      "name": "Steve (coal\u2011miner / pool player)",
+      "video_count": 1
+    },
+    {
+      "name": "Emory (Emory Fazenda / Emory Patia)",
+      "video_count": 1
+    },
+    {
+      "name": "Various women guests (Mrs. Aquinas, Mrs. Marscotti, others)",
+      "video_count": 1
+    },
+    {
+      "name": "Bob Andrews",
+      "video_count": 1
+    },
+    {
+      "name": "Frank Ketterman",
+      "video_count": 1
+    },
+    {
+      "name": "Joe DeFazio",
+      "video_count": 1
+    },
+    {
+      "name": "Clarence Hebb",
+      "video_count": 1
+    },
+    {
+      "name": "Tom Stamp",
+      "video_count": 1
+    },
+    {
+      "name": "Larry Reel",
+      "video_count": 1
+    },
+    {
+      "name": "Christopher Reel",
+      "video_count": 1
+    },
+    {
+      "name": "Tony Loria",
+      "video_count": 1
+    },
+    {
+      "name": "Tom Alexander",
+      "video_count": 1
+    },
+    {
+      "name": "Randy Haddix",
+      "video_count": 1
+    },
+    {
+      "name": "Steve Helmick",
+      "video_count": 1
+    },
+    {
+      "name": "Bob Fiala",
+      "video_count": 1
+    },
+    {
+      "name": "P.H. Horgan III",
+      "video_count": 1
+    },
+    {
+      "name": "Bobby Kalinowski",
+      "video_count": 1
+    },
+    {
+      "name": "Jason Caron",
+      "video_count": 1
+    },
+    {
+      "name": "Jason Schultz",
+      "video_count": 1
+    },
+    {
+      "name": "Euan Walters",
+      "video_count": 1
+    },
+    {
+      "name": "Ryan Hietala",
+      "video_count": 1
+    },
+    {
+      "name": "Ryan Howison",
+      "video_count": 1
+    },
+    {
+      "name": "Johnson Wagner",
+      "video_count": 1
+    },
+    {
+      "name": "Zach Johnson",
+      "video_count": 1
+    },
+    {
+      "name": "Bo Van Pelt",
+      "video_count": 1
+    },
+    {
+      "name": "Kevin Stadler",
+      "video_count": 1
+    },
+    {
+      "name": "Kurt (last name not given in transcript)",
+      "video_count": 1
+    },
+    {
+      "name": "Scott Gutschewski",
+      "video_count": 1
+    },
+    {
+      "name": "Franklin Langham",
+      "video_count": 1
+    },
+    {
+      "name": "Scott Gump",
+      "video_count": 1
+    },
+    {
+      "name": "Mario Tiziani",
+      "video_count": 1
+    },
+    {
+      "name": "Jimmy Walker",
+      "video_count": 1
+    },
+    {
+      "name": "D.J. Trahan",
+      "video_count": 1
+    },
+    {
+      "name": "Tyler \u201cTy\u201d Tryon",
+      "video_count": 1
+    },
+    {
+      "name": "Bryan \u201cBo\u201d Van Pelt, Zach Johnson, Matthew Goggin",
+      "video_count": 1
+    },
+    {
+      "name": "John Daly",
+      "video_count": 1
+    },
+    {
+      "name": "Mark Hensby",
+      "video_count": 1
+    },
+    {
+      "name": "LaRosa family",
+      "video_count": 1
+    },
+    {
+      "name": "Jeff Julian",
+      "video_count": 1
+    },
+    {
+      "name": "Walter Barnes (MC / Executive Director)",
+      "video_count": 1
+    },
+    {
+      "name": "Gary Bowden",
+      "video_count": 1
+    },
+    {
+      "name": "Dr. Fred (or Harry) Murray",
+      "video_count": 1
+    },
+    {
+      "name": "Father King",
+      "video_count": 1
+    },
+    {
+      "name": "Bruce Carter",
+      "video_count": 1
+    },
+    {
+      "name": "Dr. Charles Jacobson",
+      "video_count": 1
+    },
+    {
+      "name": "Frank Oliverio & Mark Oliverio",
+      "video_count": 1
+    },
+    {
+      "name": "John Lowe (or Love)",
+      "video_count": 1
+    },
+    {
+      "name": "Mary Beth (office manager) & Madeline Phillips",
+      "video_count": 1
+    },
+    {
+      "name": "Louis Ellis",
+      "video_count": 1
+    },
+    {
+      "name": "Max Robertson",
+      "video_count": 1
+    },
+    {
+      "name": "Harris (Harris Holt)",
+      "video_count": 1
+    },
+    {
+      "name": "Sheriff DeAnna",
+      "video_count": 1
+    },
+    {
+      "name": "Mike Delaney",
+      "video_count": 1
+    },
+    {
+      "name": "James J. LaRosa",
+      "video_count": 1
+    },
+    {
+      "name": "Father Thomas Acker",
+      "video_count": 1
+    },
+    {
+      "name": "Unidentified priest at birthday",
+      "video_count": 1
+    },
+    {
+      "name": "Bernadine",
+      "video_count": 1
+    },
+    {
+      "name": "TV7 Sports reporter George Kellis",
+      "video_count": 1
+    },
+    {
+      "name": "Unidentified violinist",
+      "video_count": 1
+    },
+    {
+      "name": "Catherine LaRosa",
+      "video_count": 1
+    },
+    {
+      "name": "Mike Langkau",
+      "video_count": 1
+    },
+    {
+      "name": "Unidentified crew and staff",
+      "video_count": 1
+    },
+    {
+      "name": "Joe DiMaggio",
+      "video_count": 1
+    },
+    {
+      "name": "Unidentified Governor (likely Governor Gaston Caperton)",
+      "video_count": 1
+    },
+    {
+      "name": "Unidentified Course Architect (not clearly Pete Dye on camera)",
+      "video_count": 1
+    },
+    {
+      "name": "Unidentified Clergyman",
+      "video_count": 1
+    },
+    {
+      "name": "Justin Velcastro",
+      "video_count": 1
+    },
+    {
+      "name": "Joe Mangin / Joe Manchin (local dignitary)",
+      "video_count": 1
+    },
+    {
+      "name": "Unidentified boy with Joe Mangin",
+      "video_count": 1
+    },
+    {
+      "name": "Unidentified club members & family guests",
+      "video_count": 1
+    },
+    {
+      "name": "Jim Compton",
+      "video_count": 1
+    },
+    {
+      "name": "Unidentified narrator",
+      "video_count": 1
+    },
+    {
+      "name": "Unidentified interviewer / family voice",
+      "video_count": 1
+    },
+    {
+      "name": "Unidentified family members (multiple)",
+      "video_count": 1
+    },
+    {
+      "name": "Valerie Smith",
+      "video_count": 1
+    },
+    {
+      "name": "Jimmy (Jim) LaRosa",
+      "video_count": 1
+    },
+    {
+      "name": "Carol Hart",
+      "video_count": 1
+    },
+    {
+      "name": "Ann Hart",
+      "video_count": 1
+    },
+    {
+      "name": "Julie Goodwin",
+      "video_count": 1
+    },
+    {
+      "name": "Clarice Burkhammer",
+      "video_count": 1
+    },
+    {
+      "name": "Chris (chef)",
+      "video_count": 1
+    },
+    {
+      "name": "Harris (unidentified suited host by lake)",
+      "video_count": 1
+    },
+    {
+      "name": "Multiple members & guests",
+      "video_count": 1
+    },
+    {
+      "name": "James D. LaRosa (Jimmy Joe\u2019s dad)",
+      "video_count": 1
+    },
+    {
+      "name": "Unknown professional narrator",
+      "video_count": 1
+    },
+    {
+      "name": "Unidentified male golfer / spokesperson",
+      "video_count": 1
+    },
+    {
+      "name": "Joe Hall",
+      "video_count": 1
+    },
+    {
+      "name": "Skip Reel",
+      "video_count": 1
+    },
+    {
+      "name": "Danny Harris",
+      "video_count": 1
+    },
+    {
+      "name": "Alon Kovachny",
+      "video_count": 1
+    },
+    {
+      "name": "Carson Davis",
+      "video_count": 1
+    },
+    {
+      "name": "Unnamed operators & crew (Joe Hall\u2019s crew, sod crews, dozer operators)",
+      "video_count": 1
+    },
+    {
+      "name": "Jack Anderson",
+      "video_count": 1
+    },
+    {
+      "name": "Alain Kovachny (duplicate spelling)",
+      "video_count": 1
+    },
+    {
+      "name": "Alice Dye",
+      "video_count": 1
+    },
+    {
+      "name": "Bill Steines",
+      "video_count": 1
+    },
+    {
+      "name": "Mark Shaw",
+      "video_count": 1
+    },
+    {
+      "name": "Unidentified membership/operations speaker (likely Jimmy LaRosa)",
+      "video_count": 1
+    },
+    {
+      "name": "Unidentified questioners / members",
+      "video_count": 1
+    },
+    {
+      "name": "Louis P. Ellis",
+      "video_count": 1
+    },
+    {
+      "name": "Pam Iquina",
+      "video_count": 1
+    },
+    {
+      "name": "Nancy (unidentified last name)",
+      "video_count": 1
+    },
+    {
+      "name": "Band members (unidentified)",
+      "video_count": 1
+    },
+    {
+      "name": "Woman in black sequined dress (possible emcee/host)",
+      "video_count": 1
+    },
+    {
+      "name": "\u201cMy lawyer, December G. Mousefield\u201d (joking reference)",
+      "video_count": 1
+    },
+    {
+      "name": "Jimmy LaRosa (probable)",
+      "video_count": 1
+    },
+    {
+      "name": "James D. LaRosa (probable)",
+      "video_count": 1
+    },
+    {
+      "name": "Bill Pulice",
+      "video_count": 1
+    },
+    {
+      "name": "Nancy Ellis (probable)",
+      "video_count": 1
+    },
+    {
+      "name": "Jim Jamison (members\u2019 pronunciation \u201cJameson\u201d)",
+      "video_count": 1
+    },
+    {
+      "name": "Raymond Pizzillo",
+      "video_count": 1
+    },
+    {
+      "name": "Bobby Farrell",
+      "video_count": 1
+    },
+    {
+      "name": "Ralph Sutton",
+      "video_count": 1
+    },
+    {
+      "name": "Alan Mollohan",
+      "video_count": 1
+    },
+    {
+      "name": "Tom Murray",
+      "video_count": 1
+    },
+    {
+      "name": "Stuart Ball",
+      "video_count": 1
+    },
+    {
+      "name": "Charlie Gladich",
+      "video_count": 1
+    },
+    {
+      "name": "Bob Gordy / Bill Pfeiffer / Bill Gordy",
+      "video_count": 1
+    },
+    {
+      "name": "Various founding members & board (Lloyd Bonasso, Tom Amon, Steve Savodnik, etc.)",
+      "video_count": 1
+    },
+    {
+      "name": "Multiple club members (Raymond Pizzillo, Louie Bonasso, Ralph Sutton, Frank & Mark Oliverio, etc.)",
+      "video_count": 1
+    },
+    {
+      "name": "James LaRosa Sr. (Papa Jim)",
+      "video_count": 1
+    },
+    {
+      "name": "Virgil LaRosa",
+      "video_count": 1
+    },
+    {
+      "name": "James D. LaRosa (James D., JDL)",
+      "video_count": 1
+    },
+    {
+      "name": "Jimmy LaRosa (Jimmy, Jimmy Joe, JJL)",
+      "video_count": 1
+    },
+    {
+      "name": "Keith Sparkman (Sparky)",
+      "video_count": 1
+    },
+    {
+      "name": "Unidentified Glen Elk narrator (likely a LaRosa/Ellis contemporary)",
+      "video_count": 1
+    },
+    {
+      "name": "John and Angie Oliverio",
+      "video_count": 1
+    },
+    {
+      "name": "Louis Rota",
+      "video_count": 1
+    },
+    {
+      "name": "Jack DePue",
+      "video_count": 1
+    },
+    {
+      "name": "Various unnamed construction workers",
+      "video_count": 1
+    },
+    {
+      "name": "Bob Wise",
+      "video_count": 1
+    },
+    {
+      "name": "Kurt (Curt) Byram",
+      "video_count": 1
+    },
+    {
+      "name": "Vance Veazey",
+      "video_count": 1
+    },
+    {
+      "name": "Patrick Damron",
+      "video_count": 1
+    },
+    {
+      "name": "Jon Mills",
+      "video_count": 1
+    },
+    {
+      "name": "Doug Marquette",
+      "video_count": 1
+    },
+    {
+      "name": "John Snider",
+      "video_count": 1
+    },
+    {
+      "name": "Dan Gerkin",
+      "video_count": 1
+    },
+    {
+      "name": "Betty Carver",
+      "video_count": 1
+    },
+    {
+      "name": "Pete Dye Golf Club volunteers",
+      "video_count": 1
+    },
+    {
+      "name": "Keith Sparkman",
+      "video_count": 1
+    },
+    {
+      "name": "Monsignor O\u2019Reilly (\u201cMon Senior\u201d)",
+      "video_count": 1
+    },
+    {
+      "name": "Unidentified older golfer in yellow WV shirt",
+      "video_count": 1
+    },
+    {
+      "name": "Gary\u2019s dogs (Bogey, Rusty, Prince)",
+      "video_count": 1
+    },
+    {
+      "name": "Construction crew (Herb Hasselbacker, Arnold Chewing, Mike Renzelli, Clarence Eagle, Danny Harold, Mark Urso, Roy Randolph, etc.)",
+      "video_count": 1
+    },
+    {
+      "name": "Jim Fazio (from California)",
+      "video_count": 1
+    },
+    {
+      "name": "Unidentified older man in shirt and tie (likely a local dignitary or priest)",
+      "video_count": 1
+    },
+    {
+      "name": "Construction crew (various named workers)",
+      "video_count": 1
+    },
+    {
+      "name": "Raymond (narrator of road/valet sequence)",
+      "video_count": 1
+    },
+    {
+      "name": "Unidentified younger workers (red shirts, camo pants, etc.)",
+      "video_count": 1
+    },
+    {
+      "name": "Unidentified course narrator (likely a LaRosa family member or senior project figure)",
+      "video_count": 1
+    },
+    {
+      "name": "James D. LaRosa (Jim, James D.)",
+      "video_count": 1
+    },
+    {
+      "name": "Bunker / Brutus (Pete\u2019s dog)",
+      "video_count": 1
+    },
+    {
+      "name": "Other dogs (site/family dogs, incl. \u2018Bogey\u2019)",
+      "video_count": 1
+    },
+    {
+      "name": "Unidentified professional narrator (likely Harris Holt or similar)",
+      "video_count": 1
+    },
+    {
+      "name": "Unidentified host / MC",
+      "video_count": 1
+    },
+    {
+      "name": "Unidentified associate in blue cap",
+      "video_count": 1
+    },
+    {
+      "name": "Monsignor O\u2019Reilly",
+      "video_count": 1
+    },
+    {
+      "name": "Jim Fazio",
+      "video_count": 1
+    },
+    {
+      "name": "Unidentified bulldozer and loader operators",
+      "video_count": 1
+    },
+    {
+      "name": "Unidentified labor crew (Arnold Chewing, Mike Renzelli, etc.)",
+      "video_count": 1
+    },
+    {
+      "name": "Bogart, Rusty, Prince, Bogey (dogs)",
+      "video_count": 1
+    },
+    {
+      "name": "Jimmy (Young Jim) LaRosa",
+      "video_count": 1
+    },
+    {
+      "name": "Mike (dozer operator)",
+      "video_count": 1
+    },
+    {
+      "name": "Arnold",
+      "video_count": 1
+    },
+    {
+      "name": "Bill Endress",
+      "video_count": 1
+    },
+    {
+      "name": "John & Angie Oliverio",
+      "video_count": 1
+    },
+    {
+      "name": "Louie Rhoda (Rota)",
+      "video_count": 1
+    },
+    {
+      "name": "Unidentified older narrator (friend of LaRosa / band fiddler)",
+      "video_count": 1
+    },
+    {
+      "name": "Bogart (dog)",
+      "video_count": 1
+    },
+    {
+      "name": "Unidentified bridge crew & crane operators",
+      "video_count": 1
+    },
+    {
+      "name": "John B.N. Gotti",
+      "video_count": 1
+    },
+    {
+      "name": "Gary Davis",
+      "video_count": 1
+    },
+    {
+      "name": "Harris (Holt) \u2013 seeding narrator",
+      "video_count": 1
+    },
+    {
+      "name": "Unidentified construction workers (Mike Ranzelli, Jack Oswald, Jack Dempsey, Larry Reel, Herb, etc.)",
+      "video_count": 1
+    },
+    {
+      "name": "P.B. Dye",
+      "video_count": 1
+    },
+    {
+      "name": "Dick Pasala",
+      "video_count": 1
+    },
+    {
+      "name": "Frank Etterey (Frank Gettery)",
+      "video_count": 1
+    },
+    {
+      "name": "Raymond Brasilla",
+      "video_count": 1
+    },
+    {
+      "name": "Unnamed hospital visitor (likely family or associate)",
+      "video_count": 1
+    },
+    {
+      "name": "Todd Demsey",
+      "video_count": 1
+    },
+    {
+      "name": "Jeff Gove",
+      "video_count": 1
+    },
+    {
+      "name": "Kevin Johnson",
+      "video_count": 1
+    },
+    {
+      "name": "Bill Lunde",
+      "video_count": 1
+    },
+    {
+      "name": "Mark Wurtz",
+      "video_count": 1
+    },
+    {
+      "name": "Steve Runge",
+      "video_count": 1
+    },
+    {
+      "name": "Kraig Kann",
+      "video_count": 1
+    },
+    {
+      "name": "Craig Cann",
+      "video_count": 1
+    },
+    {
+      "name": "Skip Kendall",
+      "video_count": 1
+    },
+    {
+      "name": "Frank Etterie (Frank Gettery)",
+      "video_count": 1
+    },
+    {
+      "name": "Raymond (Raymondo Frazzilio)",
+      "video_count": 1
+    },
+    {
+      "name": "Various construction workers (Mazzee brothers, Larry, Steve Helmig, etc.)",
+      "video_count": 1
+    },
+    {
+      "name": "Gary Davis & Bob Andrew",
+      "video_count": 1
+    },
+    {
+      "name": "Anthony Ellis",
+      "video_count": 1
+    },
+    {
+      "name": "Drew Pearson",
+      "video_count": 1
+    },
+    {
+      "name": "Ed Fuseman (Fiefman)",
+      "video_count": 1
+    },
+    {
+      "name": "John Angotti",
+      "video_count": 1
+    },
+    {
+      "name": "James J. (Jimmy) LaRosa",
+      "video_count": 1
+    },
+    {
+      "name": "Unidentified professional narrator",
+      "video_count": 1
+    },
+    {
+      "name": "Course routing demonstrator (off\u2011screen)",
+      "video_count": 1
+    }
+  ]
+}
