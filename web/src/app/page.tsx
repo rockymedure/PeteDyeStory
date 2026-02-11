@@ -319,16 +319,6 @@ export default async function Home() {
                                   : analysis.content_type}
                               </span>
                             )}
-                            {chapterCount > 0 && (
-                              <span className="font-mono text-[9px] sm:text-[10px] text-[var(--text-muted)] tracking-wide">
-                                {chapterCount} chapters
-                              </span>
-                            )}
-                            {quoteCount > 0 && (
-                              <span className="font-mono text-[9px] sm:text-[10px] text-[var(--text-muted)] tracking-wide">
-                                {quoteCount} quotes
-                              </span>
-                            )}
                           </div>
 
                           {/* Character tags */}
