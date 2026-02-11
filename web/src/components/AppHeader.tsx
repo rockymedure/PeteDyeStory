@@ -36,7 +36,7 @@ export default function AppHeader({
         <div className="flex items-center gap-3 min-w-0">
           {left ?? (
             <span className="font-mono text-[9px] sm:text-xs tracking-widest uppercase text-[var(--text-muted)] truncate">
-              Pete Dye Golf Club Project
+              Pete Dye Project
             </span>
           )}
         </div>

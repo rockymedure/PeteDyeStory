@@ -15,7 +15,7 @@ const ibmPlexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Pete Dye — A Documentary",
+  title: "Pete Dye Project",
   description: "He designed over 100 legendary golf courses. He put his name on one.",
 };
 
