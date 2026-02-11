@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import AppHeader from '@/components/AppHeader';
+import ClipCarousel from '@/components/ClipCarousel';
+import { supabase } from '@/lib/supabase';
 import characterProfiles from '@/data/characterProfiles.json';
 
 /* ─── Types ─────────────────────────────────────────────────────────────── */
@@ -82,6 +84,30 @@ export default async function CharacterDetailPage({
   if (!character) notFound();
 
   const totalAppearances = character.appearances.length;
+
+  // Fetch all videos + clips from Supabase so we can show clip carousels per appearance
+  const { data: videosData } = await supabase.from('videos').select('id, filename, title');
+  const { data: clipsData } = await supabase.from('clips').select('*, videos(filename)');
+
+  // Build a map: video directory name -> clips
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const clipsByVideoDir: Record<string, any[]> = {};
+  if (videosData && clipsData) {
+    const videoIdToDir: Record<string, string> = {};
+    for (const v of videosData as { id: string; filename: string }[]) {
+      videoIdToDir[v.id] = v.filename;
+    }
+    for (const clip of clipsData as { video_id: string; videos: { filename: string } | null; [key: string]: unknown }[]) {
+      const dir = videoIdToDir[clip.video_id];
+      if (dir) {
+        if (!clipsByVideoDir[dir]) clipsByVideoDir[dir] = [];
+        clipsByVideoDir[dir].push({
+          ...clip,
+          video: clip.videos ? { filename: clip.videos.filename } : undefined,
+        });
+      }
+    }
+  }
 
   return (
     <main className="min-h-screen relative">
@@ -197,6 +223,27 @@ export default async function CharacterDetailPage({
                     {appearance.description}
                   </p>
                 )}
+
+                {/* Clip carousel for this video */}
+                {(() => {
+                  // Match appearance.video to Supabase video directory names
+                  const videoDir = appearance.video;
+                  const matchedClips = clipsByVideoDir[videoDir]
+                    || Object.entries(clipsByVideoDir).find(([key]) =>
+                      key.toLowerCase().includes(videoDir.toLowerCase().slice(0, 20)) ||
+                      videoDir.toLowerCase().includes(key.toLowerCase().slice(0, 20))
+                    )?.[1]
+                    || [];
+                  
+                  if (matchedClips.length > 0) {
+                    return (
+                      <div className="mt-4 -mx-5 sm:-mx-6">
+                        <ClipCarousel clips={matchedClips as any} />
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
 
                 {/* Quotes */}
                 {appearance.quotes.length > 0 && (
