@@ -16,6 +16,10 @@ interface VideoPlayerProps {
   currentIndex: number;
   onClose: () => void;
   onNavigate: (index: number) => void;
+  onPrevTape?: () => void;
+  onNextTape?: () => void;
+  prevTapeLabel?: string;
+  nextTapeLabel?: string;
 }
 
 function formatDuration(seconds: number | null | undefined): string {
@@ -32,7 +36,7 @@ function downloadFilename(clip: ClipWithVideo): string {
   return `${safe}.mp4`;
 }
 
-export default function VideoPlayer({ clip, clips, currentIndex, onClose, onNavigate }: VideoPlayerProps) {
+export default function VideoPlayer({ clip, clips, currentIndex, onClose, onNavigate, onPrevTape, onNextTape, prevTapeLabel, nextTapeLabel }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const clipPath = resolveClipUrl(clip);
   
@@ -76,6 +80,14 @@ export default function VideoPlayer({ clip, clips, currentIndex, onClose, onNavi
         case 'ArrowRight':
           handleNext();
           break;
+        case 'ArrowUp':
+          e.preventDefault();
+          if (onPrevTape) onPrevTape();
+          break;
+        case 'ArrowDown':
+          e.preventDefault();
+          if (onNextTape) onNextTape();
+          break;
         case ' ':
           e.preventDefault();
           if (videoRef.current) {
@@ -99,7 +111,7 @@ export default function VideoPlayer({ clip, clips, currentIndex, onClose, onNavi
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleClose, handlePrev, handleNext, clip, clipPath]);
+  }, [handleClose, handlePrev, handleNext, onPrevTape, onNextTape, clip, clipPath]);
 
   // Auto-advance to next video when current ends
   const handleEnded = () => {
@@ -251,9 +263,38 @@ export default function VideoPlayer({ clip, clips, currentIndex, onClose, onNavi
             )}
           </div>
           
+          {/* Tape navigation hints */}
+          {(onPrevTape || onNextTape) && (
+            <div className="flex items-center gap-4 mt-3">
+              {onPrevTape && prevTapeLabel && (
+                <button
+                  onClick={onPrevTape}
+                  className="pointer-events-auto flex items-center gap-1.5 text-white/40 hover:text-white/70 transition-colors"
+                >
+                  <svg className="w-3 h-3 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                  <span className="font-mono text-[10px] tracking-wider uppercase line-clamp-1 max-w-[200px]">{prevTapeLabel}</span>
+                </button>
+              )}
+              {onNextTape && nextTapeLabel && (
+                <button
+                  onClick={onNextTape}
+                  className="pointer-events-auto flex items-center gap-1.5 text-white/40 hover:text-white/70 transition-colors"
+                >
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                  <span className="font-mono text-[10px] tracking-wider uppercase line-clamp-1 max-w-[200px]">{nextTapeLabel}</span>
+                </button>
+              )}
+            </div>
+          )}
+
           {/* Keyboard hints — hidden on touch/mobile */}
-          <div className="hidden sm:flex items-center gap-4 mt-3 sm:mt-4 text-white/30 text-[10px] font-mono tracking-wider">
-            <span>← → Navigate</span>
+          <div className="hidden sm:flex items-center gap-4 mt-2 sm:mt-3 text-white/30 text-[10px] font-mono tracking-wider">
+            <span>← → Clips</span>
+            {(onPrevTape || onNextTape) && <span>↑ ↓ Tapes</span>}
             <span>Space Pause</span>
             <span>D Download</span>
             <span>Esc Close</span>

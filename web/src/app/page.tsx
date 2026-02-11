@@ -2,7 +2,7 @@ import { supabase } from '@/lib/supabase';
 import { unstable_cache } from 'next/cache';
 import type { Clip } from '@/lib/types';
 import Link from 'next/link';
-import ClipCarousel from '@/components/ClipCarousel';
+import TapePlayer from '@/components/TapePlayer';
 import AppHeader from '@/components/AppHeader';
 import videoAnalyses from '@/data/videoAnalyses.json';
 
@@ -254,6 +254,24 @@ export default async function Home() {
       </section>
 
       {/* ── Categories ──────────────────────────────────────────────────── */}
+      {(() => {
+        // Build a flat ordered list of all tapes for cross-tape navigation
+        const allTapes = orderedCategories.flatMap((cat) =>
+          (categories[cat] ?? []).map((video) => ({
+            videoId: video.id,
+            title: getAnalysis(video)?.title || video.title || video.filename.replace(/_/g, ' '),
+            clips: video.clips,
+          }))
+        );
+        // Deduplicate (videos can appear in multiple categories like "Featuring Pete Dye")
+        const seen = new Set<string>();
+        const uniqueTapes = allTapes.filter((t) => {
+          if (seen.has(t.videoId)) return false;
+          seen.add(t.videoId);
+          return true;
+        });
+
+        return (
       <section className="px-4 pb-16 sm:px-6 sm:pb-24">
         <div className="max-w-6xl mx-auto space-y-10 sm:space-y-16">
           {orderedCategories.map((categoryName) => {
@@ -351,7 +369,10 @@ export default async function Home() {
                           )}
                         </div>
 
-                        <ClipCarousel clips={video.clips} />
+                        <TapePlayer
+                          tapes={uniqueTapes}
+                          tapeIndex={uniqueTapes.findIndex((t) => t.videoId === video.id)}
+                        />
                       </article>
                     );
                   })}
@@ -361,6 +382,8 @@ export default async function Home() {
           })}
         </div>
       </section>
+        );
+      })()}
 
       {/* ── Footer ──────────────────────────────────────────────────────── */}
       <footer className="border-t border-[var(--border-subtle)] px-4 py-6 sm:px-6 sm:py-8">
