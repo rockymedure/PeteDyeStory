@@ -38,26 +38,34 @@ interface VideoAnalysis {
 
 const analyses = videoAnalyses as Record<string, VideoAnalysis>;
 
-function getAnalysis(video: Video): VideoAnalysis | null {
+function getAnalysisWithKey(video: Video): { analysis: VideoAnalysis; key: string } | null {
   const dirName = (video.filename || '')
     .replace(/\.mp4$/i, '')
     .replace(/[^\w\-]/g, '_')
     .replace(/_+/g, '_');
 
-  if (analyses[dirName]) return analyses[dirName];
+  if (analyses[dirName]) return { analysis: analyses[dirName], key: dirName };
 
   for (const [key, val] of Object.entries(analyses)) {
     if (
       key.toLowerCase().includes(dirName.toLowerCase().slice(0, 20)) ||
       dirName.toLowerCase().includes(key.toLowerCase().slice(0, 20))
     ) {
-      return val;
+      return { analysis: val, key };
     }
   }
   return null;
 }
 
+function getAnalysis(video: Video): VideoAnalysis | null {
+  return getAnalysisWithKey(video)?.analysis ?? null;
+}
+
 function getSlug(video: Video): string {
+  // Use the actual analysis key (which matches pre-rendered pages) when available
+  const match = getAnalysisWithKey(video);
+  if (match) return match.key;
+  // Fallback for videos without analysis
   return (video.filename || '')
     .replace(/\.mp4$/i, '')
     .replace(/[^\w\-]/g, '_')

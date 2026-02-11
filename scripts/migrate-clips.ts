@@ -44,17 +44,39 @@ function getActsForVideo(videoDir: string): number[] {
 
 interface VideoAnalysis {
   video_analysis: {
-    synthesis_text: string;
-    total_segments: number;
-    total_duration_minutes: number;
+    // New structured format (GPT-5.1)
+    title?: string;
+    content_type?: string;
+    summary?: string;
+    characters?: Array<{ name: string; role: string; description: string; is_speaking: boolean }>;
+    chapters?: Array<{ title: string; start_time: string; end_time: string; summary: string; characters_present: string[] }>;
+    highlights?: Array<{ title: string; timestamp: string; description: string; emotional_tone: string; characters_involved: string[] }>;
+    quotes?: Array<{ text: string; speaker: string; timestamp: string; context: string }>;
+    themes?: string[];
+    // Old format fallback
+    synthesis_text?: string;
+    total_segments?: number;
+    total_duration_minutes?: number;
   };
   raw_segments?: Array<{
     segment_id: number;
     timestamp_range: string;
   }>;
   processing_metadata?: {
-    processing_time_seconds: number;
+    processing_time_seconds?: number;
+    total_processing_time_minutes?: number;
   };
+}
+
+function sanitizeFilename(name: string): string {
+  return name
+    .replace(/\u2011/g, '-').replace(/\u2013/g, '-').replace(/\u2014/g, '-')
+    .replace(/'/g, '').replace(/"/g, '').replace(/\u2019/g, '')
+    .replace(/&/g, 'and')
+    .replace(/[^a-zA-Z0-9_\-]/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+    .substring(0, 60);
 }
 
 async function getActIds(): Promise<Record<number, string>> {
@@ -167,15 +189,29 @@ async function main() {
     // Parse analysis (may not exist)
     const analysis = fs.existsSync(analysisPath) ? parseAnalysis(analysisPath) : null;
     
-    // Extract video metadata
+    // Extract video metadata - prefer new structured format, fall back to old
+    let videoTitle = videoDir.replace(/_/g, ' ').replace(/-/g, ' - ');
     let summary = '';
     let characters: string[] = [];
     let durationSeconds = 0;
+    let chapters: object[] = [];
+    let highlights: string[] = [];
     
     if (analysis) {
-      summary = extractSummary(analysis.video_analysis.synthesis_text);
-      characters = extractCharacters(analysis.video_analysis.synthesis_text);
-      durationSeconds = Math.round(analysis.video_analysis.total_duration_minutes * 60);
+      const va = analysis.video_analysis;
+      if (va.title) {
+        // New structured format (GPT-5.1)
+        videoTitle = va.title;
+        summary = va.summary || '';
+        characters = (va.characters || []).map(c => c.name);
+        chapters = va.chapters || [];
+        highlights = (va.highlights || []).map(h => h.title);
+      } else if (va.synthesis_text) {
+        // Old format fallback
+        summary = extractSummary(va.synthesis_text);
+        characters = extractCharacters(va.synthesis_text);
+      }
+      durationSeconds = Math.round((va.total_duration_minutes || analysis.processing_metadata?.total_processing_time_minutes || 0) * 60);
     }
     
     // Determine processing status based on word count
@@ -192,11 +228,13 @@ async function main() {
     const { data: videoData, error: videoError } = await supabase
       .from('videos')
       .upsert({
-        title: videoDir.replace(/_/g, ' ').replace(/-/g, ' - '),
+        title: videoTitle,
         filename: videoDir,
         duration_seconds: durationSeconds,
         summary: summary,
         characters: characters,
+        chapters: chapters as any,
+        highlights: highlights,
         transcript_word_count: wordCount,
         processing_status: status
       }, { onConflict: 'filename' })
@@ -231,7 +269,7 @@ async function main() {
       
       for (const clipFile of clipFiles) {
         const clipName = path.basename(clipFile, '.mp4');
-        const safeFilename = `${videoDir}__${clipName}`;
+        const safeFilename = `${sanitizeFilename(videoDir)}__${sanitizeFilename(clipName)}`;
         
         // Check if optimized clip exists
         const optimizedPath = path.join(WEB_CLIPS_DIR, `${safeFilename}.mp4`);
@@ -250,13 +288,19 @@ async function main() {
           thumbnailPath = await uploadFile(thumbPath, 'thumbnails', `${safeFilename}.jpg`);
         }
         
-        // Insert clip
+        // Insert clip - use descriptive name from chapter title
+        const clipTitle = clipName
+          .replace(/^\d+-/, '')  // Remove leading number
+          .replace(/-/g, ' ')
+          .replace(/\s+/g, ' ')
+          .trim();
+        
         const { error: clipError } = await supabase
           .from('clips')
           .upsert({
             video_id: videoId,
-            title: clipName.replace(/-/g, ' '),
-            filename: clipFile,
+            title: clipTitle || clipName,
+            filename: `${safeFilename}.mp4`,
             storage_path: storagePath,
             thumbnail_path: thumbnailPath,
             sort_order: parseInt(clipName.match(/^(\d+)/)?.[1] || '0')
