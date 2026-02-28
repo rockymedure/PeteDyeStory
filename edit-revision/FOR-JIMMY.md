@@ -1,20 +1,31 @@
 # Where We Are and Where We're Going
 
-Jimmy — Seth's rough cut is strong. The heritage material, the naming scene, and the legacy ending all work. We're not starting over. We're sharpening it.
+Jimmy — what we're prioritizing is the story of how this happened. Not the golf course as it is today. Not the beauty shots. Not the reflections. The story. Beginning to end. How two coal miners convinced the greatest golf architect alive to stake his legacy on an abandoned mine — and then spent 18 years proving he was right to do it.
+
+Seth's rough cut is beautiful, and there's real footage in it we'll use. But it's a portrait of the place, not the story of the place. What we're building is the story — told clearly enough that anyone can follow it, scene by scene, from the scarred land to the bell on 12.
 
 ---
 
-**What we have:** A 29-minute cut that tells the story honestly and has real emotional moments. About 70% of the footage is exactly right.
+## Our approach to footage
 
-**What we're changing:**
+The story comes first. We will not skip a scene or weaken the narrative because we're missing a shot.
 
-The film currently opens like a golf promo — beauty shots, aerials, "heaven in the hills." We're flipping that. It opens on the scarred land, the orange water, the coal. Your grandfather's voice. Then your father. The audience needs to understand what this place *was* before they see what it became. That's what makes the transformation hit.
+- If we have the footage — archival or new — we use it.
+- If we don't, we generate it. AI-assisted video generation, faithful to every detail in the interviews, the banquet tapes, the construction footage, the transcripts, and the family's own accounts. Every generated frame will be grounded in real reference material. Nothing invented. Nothing embellished.
 
-The middle of the film right now says your family faced "every conceivable challenge" for 18 years — but it doesn't show a single one. We're adding the real stories: your father nearly dying from black damp in the mine shaft on 13. Three near-foreclosures. The Storm of the Century burying the back nine. The lake on 15 that leaked twice. The Lupton loan that got rescinded and then saved by a letter. These are the moments that prove this wasn't just a dream — it was a fight. And the footage and interviews to build them are already in the archive.
+The 31 archival videos, 180+ extracted clips, full transcripts, and decades of documentation give us a deep well of reference. Where footage exists, we use it. Where it doesn't, we have everything we need to recreate it faithfully.
 
-**What's missing — and this is the big one:** The bell on 12. The film doesn't have it. Not a frame, not a word. That bell — Pete's father, your father, the three father-son lines that run through this whole story — that's the emotional climax. That's the moment that makes someone who's never played golf in their life want to drive to West Virginia. We need to dig through the Grand Opening and opening-day tapes to find this footage — it's likely buried in the archive somewhere. If it's truly not on any tape, we can recreate the moment visually using the existing archival style and AI-assisted video generation to produce a faithful representation of that morning.
+---
 
-**The closing:** Pete's final line about the property, a drone pulling back over all 18 holes at sunrise, the bell sound, and then white text on black: *"Pete Dye designed over 100 golf courses. He put his name on one."*
+**What's changing in the film:**
+
+The opening flips. No more beauty shots and aerials first. It opens on the scarred land, the orange water, the coal. Your grandfather's voice. Then your father. The audience needs to understand what this place *was* before they see what it became.
+
+The middle of the film right now says your family faced "every conceivable challenge" for 18 years — but it doesn't show a single one. We're adding the real stories: your father nearly dying from black damp in the mine shaft on 13. Three near-foreclosures. The Storm of the Century burying the back nine. The lake on 15 that leaked twice. The Lupton loan that got rescinded and then saved by a letter.
+
+The bell on 12 has to be in the film. It's the emotional climax — Pete ringing a bell in memory of his father, on a course he spent 18 years building with another father and son. We search the archive for it. If it's there, we use it. If it's not, we generate it — faithful to the moment as it's been described by everyone who was there.
+
+The closing: Pete's final line about the property, a drone pulling back over all 18 holes at sunrise, the bell sound, and then white text on black: *"Pete Dye designed over 100 golf courses. He put his name on one."*
 
 ---
 

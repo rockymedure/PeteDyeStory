@@ -388,18 +388,29 @@ This is why it matters to West Virginia. This is why sponsors will care. Not bec
 
 ## FOR SETH: THE SHORT VERSION
 
-You built something real. The heritage section is excellent. Pete naming the club is the emotional highlight. The closing legacy material lands. Here's what needs to change:
+What we're prioritizing is the story of how this happened — scene by scene, beginning to end. The current cut is a beautiful portrait of the golf course as it is today. What we need is the story of how it got there. If someone who's never heard of Pete Dye watches this film, they should be able to tell you exactly what happened, in order, by the time it's over.
+
+Your footage is in this film. The beauty is in this film. But it comes at the end — as the reward — not at the beginning.
+
+### The approach to footage
+
+The story comes first. We will not weaken the narrative because a shot is missing.
+
+- If we have the footage — archival or from your cut — we use it.
+- If we don't, we generate it. AI-assisted video generation, faithful to the interviews, banquet tapes, construction footage, transcripts, and family accounts. Every generated frame grounded in real reference material. Nothing invented.
+
+### What needs to change
 
 1. **Open on devastation, not beauty.** The scarred land, the coal, the ruin. Save the beauty for the end.
 2. **Add 45 seconds of "Who Is Pete Dye?"** before the rejection. The audience needs to know what his name means.
-3. **Expand the middle.** You have 5 minutes of generic struggle. We need 5-7 minutes of specific crises — the near-death, the storms, the money, the lake. The archival is there.
+3. **Expand the middle.** You have 5 minutes of generic struggle. We need 5-7 minutes of specific crises — the near-death, the storms, the money, the lake. If the archival footage exists, we use it. If it doesn't, we generate it faithful to the accounts.
 4. **Move hospitality and gates to the closing.** They're payoff. They don't belong before Opening Day.
 5. **Add Opening Day with dates.** July 4, 1993. 1994. July 4, 1995. Clear supers.
-6. **Add the bell on #12.** This is the climax. Without it, the film has no peak. Find the footage in the archive or we recreate the moment with AI-assisted video generation.
+6. **Add the bell on #12.** This is the climax. Without it, the film has no peak. Search the archive. If the footage exists, use it. If it doesn't, we generate the moment — faithful to every description we have of that morning.
 7. **Rework the closing:** "Our spot" → Pete's final line → drone sunrise → bell → title card.
 8. **Lower thirds.** The audience needs to know who Jimmy is by minute 2.
 
-Everything else you've done is the foundation. This restructure turns a strong teaser into the definitive film.
+Everything else you've done is the foundation. This restructure turns a strong portrait into the definitive story.
 
 ---
 
