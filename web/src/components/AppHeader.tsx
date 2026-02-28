@@ -47,6 +47,7 @@ export default function AppHeader({
             <NavLink href="/characters">Characters</NavLink>
             <NavLink href="/timeline">Timeline</NavLink>
             <NavLink href="/outline">Outline</NavLink>
+            <NavLink href="/review">Review</NavLink>
           </nav>
         </div>
       </div>
