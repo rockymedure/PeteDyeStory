@@ -1,7 +1,7 @@
 # Edit Guide: Pete Dye Golf Club Documentary
 ## Scene-by-Scene Blueprint for the Editor
 
-> **See also: [REVISION-MAP.md](REVISION-MAP.md)** — Maps Seth's existing rough cut (timecodes 00:00–28:55) directly to this scene structure. Start there if you're working from the current "Heaven in the Hills" cut.
+> **See also: [FOR-SETH-REVISION-MAP.md](FOR-SETH-REVISION-MAP.md)** — Maps Seth's existing rough cut (timecodes 00:00–28:55) directly to this scene structure. Start there if you're working from the current "Heaven in the Hills" cut.
 
 **Target Runtime:** 20–25 minutes  
 **Format:** Documentary (interview + archival + drone)  
