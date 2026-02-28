@@ -27,10 +27,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${instrumentSans.variable} ${ibmPlexMono.variable}`}>
-        {/* Scan lines overlay */}
-        <div className="scanlines" aria-hidden="true" />
-        {/* Film grain */}
-        <div className="grain" aria-hidden="true" />
         {children}
       </body>
     </html>
