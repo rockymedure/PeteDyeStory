@@ -200,7 +200,7 @@ Each crisis is 20-40 seconds. Quick. Stacking. The audience should feel the accu
 
 > "I want you to know — this will be the only club named after me."
 
-If it's in the existing interview footage, use it. If not, it needs to come from the banquet tape, a new interview pickup, or a title card. This line is the hinge of the entire film.
+If it's in the existing interview footage, use it. If not, it needs to come from the banquet tape or a title card. This line is the hinge of the entire film.
 
 Also add quick visual context: TPC Sawgrass, Ocean Course, Whistling Straits — *none* of them carry Pete's name. He named a coal mine in West Virginia.
 
@@ -255,8 +255,9 @@ This is the emotional climax of the film. Not a ranking. Not an accolade. A man 
 - `PDGC Opening 7-3-1993` — May contain earlier bell-related material
 
 #### If archival footage doesn't exist:
-- New interview with Jimmy describing the moment in full
-- New footage: close-up of the bell on #12 as it exists today, the bell being rung, the sound captured clean
+- Reconstruct the moment visually using AI-assisted video generation — a faithful recreation matching the archival look and feel: morning light, the bell in close-up, a hand reaching for it, the ring
+- Jimmy's existing interview audio or banquet-tape narration layered over the generated imagery
+- The bell sound itself can be sourced from any existing tape that captures it, or generated clean for the motif
 
 #### Sonic element:
 Third bell tone — full, resonant. Hold it. This is the moment the faint bell from the opening finally resolves.
@@ -333,7 +334,7 @@ Black. Silence. Credits.
 
 | New Material | Scene | Source | Priority |
 |-------------|-------|--------|----------|
-| **Bell on #12** | Scene 9 | `PDGC Grand Opening`, new footage | **#1 — Non-negotiable** |
+| **Bell on #12** | Scene 9 | `PDGC Grand Opening`, opening-day tapes; AI-generated video if archival not found | **#1 — Non-negotiable** |
 | **Who Is Pete Dye?** beat | Scene 3 | Harris Holt narration, Pete interview 7-10-94 | #2 |
 | **Specific crises** (black damp, storm, foreclosures, Lupton, leaking lake) | Scene 6B | Construction tapes, Papa Jim interview, new Jimmy pickup | #3 |
 | **Alice Dye** | Scene 6D | Grand Opening banquet, archival photo | #4 |
@@ -394,7 +395,7 @@ You built something real. The heritage section is excellent. Pete naming the clu
 3. **Expand the middle.** You have 5 minutes of generic struggle. We need 5-7 minutes of specific crises — the near-death, the storms, the money, the lake. The archival is there.
 4. **Move hospitality and gates to the closing.** They're payoff. They don't belong before Opening Day.
 5. **Add Opening Day with dates.** July 4, 1993. 1994. July 4, 1995. Clear supers.
-6. **Add the bell on #12.** This is the climax. Without it, the film has no peak. Find the footage or we'll build it from a new interview and new footage.
+6. **Add the bell on #12.** This is the climax. Without it, the film has no peak. Find the footage in the archive or we recreate the moment with AI-assisted video generation.
 7. **Rework the closing:** "Our spot" → Pete's final line → drone sunrise → bell → title card.
 8. **Lower thirds.** The audience needs to know who Jimmy is by minute 2.
 

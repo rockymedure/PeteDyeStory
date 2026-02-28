@@ -150,7 +150,7 @@ The relationship. Two stubborn men who loved the same piece of ground. Pete burn
 **Source material:**
 - Construction tapes from 1985–1994 (any footage showing weather damage, flooding, bare dirt, stalled progress)
 - `PDGC Construction 8-31-93 thru 7-7-94` — Final push footage
-- **NEW INTERVIEW NEEDED:** Jimmy telling the specific stories — black damp on #13, the Storm of the Century, the lake on #15 leaking twice, the near-foreclosures, the Lupton million-dollar loan
+- Jimmy's existing interviews and banquet-tape audio telling the specific stories — black damp on #13, the Storm of the Century, the lake on #15 leaking twice, the near-foreclosures, the Lupton million-dollar loan. Search all processed transcripts for these references. If specific crisis narration doesn't exist in the archive, reconstruct visually with AI-generated footage over existing VO.
 
 **What I want to see:**  
 Jimmy's voice over construction footage. Not generalities. Specifics.
@@ -182,7 +182,7 @@ Louie's sign-off from the 1994 interview:
 **Source material:**
 - `PDGC Grand Opening` (banquet) — Alice is honored; her critique of the 17th: "Would you like it if somebody else had built it?" [referenced in analysis]
 - Any archival photo of Alice with Pete on site
-- **Jimmy's modern interview or NEW INTERVIEW:** The story of Alice's first visit. Her line: "Pete, if this is designed to be a men's club, you won't finish the course." Pete: "OK, Allie."
+- Jimmy's modern interview or banquet tape for Alice's first visit. Her line: "Pete, if this is designed to be a men's club, you won't finish the course." Pete: "OK, Allie." Search existing transcripts for any reference to Alice.
 
 **What I want to see:**  
 20-30 seconds. One photo of Alice. Jimmy telling the story. Her impact was immediate — forward tees on 10 and 11, the 12th green mound moved, the 17th softened. She changed the course in one visit.
@@ -204,7 +204,7 @@ Jimmy's retelling is the emotional centerpiece. He's already done this well in t
 
 > "I want you to know this will be the only club named after me."
 
-If that line is in the existing interview, use it. If not, it needs to come from somewhere — the banquet tape, a new interview pickup, or a title card.
+If that line is in the existing interview, use it. If not, it needs to come from the banquet tape or a title card.
 
 The audience should understand the weight. TPC Sawgrass. The Ocean Course. Whistling Straits. Teeth of the Dog. He named *none* of them after himself. He named this one. A coal mine in West Virginia built by two miners who kept calling him back.
 
@@ -239,8 +239,7 @@ From the rough cut, the bagpipe footage is powerful. Keep it. But give it a date
 
 **Source material:**
 - `PDGC Grand Opening` — **SEARCH FOR:** footage of Pete at #12 on the morning of July 4, 1995, seeing and ringing the bell. This may be in an unanalyzed section of the tape or in a different opening-day tape.
-- **NEW INTERVIEW (if footage doesn't exist):** Jimmy describing the moment in full — the bell was installed in memory of Pete's father, the man who built Pete's first nine holes at Urbana Country Club. That morning, Pete saw it for the first time and rang it. There wasn't a dry eye.
-- **NEW FOOTAGE NEEDED:** Close-up of the bell on #12 as it exists today. The bell being rung. The sound captured clean for the motif.
+- If archival footage doesn't exist, reconstruct the moment visually using AI-assisted video generation — a faithful recreation matching the archival look and feel: morning light, the bell in close-up, a hand reaching for it, the ring. Layer Jimmy's existing interview audio or banquet-tape narration over the generated imagery. The bell sound itself can be sourced from any existing tape or generated clean for the motif.
 
 **What I want to see:**  
 The father-son thread made explicit. Three fathers. Three sons.
@@ -288,7 +287,7 @@ No lingering. The proof isn't the point. The proof is what makes the improbabili
 
 **Source material:**
 - Drone footage — sunrise pullback over the full 18 holes
-- **NEW FOOTAGE NEEDED:** Drone approaching or orbiting the bell on #12
+- Drone footage of the bell on #12 — use existing drone footage if it covers that area, or generate with AI video if needed
 - Modern interview — the "our spot" line from the younger LaRosa descendant:
 
 > "This land has its way of getting into everybody's bones who walks this property. This golf course is our spot."
@@ -320,8 +319,8 @@ Black. Silence. Credits.
 | 3 | **Pull 1994 interview material** — Pete's design philosophy, "I'll never have a setting like this," Papa Jim handing off to Jimmy, Louie's sign-off | `Interview With Pete Dye 7-10-94` |
 | 4 | **Pull James D. material** — James D. at 91, Glen Elk tour, Gary Grandstaff technical footage | `Papa Jim Interview` |
 | 5 | **Restructure rough cut** — Reorder to follow this scene sequence. Move hospitality/gates material into post-opening or cut. Expand middle with banquet stories and construction B-roll. | Existing rough cut |
-| 6 | **Schedule new interview** — Jimmy on: specific crises (black damp, storms, foreclosures, Lupton), the bell story in full, Alice Dye's visit and impact | One shoot day |
-| 7 | **Schedule new drone** — Bell on #12 close-up, sunrise pullback over full 18, bell being rung for sound capture | One shoot morning |
+| 6 | **Deep-search archival transcripts** — Find crisis stories (black damp, storms, foreclosures, Lupton), the bell story, Alice Dye references across all 31 processed videos | Existing archive |
+| 7 | **AI video generation** — For any gaps where archival footage doesn't exist (bell close-up, bell ringing, drone of #12), generate faithful recreations matching the archival visual style | AI-assisted |
 | 8 | **Add year supers** — 1978, 1982, 1985, 1989, 1993, 1994, 1995 over construction footage | Graphics |
 | 9 | **Add lower thirds** — Jimmy LaRosa, Papa Jim LaRosa, James D. LaRosa, Pete Dye, Alice Dye, Gary Grandstaff, next-generation voices | Graphics |
 | 10 | **Commission score** — Bell motif, something that feels like West Virginia (not generic documentary strings), builds across the film | Composer |
