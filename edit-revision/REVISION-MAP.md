@@ -402,4 +402,8 @@ Everything else you've done is the foundation. This restructure turns a strong t
 
 ---
 
+> **For Jimmy's summary:** See [FOR-JIMMY.md](FOR-JIMMY.md)
+
+---
+
 *Prepared: February 28, 2026*
