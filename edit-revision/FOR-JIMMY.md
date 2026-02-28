@@ -1,45 +1,75 @@
 # Where We Are and Where We're Going
 
-Jimmy — Seth's rough cut is strong. The heritage material, the naming scene, and the legacy ending all work. We're not starting over. We're sharpening it.
+Jimmy — Seth made something beautiful. The footage is gorgeous, the people in it are real, and the love for the place comes through in every frame.
+
+But here's the honest truth: what Seth made is a portrait of the golf course as it exists today. People reflecting on how special it is. Stunning aerials. The beauty of the property. It's a wonderful tribute — but it's not the *story*.
+
+If you handed this cut to someone who's never heard of Pete Dye or the LaRosa family and said "tell me what happened," they couldn't. They'd say: "There's a beautiful golf course in West Virginia and a lot of people love it." They wouldn't be able to tell you *how* it happened. They wouldn't know the order of events. They wouldn't know what went wrong, what almost killed it, or why a man who designed over 100 courses put his name on this one and no other.
+
+The story we need to tell is simple enough that a child could follow it like a picture book. Page by page. Here it is:
 
 ---
 
-**What we have:** A 29-minute cut that tells the story honestly and has real emotional moments. About 70% of the footage is exactly right.
+## The Story — One Page at a Time
 
-**What we're changing:**
+**Page 1.** There was ugly land. Scarred hills, orange water, rusted coal equipment. A place people had given up on.
 
-The film currently opens like a golf promo — beauty shots, aerials, "heaven in the hills." We're flipping that. It opens on the scarred land, the orange water, the coal. Your grandfather's voice. Then your father. The audience needs to understand what this place *was* before they see what it became. That's what makes the transformation hit.
+**Page 2.** A family had worked that land for generations. An Italian immigrant came to West Virginia in 1907. His son became a coal miner, then a builder. That builder — your father — got a wild idea: build a golf course.
 
-The middle of the film right now says your family faced "every conceivable challenge" for 18 years — but it doesn't show a single one. We're adding the real stories: your father nearly dying from black damp in the mine shaft on 13. Three near-foreclosures. The Storm of the Century burying the back nine. The lake on 15 that leaked twice. The Lupton loan that got rescinded and then saved by a letter. These are the moments that prove this wasn't just a dream — it was a fight. And the footage and interviews to build them are already in the archive.
+**Page 3.** He went to the best golf course architect on earth. The man who built the most famous courses in the world. And that man said no. Forget it.
 
-**What's missing — and this is the big one:** The bell on 12. The film doesn't have it. Not a frame, not a word. That bell — Pete's father, your father, the three father-son lines that run through this whole story — that's the emotional climax. That's the moment that makes someone who's never played golf in their life want to drive to West Virginia. We need to dig through the Grand Opening and opening-day tapes to find this footage — it's likely buried in the archive somewhere. If it's truly not on any tape, we can recreate the moment visually using the existing archival style and AI-assisted video generation to produce a faithful representation of that morning.
+**Page 4.** They didn't forget it. They found another piece of land — an abandoned coal mine, the same ground the family had worked. They brought the architect back. He walked it alone for two hours and came out grinning.
 
-**The closing:** Pete's final line about the property, a drone pulling back over all 18 holes at sunrise, the bell sound, and then white text on black: *"Pete Dye designed over 100 golf courses. He put his name on one."*
+**Page 5.** They shook hands. No contract. No lawyers. Just a handshake on torn-up ground. 1978.
 
----
+**Page 6.** Then it got hard. Really hard. For 18 years. Your father nearly died in a mine shaft. They almost lost the money three times. A blizzard buried everything. A lake leaked twice. A million-dollar loan got pulled and then saved by a letter.
 
-## Why This Version Matters for Sponsors
+**Page 7.** Somewhere along the way, the architect said: "Let's call it Pete Dye." Out of over 100 courses, he'd never put his name on one. He put it on this one.
 
-West Virginia tourism, the coal association, economic development — they don't need a golf commercial. They need a story that proves what working-class West Virginians can build when they refuse to quit. Your family's story does that better than anything else in the state.
+**Page 8.** On July 4, they finally opened it. Bagpipes down the first fairway. 18 years. 18 holes.
 
-This version of the film leads with the heritage, the coal, the immigrant roots, and the grit — and then delivers the proof that the whole world validated it. That's what opens doors.
+**Page 9.** That morning, Pete rang a bell they'd hung on the 12th hole — in memory of his father, the man who built Pete's first nine holes. Three fathers. Three sons.
 
----
+**Page 10.** It became one of the best golf courses in America. Top 100 in the country. Members from 27 states and 5 countries. The world validated what two coal miners built.
 
-## The Film in 11 Beats
+**Page 11.** The same ugly land from page 1 — now alive. The family is still there. Five generations deep. The bell is still on the 12th hole.
 
-1. **The Land** — Open on the scarred hills, the coal, the ruin. Your grandfather's voice over the images.
-2. **The Dreamer** — Your father. The builder. The wild idea to put a golf course on coal country.
-3. **The Legend** — 45 seconds on Pete Dye. Sawgrass, Kiawah, Whistling Straits. So the audience knows who said no.
-4. **The Rejection** — "Call it Miracle Mountain — it'll be a miracle if anybody wanted to play it."
-5. **The Second Chance** — The mine at Simpson Creek. Pete walks in with flags, comes out grinning. A handshake. 1978.
-6. **The Long Middle** — 18 years. The partnership, the crises, the team, Alice. This is the guts of it. The section that makes the audience feel what your family endured.
-7. **The Naming** — Pete on the 6th fairway: "The hell with it. Let's call it Pete Dye." And the line that changes everything: "This will be the only club named after me."
-8. **Opening Day** — July 4, 1993. 1994. July 4, 1995. Bagpipes. Two governors. Joe DiMaggio. Your father: "This golf course is my thing in life, it's my labor of love."
-9. **The Bell** — Pete rings the bell on 12 in memory of his father. Three fathers, three sons. The climax.
-10. **The Proof** — Top 100. #2 among 9,000. 474 members, 27 states, 5 countries. Quick. The proof isn't the point — it's what makes the improbability undeniable.
-11. **The Land** — Drone at sunrise over all 18 holes. The same ground, transformed. Bell sound. Title card.
+*Pete Dye designed over 100 golf courses. He put his name on one.*
 
 ---
 
-The film is your family's story. We just want to make sure it hits as hard as it deserves to.
+## What Seth's Cut Has vs. What It Needs
+
+Seth's cut is pages 1–2 and page 10. The heritage at the beginning and the beauty at the end. The bookends.
+
+**What's missing is pages 3 through 9 — the actual story.** The rejection. The second chance. The 18 years of hell. The naming. Opening Day. The bell. Those aren't embellishments. Those are the plot.
+
+Right now the film says "this place is incredible" for 29 minutes. The revised film says "let me tell you how this place became incredible" in 20–25 minutes. That's the difference between a tribute and a story.
+
+---
+
+## What Has to Change
+
+**The opening** flips. No more beauty shots and aerials first. Open on the scarred land, the coal, the ruin. The audience has to feel hopeless about this place before they can feel amazed by it.
+
+**The middle** has to exist. Seth's cut covers 18 years of construction in 5 minutes of generalities — "every conceivable challenge." We need the actual challenges. The black damp. The storms. The foreclosures. The lake. The Lupton loan. These are in the archive. We find them or we build the visuals to match Jimmy's voice telling them.
+
+**The bell on 12** has to be in the film. It's the emotional climax — the moment that ties the three father-son lines together. We search every tape in the archive for Grand Opening morning footage. If it's not on any tape, we recreate it faithfully with AI-assisted video generation, matching the archival look and feel.
+
+**The ending** changes. Not a montage of people saying nice things. Pete's final line about the property, a drone pulling back over all 18 at sunrise, the bell sound, and white text on black: *"Pete Dye designed over 100 golf courses. He put his name on one."*
+
+---
+
+## Why This Version Opens Doors
+
+A film that says "look how beautiful this golf course is" reaches golfers who already know about Pete Dye.
+
+A film that says "two coal miners spent 18 years building something the world said couldn't exist" reaches everyone. West Virginia tourism. The coal heritage organizations. Economic development. Golf media. Festival circuits. People who have never played golf and never will.
+
+That's the film sponsors will fund. Not because it's about a great golf course — because it's the best story of working-class perseverance, immigrant heritage, and family legacy the state has ever produced. And it happens to have been validated by the entire golf world.
+
+The footage Seth shot is in this film. The beauty is in this film. It just comes at the end — as the reward — instead of at the beginning.
+
+---
+
+The film is your family's story. We want to make sure it's told clearly enough that anyone can follow it, and powerfully enough that no one forgets it.
