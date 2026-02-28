@@ -1,10 +1,10 @@
 # The Pete Dye Golf Club Story
 
-Two coal miners. Father and son. Italian immigrants' grandsons from the hills of West Virginia. They had a dream to build a golf course, so they went to the most famous golf course architect on earth — the man behind Sawgrass, Kiawah, Whistling Straits — and he told them to forget it.
+Two coal miners. Father and son. An Italian immigrant's son and grandson from the hills of West Virginia. They had a dream to build a golf course, so they went to the most famous golf course architect on earth — the man behind Sawgrass, Kiawah, Whistling Straits — and he told them to forget it.
 
 They didn't.
 
-They found an abandoned coal mine — the same land their grandparents had worked — and brought him back. He walked it alone for two hours, came out grinning, and said he could build one of the finest inland courses in the country. They shook hands. They didn't even own most of the land yet.
+They found an abandoned coal mine — the same land their family had worked for generations — and brought him back. He walked it alone for two hours, came out grinning, and said he could build one of the finest inland courses in the country. They shook hands. They didn't even own most of the land yet.
 
 It took 18 years. Three near-foreclosures. Thirty inches of snow. A father who nearly died in a mine shaft. A lake that leaked twice. A million-dollar loan that got approved, rescinded, and reinstated because of a letter.
 

@@ -5,11 +5,11 @@
 
 ## The Story
 
-Two coal miners. Father and son. Italian immigrants' grandsons from the hills of West Virginia. They had a dream to build a golf course, so they went to the most famous golf course architect on earth — the man behind Sawgrass, Kiawah, Whistling Straits — and he told them to forget it.
+Two coal miners. Father and son. An Italian immigrant's son and grandson from the hills of West Virginia. They had a dream to build a golf course, so they went to the most famous golf course architect on earth — the man behind Sawgrass, Kiawah, Whistling Straits — and he told them to forget it.
 
 They didn't.
 
-They found an abandoned coal mine — the same land their grandparents had worked — and brought him back. He walked it alone for two hours, came out grinning, and said he could build one of the finest inland courses in the country. They shook hands. They didn't even own most of the land yet.
+They found an abandoned coal mine — the same land their family had worked for generations — and brought him back. He walked it alone for two hours, came out grinning, and said he could build one of the finest inland courses in the country. They shook hands. They didn't even own most of the land yet.
 
 It took 18 years. Three near-foreclosures. Thirty inches of snow. A father who nearly died in a mine shaft. A lake that leaked twice. A million-dollar loan that got approved, rescinded, and reinstated because of a letter.
 
@@ -82,7 +82,7 @@ Golf is an $84 billion industry. Pete Dye is one of the five most recognizable n
 - The most positive coal-heritage story in modern media
 - Coal isn't background — it's the foundation. The immigrant miners aren't extras — they're the heroes
 - The mining scars aren't hidden — Pete Dye insisted they stay, woven into the course as a living museum
-- The family's story begins in the coal mines: James LaRosa Sr. met his wife at Cooks Mine in 1913, on the very land the course now sits
+- The family's story begins in the coal mines: James D. LaRosa met his wife at Cooks Mine in 1913, on the very land the course now sits
 - Honors the industry without tying it to decline
 
 **Themes:** Coal heritage, immigrant story, land transformation, preservation of industrial history, working-class pride
@@ -118,7 +118,7 @@ Golf is an $84 billion industry. Pete Dye is one of the five most recognizable n
 **Role:** Community sponsors  
 **Alignment:**
 - Local pride — the LaRosa family story is a Harrison County story, a Clarksburg story, a north-central WV story
-- The Italian Heritage Festival connection — James D. served on the board; the festival became an ambassador for the club
+- The Italian Heritage Festival connection — Papa Jim served on the board; the festival became an ambassador for the club
 - Community impact: jobs, charities, tourism, state championships hosted
 - This isn't just a golf club — it's a community institution, five generations deep
 
@@ -160,7 +160,7 @@ The film is not a concept. It's a project in advanced production.
 | **Archival video library** | 31 videos (44 GB), 180+ clips extracted, full transcripts |
 | **Modern interviews** | Jimmy LaRosa, family members, club officials — captured |
 | **Drone / beauty footage** | Captured |
-| **Key emotional moments on film** | Pete naming the club, Miracle Mountain rejection, James D. "labor of love," Pete's design philosophy, Papa Jim at 91, Opening Day, Grand Opening banquet with Pete and James D. bantering |
+| **Key emotional moments on film** | Pete naming the club, Miracle Mountain rejection, Papa Jim's "labor of love," Pete's design philosophy, James D. at 91, Opening Day, Grand Opening banquet with Pete and Papa Jim bantering |
 | **Story outline and edit guide** | Complete |
 
 **What's needed to finish:**

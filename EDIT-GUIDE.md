@@ -16,7 +16,7 @@ A single bell tone — the bell on #12, installed in memory of Pete Dye's father
 2. **At the naming scene** (a subtle presence as the stakes become clear)
 3. **As the final sound of the film** (full, resonant, the emotional release)
 
-The bell is the thread that ties three father-son stories together: James Sr. and James D., James D. and Jimmy, Pete and his father.
+The bell is the thread that ties three father-son stories together: James D. and Papa Jim, Papa Jim and Jimmy, Pete and his father.
 
 ---
 
@@ -39,7 +39,7 @@ Then Jimmy's voice — from his modern interview — over the images:
 
 > "My grandfather, James LaRosa — no middle name — fought in both the Italian and American armies, came here, met my grandmother on the property..."
 
-**Cut to:** Papa Jim on camera, at 91, giving his life story:
+**Cut to:** James D. on camera, at 91, giving his life story:
 
 > "I came to this country in 1907... I'm very glad that I love the country, I love the people."
 
@@ -49,17 +49,17 @@ Then Jimmy's voice — from his modern interview — over the images:
 
 ## SCENE 2: THE DREAMER
 **Runtime:** 1:30–2:00  
-**Purpose:** Establish James D. LaRosa — coal miner's son, builder, dreamer.
+**Purpose:** Establish Papa Jim — James D.'s son, coal miner, builder, dreamer.
 
 **Source material:**
 - `Papa Jim Interview` — Glen Elk tour pointing out where James D. was born; the blasting/commercial development sequence (Chapter 4) where Jimmy describes the 3-year hill project
-- `PDGC Grand Opening` (banquet) — James D. calling the course "my labor of love" and "my thing in life" [~00:30:00]
-- Any archival footage of James D. on the construction site in work clothes, pointing, directing equipment, with his dogs
+- `PDGC Grand Opening` (banquet) — Papa Jim calling the course "my labor of love" and "my thing in life" [~00:30:00]
+- Any archival footage of Papa Jim on the construction site in work clothes, pointing, directing equipment, with his dogs
 
 **What I want to see:**  
-A quick portrait of James D.: the buildings he built, the land he moved, his energy. The audience should understand — this man moved earth for a living. He was a coal miner who became a builder. And somewhere in the late '70s, he got a wild idea: build a golf course.
+A quick portrait of Papa Jim: the buildings he built, the land he moved, his energy. The audience should understand — this man moved earth for a living. He was a coal miner's son who became a builder. And somewhere in the late '70s, he got a wild idea: build a golf course.
 
-From the Grand Opening banquet, James D.:
+From the Grand Opening banquet, Papa Jim:
 
 > "This golf course is my thing in life, it's my labor of love, and I don't think that I could have shared it with anybody else in this manner than I have with you."
 
@@ -106,7 +106,7 @@ Jimmy's modern interview: the sting of the rejection. But also the stubbornness 
 **Purpose:** They find the mine. Pete sees something no one else can.
 
 **Source material:**
-- `PDGC Grand Opening` (banquet) — Jimmy's telling of finding the Simpson Creek property on USGS maps, bringing Pete back [Chapter 3 continued; Chapter 6, ~00:27:00–00:31:30]
+- `PDGC Grand Opening` (banquet) — Jimmy and Papa Jim's telling of finding the Simpson Creek property on USGS maps, bringing Pete back [Chapter 3 continued; Chapter 6, ~00:27:00–00:31:30]
 - Early construction footage (any tape from 1982-1988) showing the raw site — gob piles, tipple, derelict machinery
 - `Papa Jim Interview` — Pete on site praising the land [Chapter 11, ~01:12:30]: "I felt like I've worked on this concept in different places around the world, but I've never had a setting like this. I may never have a setting like this."
 - `PDGC Grand Opening` (banquet) — Pete: "When I walked in here and saw this ground, yes, it was all torn up from the coal, but you could see the routing going down and coming back... this will never happen again, has never happened before, will never happen again to me." [~00:36:40]
@@ -133,14 +133,14 @@ This scene has **sub-sections** that intercut with each other. The year supers k
 
 ### 6A: The Partnership
 **Source material:**
-- `PDGC Grand Opening` (banquet) — Pete/James D. banter. The oaks on #2 story [Chapter 4/7, ~00:15:30–00:22:30]. The 18th hole debacle [Chapter 3, ~00:12:00]. Pete: "I never met a man that can't play golf that loves golf as much as Jim LaRosa." [~00:15:10]
-- `Interview With Pete Dye 7-10-94` — Pete: "Am I your assistant, or are you my assistant?" James D.: "No, I'm your assistant, Jim. I'll always be your assistant." [~00:10:05]
-- Any archival of Pete and James D. together on the dirt — walking, arguing, pointing, laughing
+- `PDGC Grand Opening` (banquet) — Pete/Papa Jim banter. The oaks on #2 story [Chapter 4/7, ~00:15:30–00:22:30]. The 18th hole debacle [Chapter 3, ~00:12:00]. Pete: "I never met a man that can't play golf that loves golf as much as Jim LaRosa." [~00:15:10]
+- `Interview With Pete Dye 7-10-94` — Pete: "Am I your assistant, or are you my assistant?" Papa Jim: "No, I'm your assistant, Jim. I'll always be your assistant." [~00:10:05]
+- Any archival of Pete and Papa Jim together on the dirt — walking, arguing, pointing, laughing
 
 **What I want to see:**  
-The relationship. Two stubborn men who loved the same piece of ground. Pete burned the oaks James D. wanted to save. James D. moved the 18th green while Pete was away. Pete made him haul every yard back. And through it all:
+The relationship. Two stubborn men who loved the same piece of ground. Pete burned the oaks Papa Jim wanted to save. Papa Jim moved the 18th green while Pete was away. Pete made him haul every yard back. And through it all:
 
-> "James D. was the toughest, most tenacious, never-give-up son of a gun I ever worked for."
+> "Papa Jim was the toughest, most tenacious, never-give-up son of a gun I ever worked for."
 
 **Year super: 1982**
 
@@ -153,7 +153,7 @@ The relationship. Two stubborn men who loved the same piece of ground. Pete burn
 **What I want to see:**  
 Jimmy's voice over construction footage. Not generalities. Specifics.
 
-- "My father went into the mine shaft on #13 to inspect it. He forgot the golden rule — never enter without ventilation. He collapsed almost instantly. Black damp. Ten minutes unconscious. Most miners don't survive that."
+- "Papa Jim went into the mine shaft on #13 to inspect it. He forgot the golden rule — never enter without ventilation. He collapsed almost instantly. Black damp. Ten minutes unconscious. Most miners don't survive that."
 - "We refinanced at least three times. On at least three occasions it came close to foreclosure."
 - "March 1993. The Storm of the Century. Thirty inches of snow. Then another two feet. The back nine got pushed an entire year."
 - "The lake on fifteen leaked. We drained it, repaired it, refilled it. It leaked again."
@@ -192,7 +192,7 @@ Louie's sign-off from the 1994 interview:
 **Purpose:** The turn of the film. Pete stakes his legacy on this project. Of 100+ courses, this is the only one.
 
 **Source material:**
-- Jimmy's modern interview (already in rough cut, ~17:30–20:00) — The 6th fairway story. "The hell with it. Let's call it Pete Dye."
+- Jimmy's modern interview (already in rough cut, ~17:30–20:00) — The 6th fairway story. Pete and Papa Jim on the fairway. "The hell with it. Let's call it Pete Dye."
 - `PDGC Grand Opening` (banquet) — Any additional telling of this moment
 - Course footage of the 6th hole
 - The clubhouse inscription: "18 of the most exciting and memorable holes I have ever built on one course"
@@ -227,7 +227,7 @@ A clear timeline with date supers:
 - **1994** — Back nine opens.
 - **July 4, 1995** — Grand Opening. Pete and Alice there. Joe DiMaggio. Two governors. Mark Shaw. 18 years, 18 holes.
 
-From the rough cut, the bagpipe footage is powerful. Keep it. But give it a date. Give it context. The audience should know: this man worked for 15 years before a single golfer played a hole.
+From the rough cut, the bagpipe footage is powerful. Keep it. But give it a date. Give it context. The audience should know: Papa Jim worked for 15 years before a single golfer played a hole.
 
 ---
 
@@ -243,8 +243,8 @@ From the rough cut, the bagpipe footage is powerful. Keep it. But give it a date
 **What I want to see:**  
 The father-son thread made explicit. Three fathers. Three sons.
 
-- James LaRosa Sr. (Papa Jim) came to America in 1907. His son James D. dreamed of building a golf course on the land his parents worked.
-- James D. and his son Jimmy spent 18 years refusing to quit.
+- James D. LaRosa came to America in 1907. His son Papa Jim dreamed of building a golf course on the land his family had worked.
+- Papa Jim and his son Jimmy spent 18 years refusing to quit.
 - Pete Dye's father built Pete's first nine holes. A bell on the 12th hole honors that man's memory.
 
 On the morning of the Grand Opening, Pete saw the bell for the first time. He rang it.
@@ -314,14 +314,14 @@ Black. Silence. Credits.
 | Priority | Action | Source |
 |----------|--------|--------|
 | 1 | **Find the bell footage** — search Grand Opening and Opening tapes for Pete at #12 | `PDGC Grand Opening`, `PDGC Opening 7-3-1993` |
-| 2 | **Pull banquet material** — Pete/James D. stories, Miracle Mountain, oaks, 18th hole, "400 trips," "will never happen again," "labor of love" | `PDGC Grand Opening` |
-| 3 | **Pull 1994 interview material** — Pete's design philosophy, "I'll never have a setting like this," James D. handing off to Jimmy, Louie's sign-off | `Interview With Pete Dye 7-10-94` |
-| 4 | **Pull Papa Jim material** — Papa Jim at 91, Glen Elk tour, Gary Grandstaff technical footage | `Papa Jim Interview` |
+| 2 | **Pull banquet material** — Pete/Papa Jim stories, Miracle Mountain, oaks, 18th hole, "400 trips," "will never happen again," "labor of love" | `PDGC Grand Opening` |
+| 3 | **Pull 1994 interview material** — Pete's design philosophy, "I'll never have a setting like this," Papa Jim handing off to Jimmy, Louie's sign-off | `Interview With Pete Dye 7-10-94` |
+| 4 | **Pull James D. material** — James D. at 91, Glen Elk tour, Gary Grandstaff technical footage | `Papa Jim Interview` |
 | 5 | **Restructure rough cut** — Reorder to follow this scene sequence. Move hospitality/gates material into post-opening or cut. Expand middle with banquet stories and construction B-roll. | Existing rough cut |
 | 6 | **Schedule new interview** — Jimmy on: specific crises (black damp, storms, foreclosures, Lupton), the bell story in full, Alice Dye's visit and impact | One shoot day |
 | 7 | **Schedule new drone** — Bell on #12 close-up, sunrise pullback over full 18, bell being rung for sound capture | One shoot morning |
 | 8 | **Add year supers** — 1978, 1982, 1985, 1989, 1993, 1994, 1995 over construction footage | Graphics |
-| 9 | **Add lower thirds** — Jimmy LaRosa, James D. LaRosa, Pete Dye, Papa Jim, Alice Dye, Gary Grandstaff, next-generation voices | Graphics |
+| 9 | **Add lower thirds** — Jimmy LaRosa, Papa Jim LaRosa, James D. LaRosa, Pete Dye, Alice Dye, Gary Grandstaff, next-generation voices | Graphics |
 | 10 | **Commission score** — Bell motif, something that feels like West Virginia (not generic documentary strings), builds across the film | Composer |
 
 ---
