@@ -41,12 +41,12 @@ This version of the film leads with the heritage, the coal, the immigrant roots,
 
 1. **The Land** — Open on the scarred hills, the coal, the ruin. Your grandfather's voice over the images.
 2. **The Dreamer** — Your father. The builder. The wild idea to put a golf course on coal country.
-3. **The Legend** — 45 seconds on Pete Dye. Sawgrass, Kiawah, Whistling Straits. So the audience knows who said no.
+3. **Pete Dye** — 45 seconds. Sawgrass, Kiawah, Whistling Straits. So the audience knows who said no.
 4. **The Rejection** — "Call it Miracle Mountain — it'll be a miracle if anybody wanted to play it."
 5. **The Second Chance** — The mine at Simpson Creek. Pete walks in with flags, comes out grinning. A handshake. 1978.
 6. **The Long Middle** — 18 years. The partnership, the crises, the team, Alice. This is the guts of it. The section that makes the audience feel what your family endured.
 7. **The Naming** — Pete on the 6th fairway: "The hell with it. Let's call it Pete Dye." And the line that changes everything: "This will be the only club named after me."
-8. **Opening Day** — July 4, 1993. 1994. July 4, 1995. Bagpipes. Two governors. Joe DiMaggio. Your father: "This golf course is my thing in life, it's my labor of love."
+8. **Opening Day** — July 4, 1993. 1994. July 4, 1995. Bagpipes. Two governors. Joe DiMaggio.
 9. **The Bell** — Pete rings the bell on 12 in memory of his father. Three fathers, three sons. The climax.
 10. **The Proof** — Top 100. #2 among 9,000. 474 members, 27 states, 5 countries. Quick. The proof isn't the point — it's what makes the improbability undeniable.
 11. **The Land** — Drone at sunrise over all 18 holes. The same ground, transformed. Bell sound. Title card.
