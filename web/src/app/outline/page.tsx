@@ -26,7 +26,7 @@ export default async function OutlinePage() {
               Where We Are and<br />Where We&apos;re Going
             </h1>
             <p className="text-lg text-[var(--text-secondary)] max-w-2xl leading-relaxed">
-              The story we&apos;re telling, the 11 beats, and why this version opens doors.
+              For Jimmy and Seth. The story we&apos;re telling, the 11 beats, and why this version opens doors.
             </p>
           </div>
         </div>
