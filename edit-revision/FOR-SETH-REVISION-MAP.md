@@ -26,11 +26,15 @@ Your footage is in this film. The beauty is in this film. But it comes at the en
 
 ---
 
-## Three Problems with the Current Cut
+## The Problem with the Current Cut
 
-1. **The middle is hollow.** 12:30–17:30 covers 18 years in 5 minutes with zero specific crises. The audience is told these men persevered but never shown why it was hard.
+**It doesn't tell the story.** The cut is a portrait of the golf course as it exists today — beautiful footage, people reflecting on how special the place is. But if you showed it to someone who's never heard of Pete Dye and asked "what happened?", they couldn't tell you. They'd know the place is beautiful and a lot of people love it. They wouldn't know how it got there.
 
-2. **The emotional climax is missing.** The bell on #12 — Pete ringing it on Grand Opening morning in memory of his father — isn't in the cut at all.
+The story — the rejection, the second chance, the 18 years of crises, the naming, the bell — is either missing or buried. Specifically:
+
+1. **The narrative isn't there.** The film doesn't take the audience through what happened, step by step, beginning to end. It reflects on the place instead of telling the story of the place.
+
+2. **The emotional climax is missing entirely.** The bell on #12 — Pete ringing it on Grand Opening morning in memory of his father — isn't in the cut. Not a frame, not a word.
 
 3. **Payoff material is spent too early.** Hospitality (20:00–22:30) and the gates sequence (22:30–25:00) belong after Opening Day, not before.
 
