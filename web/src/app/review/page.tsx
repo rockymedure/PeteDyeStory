@@ -21,25 +21,25 @@ export default async function ReviewPage() {
         <div className="max-w-4xl mx-auto">
           <div className="animate-slide-up">
             <p className="font-mono text-[10px] tracking-[0.3em] text-[var(--rec-red)] uppercase mb-6">
-              Rough Cut Review
+              For Seth
             </p>
             <h1 className="text-4xl md:text-6xl font-semibold tracking-tight text-[var(--text-primary)] mb-4 leading-[1.1]">
-              Heaven in the Hills
+              Revision Map
             </h1>
             <p className="text-lg text-[var(--text-secondary)] max-w-2xl leading-relaxed">
-              Editorial review of Seth&apos;s rough cut compared against the film outline.
-              Act-by-act analysis, key moments checklist, and a prioritized punch list.
+              Scene-by-scene guide from the rough cut to the film we&apos;re making.
+              What to keep, what to move, what to add.
             </p>
 
             <div className="mt-6 flex flex-wrap gap-3">
               <span className="px-3 py-1.5 rounded-full font-mono text-[10px] tracking-widest uppercase border border-[var(--rec-red)]/25 text-[var(--rec-red)] bg-[var(--rec-red)]/10">
-                28:55 runtime
+                11 scenes
               </span>
               <span className="px-3 py-1.5 rounded-full font-mono text-[10px] tracking-widest uppercase border border-[var(--amber)]/25 text-[var(--amber)] bg-[var(--amber)]/10">
-                10 action items
+                8 changes
               </span>
               <span className="px-3 py-1.5 rounded-full font-mono text-[10px] tracking-widest uppercase border border-[var(--border-visible)] text-[var(--text-muted)]">
-                Feb 27, 2026
+                Feb 28, 2026
               </span>
             </div>
 

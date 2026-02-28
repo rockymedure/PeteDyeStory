@@ -49,13 +49,13 @@ export default async function OutlinePage() {
         <div className="max-w-6xl mx-auto">
           <div className="animate-slide-up">
             <p className="font-mono text-[10px] tracking-[0.3em] text-[var(--amber)] uppercase mb-6">
-              Film Outline
+              For Jimmy
             </p>
             <h1 className="text-4xl md:text-6xl font-semibold tracking-tight text-[var(--text-primary)] mb-4 leading-[1.1]">
-              Story spine + source footage
+              Where We Are and<br />Where We&apos;re Going
             </h1>
             <p className="text-lg text-[var(--text-secondary)] max-w-2xl leading-relaxed">
-              Read the producer outline and jump straight into the clips that support each act.
+              The story we&apos;re telling, the 11 beats, and why this version opens doors.
             </p>
 
             {acts.length > 0 && (
