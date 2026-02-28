@@ -1,4 +1,5 @@
 import AppHeader from '@/components/AppHeader';
+import ReviewDownloads from '@/components/ReviewDownloads';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { readFile } from 'node:fs/promises';
@@ -30,7 +31,7 @@ export default async function ReviewPage() {
               Act-by-act analysis, key moments checklist, and a prioritized punch list.
             </p>
 
-            <div className="mt-8 flex flex-wrap gap-3">
+            <div className="mt-6 flex flex-wrap gap-3">
               <span className="px-3 py-1.5 rounded-full font-mono text-[10px] tracking-widest uppercase border border-[var(--rec-red)]/25 text-[var(--rec-red)] bg-[var(--rec-red)]/10">
                 28:55 runtime
               </span>
@@ -40,6 +41,13 @@ export default async function ReviewPage() {
               <span className="px-3 py-1.5 rounded-full font-mono text-[10px] tracking-widest uppercase border border-[var(--border-visible)] text-[var(--text-muted)]">
                 Feb 27, 2026
               </span>
+            </div>
+
+            <div className="mt-6">
+              <p className="font-mono text-[10px] tracking-[0.2em] text-[var(--text-muted)] uppercase mb-3">
+                Download
+              </p>
+              <ReviewDownloads />
             </div>
           </div>
         </div>
