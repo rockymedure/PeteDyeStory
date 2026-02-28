@@ -6,33 +6,33 @@ But here's the honest truth: what Seth made is a portrait of the golf course as 
 
 If you handed this cut to someone who's never heard of Pete Dye or the LaRosa family and said "tell me what happened," they couldn't. They'd say: "There's a beautiful golf course in West Virginia and a lot of people love it." They wouldn't be able to tell you *how* it happened. They wouldn't know the order of events. They wouldn't know what went wrong, what almost killed it, or why a man who designed over 100 courses put his name on this one and no other.
 
-The story we need to tell is simple enough that a child could follow it like a picture book. Page by page. Here it is:
+The story we need to tell is simple enough that a child could follow it scene by scene. Here it is:
 
 ---
 
-## The Story — One Page at a Time
+## The Story — Scene by Scene
 
-**Page 1.** There was ugly land. Scarred hills, orange water, rusted coal equipment. A place people had given up on.
+**Scene 1.** There was ugly land. Scarred hills, orange water, rusted coal equipment. A place people had given up on.
 
-**Page 2.** A family had worked that land for generations. An Italian immigrant came to West Virginia in 1907. His son became a coal miner, then a builder. That builder — your father — got a wild idea: build a golf course.
+**Scene 2.** A family had worked that land for generations. An Italian immigrant came to West Virginia in 1907. His son became a coal miner, then a builder. That builder — your father — got a wild idea: build a golf course.
 
-**Page 3.** He went to the best golf course architect on earth. The man who built the most famous courses in the world. And that man said no. Forget it.
+**Scene 3.** He went to the best golf course architect on earth. The man who built the most famous courses in the world. And that man said no. Forget it.
 
-**Page 4.** They didn't forget it. They found another piece of land — an abandoned coal mine, the same ground the family had worked. They brought the architect back. He walked it alone for two hours and came out grinning.
+**Scene 4.** They didn't forget it. They found another piece of land — an abandoned coal mine, the same ground the family had worked. They brought the architect back. He walked it alone for two hours and came out grinning.
 
-**Page 5.** They shook hands. No contract. No lawyers. Just a handshake on torn-up ground. 1978.
+**Scene 5.** They shook hands. No contract. No lawyers. Just a handshake on torn-up ground. 1978.
 
-**Page 6.** Then it got hard. Really hard. For 18 years. Your father nearly died in a mine shaft. They almost lost the money three times. A blizzard buried everything. A lake leaked twice. A million-dollar loan got pulled and then saved by a letter.
+**Scene 6.** Then it got hard. Really hard. For 18 years. Your father nearly died in a mine shaft. They almost lost the money three times. A blizzard buried everything. A lake leaked twice. A million-dollar loan got pulled and then saved by a letter.
 
-**Page 7.** Somewhere along the way, the architect said: "Let's call it Pete Dye." Out of over 100 courses, he'd never put his name on one. He put it on this one.
+**Scene 7.** Somewhere along the way, the architect said: "Let's call it Pete Dye." Out of over 100 courses, he'd never put his name on one. He put it on this one.
 
-**Page 8.** On July 4, they finally opened it. Bagpipes down the first fairway. 18 years. 18 holes.
+**Scene 8.** On July 4, they finally opened it. Bagpipes down the first fairway. 18 years. 18 holes.
 
-**Page 9.** That morning, Pete rang a bell they'd hung on the 12th hole — in memory of his father, the man who built Pete's first nine holes. Three fathers. Three sons.
+**Scene 9.** That morning, Pete rang a bell they'd hung on the 12th hole — in memory of his father, the man who built Pete's first nine holes. Three fathers. Three sons.
 
-**Page 10.** It became one of the best golf courses in America. Top 100 in the country. Members from 27 states and 5 countries. The world validated what two coal miners built.
+**Scene 10.** It became one of the best golf courses in America. Top 100 in the country. Members from 27 states and 5 countries. The world validated what two coal miners built.
 
-**Page 11.** The same ugly land from page 1 — now alive. The family is still there. Five generations deep. The bell is still on the 12th hole.
+**Scene 11.** The same ugly land from scene 1 — now alive. The family is still there. Five generations deep. The bell is still on the 12th hole.
 
 *Pete Dye designed over 100 golf courses. He put his name on one.*
 
@@ -40,9 +40,9 @@ The story we need to tell is simple enough that a child could follow it like a p
 
 ## What Seth's Cut Has vs. What It Needs
 
-Seth's cut is pages 1–2 and page 10. The heritage at the beginning and the beauty at the end. The bookends.
+Seth's cut is scenes 1–2 and scene 10. The heritage at the beginning and the beauty at the end. The bookends.
 
-**What's missing is pages 3 through 9 — the actual story.** The rejection. The second chance. The 18 years of hell. The naming. Opening Day. The bell. Those aren't embellishments. Those are the plot.
+**What's missing is scenes 3 through 9 — the actual story.** The rejection. The second chance. The 18 years of hell. The naming. Opening Day. The bell. Those aren't embellishments. Those are the plot.
 
 Right now the film says "this place is incredible" for 29 minutes. The revised film says "let me tell you how this place became incredible" in 20–25 minutes. That's the difference between a tribute and a story.
 
