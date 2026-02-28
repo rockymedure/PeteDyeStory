@@ -20,7 +20,7 @@ export default async function OutlinePage() {
         <div className="max-w-4xl mx-auto">
           <div className="animate-slide-up">
             <p className="font-mono text-[10px] tracking-[0.3em] text-[var(--amber)] uppercase mb-6">
-              For Jimmy
+              Rough Cut Revision
             </p>
             <h1 className="text-4xl md:text-6xl font-semibold tracking-tight text-[var(--text-primary)] mb-4 leading-[1.1]">
               Where We Are and<br />Where We&apos;re Going
