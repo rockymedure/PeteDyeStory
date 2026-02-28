@@ -1,52 +1,23 @@
-import { unstable_cache } from 'next/cache';
-import Link from 'next/link';
-import { supabase } from '@/lib/supabase';
 import AppHeader from '@/components/AppHeader';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
-interface ActRow {
-  id: string;
-  act_number: number;
-  title: string;
-  description: string | null;
-}
-
-const getActs = unstable_cache(
-  async () => {
-    const { data, error } = await supabase
-      .from('acts')
-      .select('id, act_number, title, description')
-      .order('act_number', { ascending: true });
-
-    if (error) throw error;
-    return (data ?? []) as ActRow[];
-  },
-  ['acts-for-outline'],
-  { revalidate: 60 }
-);
-
 async function getOutlineMarkdown() {
   const outlinePath = path.join(process.cwd(), 'src', 'content', 'film-outline.md');
   return readFile(outlinePath, 'utf8');
 }
 
-function actLabel(n: number) {
-  const roman = n === 1 ? 'I' : n === 2 ? 'II' : n === 3 ? 'III' : String(n);
-  return `Act ${roman}`;
-}
-
 export default async function OutlinePage() {
-  const [acts, outlineMd] = await Promise.all([getActs(), getOutlineMarkdown()]);
+  const outlineMd = await getOutlineMarkdown();
 
   return (
     <main className="min-h-screen relative">
       <AppHeader />
 
       <section className="pt-32 pb-10 px-6">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-4xl mx-auto">
           <div className="animate-slide-up">
             <p className="font-mono text-[10px] tracking-[0.3em] text-[var(--amber)] uppercase mb-6">
               For Jimmy
@@ -57,26 +28,12 @@ export default async function OutlinePage() {
             <p className="text-lg text-[var(--text-secondary)] max-w-2xl leading-relaxed">
               The story we&apos;re telling, the 11 beats, and why this version opens doors.
             </p>
-
-            {acts.length > 0 && (
-              <div className="mt-8 flex flex-wrap gap-2">
-                {acts.map((act) => (
-                  <Link
-                    key={act.id}
-                    href={`/acts/${act.id}`}
-                    className="px-3 py-1.5 rounded-full font-mono text-[10px] tracking-widest uppercase border border-[var(--border-subtle)] text-[var(--text-muted)] hover:text-[var(--amber)] hover:border-[var(--border-visible)] transition-colors"
-                  >
-                    {actLabel(act.act_number)} clips
-                  </Link>
-                ))}
-              </div>
-            )}
           </div>
         </div>
       </section>
 
       <section className="px-6 pb-24">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-8 items-start">
+        <div className="max-w-4xl mx-auto">
           <article className="card p-6 md:p-8 overflow-hidden">
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
@@ -95,6 +52,9 @@ export default async function OutlinePage() {
                     className="border-l-2 border-[var(--amber)]/40 pl-4 my-5 text-[var(--text-secondary)] italic"
                     {...props}
                   />
+                ),
+                strong: (props) => (
+                  <strong className="text-[var(--text-primary)] font-semibold" {...props} />
                 ),
                 code: ({ className, children, ...rest }) => {
                   const isInline = !className;
@@ -139,67 +99,8 @@ export default async function OutlinePage() {
               {outlineMd}
             </ReactMarkdown>
           </article>
-
-          <aside className="space-y-6 lg:sticky lg:top-20">
-            <div className="card p-5">
-              <div className="flex items-center gap-3 mb-4">
-                <span className="font-mono text-[10px] tracking-[0.2em] text-[var(--text-muted)] uppercase">
-                  Related clips
-                </span>
-                <span className="flex-1 h-px bg-[var(--border-subtle)]" />
-              </div>
-
-              {acts.length === 0 ? (
-                <p className="text-sm text-[var(--text-muted)]">
-                  No acts found in the database yet.
-                </p>
-              ) : (
-                <div className="space-y-3">
-                  {acts.map((act) => (
-                    <Link
-                      key={act.id}
-                      href={`/acts/${act.id}`}
-                      className="block group"
-                    >
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="min-w-0">
-                          <div className="font-mono text-[10px] tracking-wider text-[var(--text-muted)] uppercase">
-                            {actLabel(act.act_number)}
-                          </div>
-                          <div className="text-[var(--text-primary)] font-medium truncate group-hover:text-[var(--amber)] transition-colors">
-                            {act.title}
-                          </div>
-                        </div>
-                        <span className="font-mono text-[10px] text-[var(--text-muted)] group-hover:text-[var(--amber)] transition-colors">
-                          Open →
-                        </span>
-                      </div>
-                      {act.description && (
-                        <p className="text-sm text-[var(--text-secondary)] mt-2 line-clamp-2">
-                          {act.description}
-                        </p>
-                      )}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="card p-5">
-              <div className="flex items-center gap-3 mb-3">
-                <span className="font-mono text-[10px] tracking-[0.2em] text-[var(--text-muted)] uppercase">
-                  Tip
-                </span>
-                <span className="flex-1 h-px bg-[var(--border-subtle)]" />
-              </div>
-              <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
-                Use the outline to pick a beat, then jump into the act page to audition clips quickly in the player.
-              </p>
-            </div>
-          </aside>
         </div>
       </section>
     </main>
   );
 }
-
